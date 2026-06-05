@@ -1,0 +1,1642 @@
+# dist_gemm_base_schedule.hpp — Code Analysis / 代码分析
+
+## Source / 源文件
+- `include/cutlass/experimental/distributed/schedules/dist_gemm_base_schedule.hpp`
+
+## Purpose / 作用
+- EN: This header is introduced by the summary "and/or other materials provided with the distribution." and defines related CUTLASS facilities in `include/cutlass/experimental/distributed/schedules/dist_gemm_base_schedule.hpp`.
+- CN: 该头文件以注释摘要“and/or other materials provided with the distribution.”引入，并在 `include/cutlass/experimental/distributed/schedules/dist_gemm_base_schedule.hpp` 中定义相关的 CUTLASS 接口。
+
+## Line-by-Line Analysis / 逐行分析
+- **L1**: <code>/***************************************************************************************************</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L2**: <code> * Copyright (c) 2024 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L3**: <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L4**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L5**: <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L6**: <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L7**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L8**: <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L9**: <code> * list of conditions and the following disclaimer.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L10**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L11**: <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L12**: <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L13**: <code> * and/or other materials provided with the distribution.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L14**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L15**: <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L16**: <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L17**: <code> * this software without specific prior written permission.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L18**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L19**: <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L20**: <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L21**: <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L22**: <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L23**: <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L24**: <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L25**: <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L26**: <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L27**: <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L28**: <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L29**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L30**: <code> **************************************************************************************************/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L31**: <code>/*!</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L32**: <code>  \file Base Schedule for Distributed GEMM</code>
+  - EN: Doxygen file tag indicating that the comment documents the whole file.
+  - CN: Doxygen 文件标签，说明该注释用于描述整个文件。
+- **L33**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L34**: <code>  Templates Distributed GEMM schedules so that they can be expressed as a set of CuTe primitives and</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L35**: <code>  other static values.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L36**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L37**: <code>  NOTE: This API is __experimental__ and will change heavily over time. Particularly the use of</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L38**: <code>  CuTe layouts as integer functions in defining iteration-to-tile mappings is over-expressive and</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L39**: <code>  leaves plenty of room for incorrect/unexpected behavior.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L40**: <code>  Please proceed with caution when modifying these schedules or defining new ones.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L41**: <code>*/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L42**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L43**: <code>#pragma once</code>
+  - EN: Ensures the header is included only once per translation unit.
+  - CN: 确保该头文件在每个编译单元中只被包含一次。
+- **L44**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L45**: <code>#include &quot;cute/layout.hpp&quot;</code>
+  - EN: Includes "cute/layout.hpp" so this file can use declarations from that dependency.
+  - CN: 包含 "cute/layout.hpp"，以便本文件使用该依赖中的声明。
+- **L46**: <code>#include &quot;cute/tensor.hpp&quot;</code>
+  - EN: Includes "cute/tensor.hpp" so this file can use declarations from that dependency.
+  - CN: 包含 "cute/tensor.hpp"，以便本文件使用该依赖中的声明。
+- **L47**: <code>#include &quot;cutlass/cutlass.h&quot;</code>
+  - EN: Includes "cutlass/cutlass.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/cutlass.h"，以便本文件使用该依赖中的声明。
+- **L48**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L49**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L50**: <code>///////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L51**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L52**: <code>namespace cutlass::distributed::schedules {</code>
+  - EN: Opens namespace `cutlass::distributed::schedules` to scope the following declarations.
+  - CN: 打开命名空间 `cutlass::distributed::schedules`，为后续声明提供作用域。
+- **L53**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L54**: <code>/*</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L55**: <code> * Distributed GEMM schedules define exactly how operand tensors are tiled and sliced across </code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L56**: <code> * processors (GPUs) and stages/iterations.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L57**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L58**: <code> * BaseSchedule&#x27;s role is to ease the implementation of arbitrary Distributed GEMM schedules</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L59**: <code> * and reduce code repetition, simply by reducing the implementation to CuTe primitives and a few</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L60**: <code> * other static values (buffer sizes, whether tensors are rotated using memcpies or not, and the</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L61**: <code> * like.)</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L62**: <code> */</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L63**: <code>template &lt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L64**: <code>  class TP_,                      // CuTe constant defining the number of processors / GPUs / TP value</code>
+  - EN: Declares or defines the class `TP_`.
+  - CN: 声明或定义 class `TP_`。
+- **L65**: <code>  class ProcessorTiler_,          // CuTe tiler defining how fully materialized tensors are sharded across devices</code>
+  - EN: Declares or defines the class `ProcessorTiler_`.
+  - CN: 声明或定义 class `ProcessorTiler_`。
+- **L66**: <code>  class IterationTiler_,          // CuTe tiler defining how local tensors are tiled across stages/iterations</code>
+  - EN: Declares or defines the class `IterationTiler_`.
+  - CN: 声明或定义 class `IterationTiler_`。
+- **L67**: <code>  class PeerDeviceMapping_,       // CuTe layout mapping device index and stage/iteration to the device&#x27;s peer index for that stage/iteration</code>
+  - EN: Declares or defines the class `PeerDeviceMapping_`.
+  - CN: 声明或定义 class `PeerDeviceMapping_`。
+- **L68**: <code>  class IterationMappingM_,       // CuTe layout mapping device index and stage/iteration to M tile index</code>
+  - EN: Declares or defines the class `IterationMappingM_`.
+  - CN: 声明或定义 class `IterationMappingM_`。
+- **L69**: <code>  class IterationMappingN_,       // CuTe layout mapping device index and stage/iteration to N tile index</code>
+  - EN: Declares or defines the class `IterationMappingN_`.
+  - CN: 声明或定义 class `IterationMappingN_`。
+- **L70**: <code>  class IterationMappingK_,       // CuTe layout mapping device index and stage/iteration to K tile index</code>
+  - EN: Declares or defines the class `IterationMappingK_`.
+  - CN: 声明或定义 class `IterationMappingK_`。
+- **L71**: <code>  class IterationMappingL_,       // CuTe layout mapping device index and stage/iteration to L tile index</code>
+  - EN: Declares or defines the class `IterationMappingL_`.
+  - CN: 声明或定义 class `IterationMappingL_`。
+- **L72**: <code>  class ProcessorOffset_,         // Constant offset for processor / GPU index in iteration mapping</code>
+  - EN: Declares or defines the class `ProcessorOffset_`.
+  - CN: 声明或定义 class `ProcessorOffset_`。
+- **L73**: <code>  bool MemcpyA_,                  // Whether tensor A is memcpied</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L74**: <code>  bool MemcpyB_,                  // Whether tensor B is memcpied</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L75**: <code>  bool KernelWritesArrivalFlag_,  // Whether the kernel writes arrival flags (when tensors are directly accessed from peer and not memcpied)</code>
+  - EN: Provides part of the signature or implementation for `flags`.
+  - CN: 提供 `flags` 的签名或实现的一部分。
+- **L76**: <code>  int NumBuffersA_,               // Number of buffers required for tensor A</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L77**: <code>  int NumBuffersB_,               // Number of buffers required for tensor B</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L78**: <code>  int NumBuffersC_,               // Number of buffers required for tensor C</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L79**: <code>  int NumBuffersD_&gt;               // Number of buffers required for tensor D</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L80**: <code>struct BaseSchedule {</code>
+  - EN: Declares or defines the struct `BaseSchedule`.
+  - CN: 声明或定义 struct `BaseSchedule`。
+- **L81**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L82**: <code>  using TP = TP_;</code>
+  - EN: Defines the alias `TP` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `TP`。
+- **L83**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L84**: <code>  static_assert(</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L85**: <code>      cute::is_static&lt;TP&gt;::value &amp;&amp; cute::is_integral&lt;TP&gt;::value &amp;&amp; cute::rank(TP{}) == 1 &amp;&amp; cute::depth(TP{}) == 0,</code>
+  - EN: Starts the definition body for `rank`.
+  - CN: 开始 `rank` 的定义体。
+- **L86**: <code>      &quot;Only integers allowed for TP at this time.&quot;);</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L87**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L88**: <code>  static_assert(cute::rank(ProcessorTiler_{}) == 4, &quot;Expected rank-4 processor tiler.&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L89**: <code>  static_assert(cute::rank(IterationTiler_{}) == 4, &quot;Expected rank-4 iteration tiler.&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L90**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L91**: <code>  static_assert(cute::rank(PeerDeviceMapping_{}) == 2, </code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L92**: <code>      &quot;PeerDeviceMapping must be rank-2 (device_idx, iter)&quot;);</code>
+  - EN: Declares the callable or operator `rank`.
+  - CN: 声明可调用对象或运算符 `rank`。
+- **L93**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L94**: <code>  static_assert(cute::rank(IterationMappingM_{}) == 2, </code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L95**: <code>      &quot;IterationMappingM must be rank-2 (device_idx, iter).&quot;);</code>
+  - EN: Declares the callable or operator `rank`.
+  - CN: 声明可调用对象或运算符 `rank`。
+- **L96**: <code>  static_assert(cute::rank(IterationMappingN_{}) == 2, </code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L97**: <code>      &quot;IterationMappingN must be rank-2 (device_idx, iter).&quot;);</code>
+  - EN: Declares the callable or operator `rank`.
+  - CN: 声明可调用对象或运算符 `rank`。
+- **L98**: <code>  static_assert(cute::rank(IterationMappingK_{}) == 2, </code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L99**: <code>      &quot;IterationMappingK must be rank-2 (device_idx, iter).&quot;);</code>
+  - EN: Declares the callable or operator `rank`.
+  - CN: 声明可调用对象或运算符 `rank`。
+- **L100**: <code>  static_assert(cute::rank(IterationMappingL_{}) == 2, </code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L101**: <code>      &quot;IterationMappingL must be rank-2 (device_idx, iter).&quot;);</code>
+  - EN: Declares the callable or operator `rank`.
+  - CN: 声明可调用对象或运算符 `rank`。
+- **L102**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L103**: <code>  using ProcessorTiler = ProcessorTiler_;</code>
+  - EN: Defines the alias `ProcessorTiler` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `ProcessorTiler`。
+- **L104**: <code>  using IterationTiler = IterationTiler_;</code>
+  - EN: Defines the alias `IterationTiler` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `IterationTiler`。
+- **L105**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L106**: <code>  using PeerDeviceMapping = PeerDeviceMapping_;</code>
+  - EN: Defines the alias `PeerDeviceMapping` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `PeerDeviceMapping`。
+- **L107**: <code>  using IterationMappingM = IterationMappingM_;</code>
+  - EN: Defines the alias `IterationMappingM` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `IterationMappingM`。
+- **L108**: <code>  using IterationMappingN = IterationMappingN_;</code>
+  - EN: Defines the alias `IterationMappingN` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `IterationMappingN`。
+- **L109**: <code>  using IterationMappingK = IterationMappingK_;</code>
+  - EN: Defines the alias `IterationMappingK` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `IterationMappingK`。
+- **L110**: <code>  using IterationMappingL = IterationMappingL_;</code>
+  - EN: Defines the alias `IterationMappingL` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `IterationMappingL`。
+- **L111**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L112**: <code>  using ProcessorOffset = ProcessorOffset_;</code>
+  - EN: Defines the alias `ProcessorOffset` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `ProcessorOffset`。
+- **L113**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L114**: <code>  static constexpr bool KernelWritesArrivalFlag = KernelWritesArrivalFlag_;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L115**: <code>  static constexpr bool MemcpyA = MemcpyA_;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L116**: <code>  static constexpr bool MemcpyB = MemcpyB_;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L117**: <code>  static constexpr bool HasMemcpy = MemcpyA || MemcpyB;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L118**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L119**: <code>  static constexpr int NumBuffersA = NumBuffersA_;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L120**: <code>  static constexpr int NumBuffersB = NumBuffersB_;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L121**: <code>  static constexpr int NumBuffersC = NumBuffersC_;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L122**: <code>  static constexpr int NumBuffersD = NumBuffersD_;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L123**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L124**: <code>  static_assert(</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L125**: <code>      NumBuffersA &gt; 0 ^ </code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L126**: <code>      NumBuffersB &gt; 0 ^ </code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L127**: <code>      NumBuffersC &gt; 0 ^ </code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L128**: <code>      NumBuffersD &gt; 0,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L129**: <code>      &quot;Only one of the ABCD tensors can be buffered!&quot;);</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L130**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L131**: <code>  static constexpr bool BufferedOutput = NumBuffersC &gt; 0 || NumBuffersD &gt; 0;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L132**: <code>  static constexpr bool RemoteC = NumBuffersC == 0 &amp;&amp; NumBuffersD &gt; 0;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L133**: <code>  static constexpr bool RemoteD = NumBuffersD == 0 &amp;&amp; NumBuffersC &gt; 0;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L134**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L135**: <code>  static_assert(not RemoteD, &quot;Remote D is not supported yet.&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L136**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L137**: <code>  // Host-side API: can_implement based on the GLOBAL problem shape</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L138**: <code>  template &lt;typename ProblemShape&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L139**: <code>  static bool</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L140**: <code>  can_implement_global(ProblemShape const&amp; global_problem_shape) {</code>
+  - EN: Starts the definition body for `can_implement_global`.
+  - CN: 开始 `can_implement_global` 的定义体。
+- **L141**: <code>    auto [M, N, K, L] = append&lt;4&gt;(global_problem_shape, 1);</code>
+  - EN: Declares the callable or operator `append`.
+  - CN: 声明可调用对象或运算符 `append`。
+- **L142**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L143**: <code>    auto [ptileM, ptileN, ptileK, ptileL] = ProcessorTiler{};</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L144**: <code>    auto [itileM, itileN, itileK, itileL] = IterationTiler{};</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L145**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L146**: <code>    auto tileM = ptileM * itileM;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L147**: <code>    auto tileN = ptileN * itileN;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L148**: <code>    auto tileK = ptileK * itileK;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L149**: <code>    auto tileL = ptileL * itileL;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L150**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L151**: <code>    return M % tileM == 0 &amp;&amp; N % tileN == 0 &amp;&amp; K % tileK == 0 &amp;&amp; L % tileL == 0;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L152**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L153**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L154**: <code>  template &lt;typename ProblemShape&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L155**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L156**: <code>  static auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L157**: <code>  get_local_gemm_shape(ProblemShape const&amp; global_problem_shape) {</code>
+  - EN: Starts the definition body for `get_local_gemm_shape`.
+  - CN: 开始 `get_local_gemm_shape` 的定义体。
+- **L158**: <code>    auto problem_shape_MNKL = append&lt;4&gt;(global_problem_shape, 1);</code>
+  - EN: Declares the callable or operator `append`.
+  - CN: 声明可调用对象或运算符 `append`。
+- **L159**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L160**: <code>    return shape_div(</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L161**: <code>        shape_div(</code>
+  - EN: Begins or continues the signature/parameter list for `shape_div`.
+  - CN: 开始或继续 `shape_div` 的签名/参数列表。
+- **L162**: <code>          problem_shape_MNKL,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L163**: <code>          ProcessorTiler{}),</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L164**: <code>        IterationTiler{});</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L165**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L166**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L167**: <code>  // Host-side API: determine peers</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L168**: <code>  static auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L169**: <code>  get_peers_for_device(int device_idx) {</code>
+  - EN: Starts the definition body for `get_peers_for_device`.
+  - CN: 开始 `get_peers_for_device` 的定义体。
+- **L170**: <code>    auto left_peer_id = device_idx &gt; 0 ? device_idx - 1 : TP{} - 1;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L171**: <code>    auto right_peer_id = device_idx &lt; TP{} - 1 ? device_idx + 1 : 0;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L172**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L173**: <code>    return cute::make_tuple(left_peer_id, right_peer_id);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L174**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L175**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L176**: <code>  // Determines peer given device index and iteration</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L177**: <code>  static int</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L178**: <code>  get_remote_peer_id(int device_idx, int iteration) {</code>
+  - EN: Starts the definition body for `get_remote_peer_id`.
+  - CN: 开始 `get_remote_peer_id` 的定义体。
+- **L179**: <code>    auto device_iter_to_peer_idx = PeerDeviceMapping{};</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L180**: <code>    auto peer_idx = (</code>
+  - EN: Begins or continues the signature/parameter list for `peer_idx`.
+  - CN: 开始或继续 `peer_idx` 的签名/参数列表。
+- **L181**: <code>      device_iter_to_peer_idx(device_idx + ProcessorOffset{}, iteration) + TP{}</code>
+  - EN: Starts the definition body for `device_iter_to_peer_idx`.
+  - CN: 开始 `device_iter_to_peer_idx` 的定义体。
+- **L182**: <code>    ) % TP{};</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L183**: <code>    return peer_idx;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L184**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L185**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L186**: <code>  // Construct tilers and index mappers for sharding across processors</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L187**: <code>  template &lt;typename Tensor&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L188**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L189**: <code>  static auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L190**: <code>  get_processor_tiler_a(Tensor tensor) {</code>
+  - EN: Starts the definition body for `get_processor_tiler_a`.
+  - CN: 开始 `get_processor_tiler_a` 的定义体。
+- **L191**: <code>    if constexpr (NumBuffersA &gt; 0) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L192**: <code>      return shape_div(tensor.shape(), select&lt;0,2,3&gt;(IterationTiler{}));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L193**: <code>    } else {</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L194**: <code>      return shape_div(tensor.shape(), select&lt;0,2,3&gt;(ProcessorTiler{}));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L195**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L196**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L197**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L198**: <code>  template &lt;typename Tensor&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L199**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L200**: <code>  static auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L201**: <code>  get_processor_tiler_b(Tensor tensor) {</code>
+  - EN: Starts the definition body for `get_processor_tiler_b`.
+  - CN: 开始 `get_processor_tiler_b` 的定义体。
+- **L202**: <code>    if constexpr (NumBuffersB &gt; 0) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L203**: <code>      return shape_div(tensor.shape(), select&lt;1,2,3&gt;(IterationTiler{}));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L204**: <code>    } else {</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L205**: <code>      return shape_div(tensor.shape(), select&lt;1,2,3&gt;(ProcessorTiler{}));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L206**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L207**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L208**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L209**: <code>  template &lt;typename Tensor&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L210**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L211**: <code>  static auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L212**: <code>  get_processor_tiler_c(Tensor tensor) {</code>
+  - EN: Starts the definition body for `get_processor_tiler_c`.
+  - CN: 开始 `get_processor_tiler_c` 的定义体。
+- **L213**: <code>    if constexpr (BufferedOutput) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L214**: <code>      return shape_div(tensor.shape(), select&lt;0,1,3&gt;(IterationTiler{}));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L215**: <code>    } else {</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L216**: <code>      return shape_div(tensor.shape(), select&lt;0,1,3&gt;(ProcessorTiler{}));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L217**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L218**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L219**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L220**: <code>  template &lt;typename Tensor&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L221**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L222**: <code>  static auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L223**: <code>  get_processor_tiler_d(Tensor tensor) {</code>
+  - EN: Starts the definition body for `get_processor_tiler_d`.
+  - CN: 开始 `get_processor_tiler_d` 的定义体。
+- **L224**: <code>    return get_processor_tiler_c(tensor);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L225**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L226**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L227**: <code>  // Construct tilers and index mappers for tiling and iterating on device</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L228**: <code>  template &lt;typename Tensor&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L229**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L230**: <code>  static auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L231**: <code>  get_device_tiler_a(Tensor tensor) {</code>
+  - EN: Starts the definition body for `get_device_tiler_a`.
+  - CN: 开始 `get_device_tiler_a` 的定义体。
+- **L232**: <code>    static_assert(NumBuffersA == 0, &quot;Buffered tensors don&#x27;t have device tilers!&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L233**: <code>    return shape_div(tensor.shape(), select&lt;0,2,3&gt;(IterationTiler{}));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L234**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L235**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L236**: <code>  template &lt;typename Tensor&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L237**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L238**: <code>  static auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L239**: <code>  get_device_tiler_b(Tensor tensor) {</code>
+  - EN: Starts the definition body for `get_device_tiler_b`.
+  - CN: 开始 `get_device_tiler_b` 的定义体。
+- **L240**: <code>    static_assert(NumBuffersB == 0, &quot;Buffered tensors don&#x27;t have device tilers!&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L241**: <code>    return shape_div(tensor.shape(), select&lt;1,2,3&gt;(IterationTiler{}));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L242**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L243**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L244**: <code>  template &lt;typename Tensor&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L245**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L246**: <code>  static auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L247**: <code>  get_device_tiler_c(Tensor tensor) {</code>
+  - EN: Starts the definition body for `get_device_tiler_c`.
+  - CN: 开始 `get_device_tiler_c` 的定义体。
+- **L248**: <code>    static_assert(NumBuffersC == 0 &amp;&amp; NumBuffersD == 0, &quot;Buffered tensors don&#x27;t have device tilers!&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L249**: <code>    return shape_div(tensor.shape(), select&lt;0,1,3&gt;(IterationTiler{}));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L250**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L251**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L252**: <code>  template &lt;typename Tensor&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L253**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L254**: <code>  static auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L255**: <code>  get_device_tiler_d(Tensor tensor) {</code>
+  - EN: Starts the definition body for `get_device_tiler_d`.
+  - CN: 开始 `get_device_tiler_d` 的定义体。
+- **L256**: <code>    static_assert(NumBuffersC == 0 &amp;&amp; NumBuffersD == 0, &quot;Buffered tensors don&#x27;t have device tilers!&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L257**: <code>    return shape_div(tensor.shape(), select&lt;0,1,3&gt;(IterationTiler{}));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L258**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L259**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L260**: <code>  // Map device index and iteration to tile coordinate</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L261**: <code>  // Must be implemented by children for now.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L262**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L263**: <code>  static auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L264**: <code>  get_device_tile_idx_a(int device_idx, int iteration) {</code>
+  - EN: Starts the definition body for `get_device_tile_idx_a`.
+  - CN: 开始 `get_device_tile_idx_a` 的定义体。
+- **L265**: <code>    auto mapping_m = IterationMappingM{};</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L266**: <code>    auto mapping_k = IterationMappingK{};</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L267**: <code>    auto mapping_l = IterationMappingL{};</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L268**: <code>    auto crd_m = (mapping_m(device_idx + ProcessorOffset{}, iteration) + TP{}) % TP{};</code>
+  - EN: Declares the callable or operator `crd_m`.
+  - CN: 声明可调用对象或运算符 `crd_m`。
+- **L269**: <code>    auto crd_k = (mapping_k(device_idx + ProcessorOffset{}, iteration) + TP{}) % TP{};</code>
+  - EN: Declares the callable or operator `crd_k`.
+  - CN: 声明可调用对象或运算符 `crd_k`。
+- **L270**: <code>    auto crd_l = (mapping_l(device_idx + ProcessorOffset{}, iteration) + TP{}) % TP{};</code>
+  - EN: Declares the callable or operator `crd_l`.
+  - CN: 声明可调用对象或运算符 `crd_l`。
+- **L271**: <code>    return make_coord(crd_m, crd_k, crd_l);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L272**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L273**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L274**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L275**: <code>  static auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L276**: <code>  get_device_tile_idx_b(int device_idx, int iteration) {</code>
+  - EN: Starts the definition body for `get_device_tile_idx_b`.
+  - CN: 开始 `get_device_tile_idx_b` 的定义体。
+- **L277**: <code>    auto mapping_n = IterationMappingN{};</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L278**: <code>    auto mapping_k = IterationMappingK{};</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L279**: <code>    auto mapping_l = IterationMappingL{};</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L280**: <code>    auto crd_n = (mapping_n(device_idx + ProcessorOffset{}, iteration) + TP{}) % TP{};</code>
+  - EN: Declares the callable or operator `crd_n`.
+  - CN: 声明可调用对象或运算符 `crd_n`。
+- **L281**: <code>    auto crd_k = (mapping_k(device_idx + ProcessorOffset{}, iteration) + TP{}) % TP{};</code>
+  - EN: Declares the callable or operator `crd_k`.
+  - CN: 声明可调用对象或运算符 `crd_k`。
+- **L282**: <code>    auto crd_l = (mapping_l(device_idx + ProcessorOffset{}, iteration) + TP{}) % TP{};</code>
+  - EN: Declares the callable or operator `crd_l`.
+  - CN: 声明可调用对象或运算符 `crd_l`。
+- **L283**: <code>    return make_coord(crd_n, crd_k, crd_l);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L284**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L285**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L286**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L287**: <code>  static auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L288**: <code>  get_device_tile_idx_c(int device_idx, int iteration) {</code>
+  - EN: Starts the definition body for `get_device_tile_idx_c`.
+  - CN: 开始 `get_device_tile_idx_c` 的定义体。
+- **L289**: <code>    auto mapping_m = IterationMappingM{};</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L290**: <code>    auto mapping_n = IterationMappingN{};</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L291**: <code>    auto mapping_l = IterationMappingL{};</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L292**: <code>    auto crd_m = (mapping_m(device_idx + ProcessorOffset{}, iteration) + TP{}) % TP{};</code>
+  - EN: Declares the callable or operator `crd_m`.
+  - CN: 声明可调用对象或运算符 `crd_m`。
+- **L293**: <code>    auto crd_n = (mapping_n(device_idx + ProcessorOffset{}, iteration) + TP{}) % TP{};</code>
+  - EN: Declares the callable or operator `crd_n`.
+  - CN: 声明可调用对象或运算符 `crd_n`。
+- **L294**: <code>    auto crd_l = (mapping_l(device_idx + ProcessorOffset{}, iteration) + TP{}) % TP{};</code>
+  - EN: Declares the callable or operator `crd_l`.
+  - CN: 声明可调用对象或运算符 `crd_l`。
+- **L295**: <code>    return make_coord(crd_m, crd_n, crd_l);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L296**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L297**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L298**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L299**: <code>  static auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L300**: <code>  get_device_tile_idx_d(int device_idx, int iteration) {</code>
+  - EN: Starts the definition body for `get_device_tile_idx_d`.
+  - CN: 开始 `get_device_tile_idx_d` 的定义体。
+- **L301**: <code>    auto mapping_m = IterationMappingM{};</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L302**: <code>    auto mapping_n = IterationMappingN{};</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L303**: <code>    auto mapping_l = IterationMappingL{};</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L304**: <code>    auto crd_m = (mapping_m(device_idx + ProcessorOffset{}, iteration) + TP{}) % TP{};</code>
+  - EN: Declares the callable or operator `crd_m`.
+  - CN: 声明可调用对象或运算符 `crd_m`。
+- **L305**: <code>    auto crd_n = (mapping_n(device_idx + ProcessorOffset{}, iteration) + TP{}) % TP{};</code>
+  - EN: Declares the callable or operator `crd_n`.
+  - CN: 声明可调用对象或运算符 `crd_n`。
+- **L306**: <code>    auto crd_l = (mapping_l(device_idx + ProcessorOffset{}, iteration) + TP{}) % TP{};</code>
+  - EN: Declares the callable or operator `crd_l`.
+  - CN: 声明可调用对象或运算符 `crd_l`。
+- **L307**: <code>    return make_coord(crd_m, crd_n, crd_l);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L308**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L309**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L310**: <code>  // Device Partitioners: partition non-buffered processor-resident operands.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L311**: <code>  // Processor-resident operands fall into two categories: buffered, and not buffered.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L312**: <code>  // Those buffered aren&#x27;t expected to be further partitioned, and those </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L313**: <code>  template &lt;typename Tensor&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L314**: <code>  static auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L315**: <code>  get_tensor_A(Tensor original_tensor, void * tensor_buffer_ptr, int device_idx, int iteration) {</code>
+  - EN: Starts the definition body for `get_tensor_A`.
+  - CN: 开始 `get_tensor_A` 的定义体。
+- **L316**: <code>    static_assert(rank(original_tensor) == 3);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L317**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L318**: <code>    using Element = typename Tensor::value_type;</code>
+  - EN: Defines the alias `Element` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Element`。
+- **L319**: <code>    // Recreate tensor without constness. This is to ensure return types match.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L320**: <code>    Element* ptr = const_cast&lt;Element*&gt;(original_tensor.data());</code>
+  - EN: Declares the callable or operator `Element`.
+  - CN: 声明可调用对象或运算符 `Element`。
+- **L321**: <code>    auto shape = original_tensor.shape();</code>
+  - EN: Declares the callable or operator `shape`.
+  - CN: 声明可调用对象或运算符 `shape`。
+- **L322**: <code>    auto layout = original_tensor.layout();</code>
+  - EN: Declares the callable or operator `layout`.
+  - CN: 声明可调用对象或运算符 `layout`。
+- **L323**: <code>    auto tensor = make_tensor(ptr, layout);</code>
+  - EN: Declares the callable or operator `make_tensor`.
+  - CN: 声明可调用对象或运算符 `make_tensor`。
+- **L324**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L325**: <code>    if constexpr (NumBuffersA  == 0) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L326**: <code>      auto tiler = get_device_tiler_a(tensor);</code>
+  - EN: Declares the callable or operator `get_device_tiler_a`.
+  - CN: 声明可调用对象或运算符 `get_device_tiler_a`。
+- **L327**: <code>      auto idx = get_device_tile_idx_a(device_idx, iteration);</code>
+  - EN: Declares the callable or operator `get_device_tile_idx_a`.
+  - CN: 声明可调用对象或运算符 `get_device_tile_idx_a`。
+- **L328**: <code>      return inner_partition(tensor, tiler, idx);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L329**: <code>    } else {</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L330**: <code>      Element* ptr_buffer = reinterpret_cast&lt;Element*&gt;(tensor_buffer_ptr);</code>
+  - EN: Declares the callable or operator `Element`.
+  - CN: 声明可调用对象或运算符 `Element`。
+- **L331**: <code>      if (iteration == 0) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L332**: <code>        return tensor;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L333**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L334**: <code>      ptr_buffer += size(shape) * (iteration - 1);</code>
+  - EN: Declares the callable or operator `size`.
+  - CN: 声明可调用对象或运算符 `size`。
+- **L335**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L336**: <code>      return make_tensor(ptr_buffer, layout);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L337**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L338**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L339**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L340**: <code>  template &lt;typename Tensor&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L341**: <code>  static auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L342**: <code>  get_tensor_B(Tensor original_tensor, void * tensor_buffer_ptr, int device_idx, int iteration) {</code>
+  - EN: Starts the definition body for `get_tensor_B`.
+  - CN: 开始 `get_tensor_B` 的定义体。
+- **L343**: <code>    static_assert(rank(original_tensor) == 3);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L344**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L345**: <code>    using Element = typename Tensor::value_type;</code>
+  - EN: Defines the alias `Element` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Element`。
+- **L346**: <code>    // Recreate tensor without constness. This is to ensure return types match.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L347**: <code>    Element * ptr = const_cast&lt;Element *&gt;(original_tensor.data());</code>
+  - EN: Declares the callable or operator `Element`.
+  - CN: 声明可调用对象或运算符 `Element`。
+- **L348**: <code>    auto shape = original_tensor.shape();</code>
+  - EN: Declares the callable or operator `shape`.
+  - CN: 声明可调用对象或运算符 `shape`。
+- **L349**: <code>    auto layout = original_tensor.layout();</code>
+  - EN: Declares the callable or operator `layout`.
+  - CN: 声明可调用对象或运算符 `layout`。
+- **L350**: <code>    auto tensor = make_tensor(ptr, layout);</code>
+  - EN: Declares the callable or operator `make_tensor`.
+  - CN: 声明可调用对象或运算符 `make_tensor`。
+- **L351**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L352**: <code>    if constexpr (NumBuffersB  == 0) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L353**: <code>      auto tiler = get_device_tiler_b(tensor);</code>
+  - EN: Declares the callable or operator `get_device_tiler_b`.
+  - CN: 声明可调用对象或运算符 `get_device_tiler_b`。
+- **L354**: <code>      auto idx = get_device_tile_idx_b(device_idx, iteration);</code>
+  - EN: Declares the callable or operator `get_device_tile_idx_b`.
+  - CN: 声明可调用对象或运算符 `get_device_tile_idx_b`。
+- **L355**: <code>      return inner_partition(tensor, tiler, idx);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L356**: <code>    } else {</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L357**: <code>      Element * ptr_buffer = reinterpret_cast&lt;Element *&gt;(tensor_buffer_ptr);</code>
+  - EN: Declares the callable or operator `Element`.
+  - CN: 声明可调用对象或运算符 `Element`。
+- **L358**: <code>      if (iteration == 0) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L359**: <code>        return tensor;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L360**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L361**: <code>      ptr_buffer += size(shape) * (iteration - 1);</code>
+  - EN: Declares the callable or operator `size`.
+  - CN: 声明可调用对象或运算符 `size`。
+- **L362**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L363**: <code>      return make_tensor(ptr_buffer, layout);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L364**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L365**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L366**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L367**: <code>  template &lt;typename Tensor&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L368**: <code>  static auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L369**: <code>  get_tensor_C(Tensor original_tensor, void * tensor_buffer_ptr, int device_idx, int iteration) {</code>
+  - EN: Starts the definition body for `get_tensor_C`.
+  - CN: 开始 `get_tensor_C` 的定义体。
+- **L370**: <code>    static_assert(rank(original_tensor) == 3);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L371**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L372**: <code>    using Element = typename Tensor::value_type;</code>
+  - EN: Defines the alias `Element` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Element`。
+- **L373**: <code>    // Recreate tensor without constness. This is to ensure return types match.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L374**: <code>    Element * ptr = const_cast&lt;Element *&gt;(original_tensor.data());</code>
+  - EN: Declares the callable or operator `Element`.
+  - CN: 声明可调用对象或运算符 `Element`。
+- **L375**: <code>    auto shape = original_tensor.shape();</code>
+  - EN: Declares the callable or operator `shape`.
+  - CN: 声明可调用对象或运算符 `shape`。
+- **L376**: <code>    auto layout = original_tensor.layout();</code>
+  - EN: Declares the callable or operator `layout`.
+  - CN: 声明可调用对象或运算符 `layout`。
+- **L377**: <code>    auto tensor = make_tensor(ptr, layout);</code>
+  - EN: Declares the callable or operator `make_tensor`.
+  - CN: 声明可调用对象或运算符 `make_tensor`。
+- **L378**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L379**: <code>    if constexpr (not BufferedOutput) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L380**: <code>      auto tiler = get_device_tiler_c(tensor);</code>
+  - EN: Declares the callable or operator `get_device_tiler_c`.
+  - CN: 声明可调用对象或运算符 `get_device_tiler_c`。
+- **L381**: <code>      auto idx = get_device_tile_idx_c(device_idx, iteration);</code>
+  - EN: Declares the callable or operator `get_device_tile_idx_c`.
+  - CN: 声明可调用对象或运算符 `get_device_tile_idx_c`。
+- **L382**: <code>      return inner_partition(tensor, tiler, idx);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L383**: <code>    } else {</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L384**: <code>      // implement Remote D</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L385**: <code>      static_assert(RemoteC, &quot;&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L386**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L387**: <code>      Element * ptr_buffer = reinterpret_cast&lt;Element *&gt;(tensor_buffer_ptr);</code>
+  - EN: Declares the callable or operator `Element`.
+  - CN: 声明可调用对象或运算符 `Element`。
+- **L388**: <code>      if (iteration == 0) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L389**: <code>        return tensor;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L390**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L391**: <code>      ptr_buffer += size(shape) * (iteration - 1);</code>
+  - EN: Declares the callable or operator `size`.
+  - CN: 声明可调用对象或运算符 `size`。
+- **L392**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L393**: <code>      return make_tensor(ptr_buffer, layout);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L394**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L395**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L396**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L397**: <code>  template &lt;typename Tensor&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L398**: <code>  static auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L399**: <code>  get_tensor_D(Tensor original_tensor, void * tensor_buffer_ptr, int device_idx, int iteration) {</code>
+  - EN: Starts the definition body for `get_tensor_D`.
+  - CN: 开始 `get_tensor_D` 的定义体。
+- **L400**: <code>    static_assert(rank(original_tensor) == 3);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L401**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L402**: <code>    using Element = typename Tensor::value_type;</code>
+  - EN: Defines the alias `Element` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Element`。
+- **L403**: <code>    // Recreate tensor without constness. This is to ensure return types match.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L404**: <code>    Element * ptr = const_cast&lt;Element *&gt;(original_tensor.data());</code>
+  - EN: Declares the callable or operator `Element`.
+  - CN: 声明可调用对象或运算符 `Element`。
+- **L405**: <code>    auto shape = original_tensor.shape();</code>
+  - EN: Declares the callable or operator `shape`.
+  - CN: 声明可调用对象或运算符 `shape`。
+- **L406**: <code>    auto layout = original_tensor.layout();</code>
+  - EN: Declares the callable or operator `layout`.
+  - CN: 声明可调用对象或运算符 `layout`。
+- **L407**: <code>    auto tensor = make_tensor(ptr, layout);</code>
+  - EN: Declares the callable or operator `make_tensor`.
+  - CN: 声明可调用对象或运算符 `make_tensor`。
+- **L408**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L409**: <code>    if constexpr (not BufferedOutput) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L410**: <code>      auto tiler = get_device_tiler_d(tensor);</code>
+  - EN: Declares the callable or operator `get_device_tiler_d`.
+  - CN: 声明可调用对象或运算符 `get_device_tiler_d`。
+- **L411**: <code>      auto idx = get_device_tile_idx_d(device_idx, iteration);</code>
+  - EN: Declares the callable or operator `get_device_tile_idx_d`.
+  - CN: 声明可调用对象或运算符 `get_device_tile_idx_d`。
+- **L412**: <code>      return inner_partition(tensor, tiler, idx);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L413**: <code>    } else {</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L414**: <code>      // implement Remote D</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L415**: <code>      static_assert(RemoteC, &quot;&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L416**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L417**: <code>      Element * ptr_buffer = reinterpret_cast&lt;Element *&gt;(tensor_buffer_ptr);</code>
+  - EN: Declares the callable or operator `Element`.
+  - CN: 声明可调用对象或运算符 `Element`。
+- **L418**: <code>      // last iteration is the local tensor, the rest are buffers</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L419**: <code>      if (iteration == TP{} - 1) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L420**: <code>        return tensor;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L421**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L422**: <code>      ptr_buffer += size(shape) * iteration; // note: iteration, not iteration - 1</code>
+  - EN: Provides part of the signature or implementation for `size`.
+  - CN: 提供 `size` 的签名或实现的一部分。
+- **L423**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L424**: <code>      return make_tensor(ptr_buffer, layout);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L425**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L426**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L427**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L428**: <code>  template &lt;typename ProblemShape&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L429**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L430**: <code>  static auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L431**: <code>  get_local_a_shape(ProblemShape problem_shape) {</code>
+  - EN: Starts the definition body for `get_local_a_shape`.
+  - CN: 开始 `get_local_a_shape` 的定义体。
+- **L432**: <code>    auto problem_shape_MNKL = append&lt;4&gt;(problem_shape, 1);</code>
+  - EN: Declares the callable or operator `append`.
+  - CN: 声明可调用对象或运算符 `append`。
+- **L433**: <code>    if constexpr (NumBuffersA == 0) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L434**: <code>      return shape_div(</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L435**: <code>            select&lt;0,2,3&gt;(problem_shape_MNKL),</code>
+  - EN: Begins or continues the signature/parameter list for `select`.
+  - CN: 开始或继续 `select` 的签名/参数列表。
+- **L436**: <code>            select&lt;0,2,3&gt;(ProcessorTiler{}));</code>
+  - EN: Declares the callable or operator `select`.
+  - CN: 声明可调用对象或运算符 `select`。
+- **L437**: <code>    } else {</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L438**: <code>      return shape_div(</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L439**: <code>          shape_div(</code>
+  - EN: Begins or continues the signature/parameter list for `shape_div`.
+  - CN: 开始或继续 `shape_div` 的签名/参数列表。
+- **L440**: <code>            select&lt;0,2,3&gt;(problem_shape_MNKL),</code>
+  - EN: Begins or continues the signature/parameter list for `select`.
+  - CN: 开始或继续 `select` 的签名/参数列表。
+- **L441**: <code>            select&lt;0,2,3&gt;(ProcessorTiler{})),</code>
+  - EN: Starts the definition body for `select`.
+  - CN: 开始 `select` 的定义体。
+- **L442**: <code>          select&lt;0,2,3&gt;(IterationTiler{}));</code>
+  - EN: Declares the callable or operator `select`.
+  - CN: 声明可调用对象或运算符 `select`。
+- **L443**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L444**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L445**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L446**: <code>  template &lt;typename ProblemShape&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L447**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L448**: <code>  static auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L449**: <code>  get_local_b_shape(ProblemShape problem_shape) {</code>
+  - EN: Starts the definition body for `get_local_b_shape`.
+  - CN: 开始 `get_local_b_shape` 的定义体。
+- **L450**: <code>    auto problem_shape_MNKL = append&lt;4&gt;(problem_shape, 1);</code>
+  - EN: Declares the callable or operator `append`.
+  - CN: 声明可调用对象或运算符 `append`。
+- **L451**: <code>    if constexpr (NumBuffersB == 0) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L452**: <code>      return shape_div(</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L453**: <code>            select&lt;1,2,3&gt;(problem_shape_MNKL),</code>
+  - EN: Begins or continues the signature/parameter list for `select`.
+  - CN: 开始或继续 `select` 的签名/参数列表。
+- **L454**: <code>            select&lt;1,2,3&gt;(ProcessorTiler{}));</code>
+  - EN: Declares the callable or operator `select`.
+  - CN: 声明可调用对象或运算符 `select`。
+- **L455**: <code>    } else {</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L456**: <code>      return shape_div(</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L457**: <code>          shape_div(</code>
+  - EN: Begins or continues the signature/parameter list for `shape_div`.
+  - CN: 开始或继续 `shape_div` 的签名/参数列表。
+- **L458**: <code>            select&lt;1,2,3&gt;(problem_shape_MNKL),</code>
+  - EN: Begins or continues the signature/parameter list for `select`.
+  - CN: 开始或继续 `select` 的签名/参数列表。
+- **L459**: <code>            select&lt;1,2,3&gt;(ProcessorTiler{})),</code>
+  - EN: Starts the definition body for `select`.
+  - CN: 开始 `select` 的定义体。
+- **L460**: <code>          select&lt;1,2,3&gt;(IterationTiler{}));</code>
+  - EN: Declares the callable or operator `select`.
+  - CN: 声明可调用对象或运算符 `select`。
+- **L461**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L462**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L463**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L464**: <code>  template &lt;typename ProblemShape&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L465**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L466**: <code>  static auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L467**: <code>  get_local_c_shape(ProblemShape problem_shape) {</code>
+  - EN: Starts the definition body for `get_local_c_shape`.
+  - CN: 开始 `get_local_c_shape` 的定义体。
+- **L468**: <code>    auto problem_shape_MNKL = append&lt;4&gt;(problem_shape, 1);</code>
+  - EN: Declares the callable or operator `append`.
+  - CN: 声明可调用对象或运算符 `append`。
+- **L469**: <code>    if constexpr (not BufferedOutput) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L470**: <code>      return shape_div(</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L471**: <code>            select&lt;0,1,3&gt;(problem_shape_MNKL),</code>
+  - EN: Begins or continues the signature/parameter list for `select`.
+  - CN: 开始或继续 `select` 的签名/参数列表。
+- **L472**: <code>            select&lt;0,1,3&gt;(ProcessorTiler{}));</code>
+  - EN: Declares the callable or operator `select`.
+  - CN: 声明可调用对象或运算符 `select`。
+- **L473**: <code>    } else {</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L474**: <code>      return shape_div(</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L475**: <code>          shape_div(</code>
+  - EN: Begins or continues the signature/parameter list for `shape_div`.
+  - CN: 开始或继续 `shape_div` 的签名/参数列表。
+- **L476**: <code>            select&lt;0,1,3&gt;(problem_shape_MNKL),</code>
+  - EN: Begins or continues the signature/parameter list for `select`.
+  - CN: 开始或继续 `select` 的签名/参数列表。
+- **L477**: <code>            select&lt;0,1,3&gt;(ProcessorTiler{})),</code>
+  - EN: Starts the definition body for `select`.
+  - CN: 开始 `select` 的定义体。
+- **L478**: <code>          select&lt;0,1,3&gt;(IterationTiler{}));</code>
+  - EN: Declares the callable or operator `select`.
+  - CN: 声明可调用对象或运算符 `select`。
+- **L479**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L480**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L481**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L482**: <code>  template &lt;typename ProblemShape&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L483**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L484**: <code>  static auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L485**: <code>  get_local_d_shape(ProblemShape problem_shape) {</code>
+  - EN: Starts the definition body for `get_local_d_shape`.
+  - CN: 开始 `get_local_d_shape` 的定义体。
+- **L486**: <code>    auto problem_shape_MNKL = append&lt;4&gt;(problem_shape, 1);</code>
+  - EN: Declares the callable or operator `append`.
+  - CN: 声明可调用对象或运算符 `append`。
+- **L487**: <code>    if constexpr (not BufferedOutput) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L488**: <code>      return shape_div(</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L489**: <code>            select&lt;0,1,3&gt;(problem_shape_MNKL),</code>
+  - EN: Begins or continues the signature/parameter list for `select`.
+  - CN: 开始或继续 `select` 的签名/参数列表。
+- **L490**: <code>            select&lt;0,1,3&gt;(ProcessorTiler{}));</code>
+  - EN: Declares the callable or operator `select`.
+  - CN: 声明可调用对象或运算符 `select`。
+- **L491**: <code>    } else {</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L492**: <code>      return shape_div(</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L493**: <code>          shape_div(</code>
+  - EN: Begins or continues the signature/parameter list for `shape_div`.
+  - CN: 开始或继续 `shape_div` 的签名/参数列表。
+- **L494**: <code>            select&lt;0,1,3&gt;(problem_shape_MNKL),</code>
+  - EN: Begins or continues the signature/parameter list for `select`.
+  - CN: 开始或继续 `select` 的签名/参数列表。
+- **L495**: <code>            select&lt;0,1,3&gt;(ProcessorTiler{})),</code>
+  - EN: Starts the definition body for `select`.
+  - CN: 开始 `select` 的定义体。
+- **L496**: <code>          select&lt;0,1,3&gt;(IterationTiler{}));</code>
+  - EN: Declares the callable or operator `select`.
+  - CN: 声明可调用对象或运算符 `select`。
+- **L497**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L498**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L499**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L500**: <code>  // Host-side APIs: get_device_slice_{A,B,C,D}</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L501**: <code>  // Slice off a view of the GLOBAL tensor that corresponds to the shard that </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L502**: <code>  // is going to be owned by a specific device. This helps with the initial </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L503**: <code>  // distribution of the GLOBAL operands among devices.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L504**: <code>  template &lt;typename Tensor&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L505**: <code>  static auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L506**: <code>  get_device_slice_A(Tensor tensor, int device_idx) {</code>
+  - EN: Starts the definition body for `get_device_slice_A`.
+  - CN: 开始 `get_device_slice_A` 的定义体。
+- **L507**: <code>    auto tiler = get_processor_tiler_a(tensor);</code>
+  - EN: Declares the callable or operator `get_processor_tiler_a`.
+  - CN: 声明可调用对象或运算符 `get_processor_tiler_a`。
+- **L508**: <code>    return inner_partition(tensor, tiler, device_idx);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L509**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L510**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L511**: <code>  template &lt;typename Tensor&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L512**: <code>  static auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L513**: <code>  get_device_slice_B(Tensor tensor, int device_idx) {</code>
+  - EN: Starts the definition body for `get_device_slice_B`.
+  - CN: 开始 `get_device_slice_B` 的定义体。
+- **L514**: <code>    auto tiler = get_processor_tiler_b(tensor);</code>
+  - EN: Declares the callable or operator `get_processor_tiler_b`.
+  - CN: 声明可调用对象或运算符 `get_processor_tiler_b`。
+- **L515**: <code>    return inner_partition(tensor, tiler, device_idx);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L516**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L517**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L518**: <code>  template &lt;typename Tensor&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L519**: <code>  static auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L520**: <code>  get_device_slice_C(Tensor tensor, int device_idx) {</code>
+  - EN: Starts the definition body for `get_device_slice_C`.
+  - CN: 开始 `get_device_slice_C` 的定义体。
+- **L521**: <code>    auto tiler = get_processor_tiler_c(tensor);</code>
+  - EN: Declares the callable or operator `get_processor_tiler_c`.
+  - CN: 声明可调用对象或运算符 `get_processor_tiler_c`。
+- **L522**: <code>    return inner_partition(tensor, tiler, device_idx);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L523**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L524**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L525**: <code>  template &lt;typename Tensor&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L526**: <code>  static auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L527**: <code>  get_device_slice_D(Tensor tensor, int device_idx) {</code>
+  - EN: Starts the definition body for `get_device_slice_D`.
+  - CN: 开始 `get_device_slice_D` 的定义体。
+- **L528**: <code>    auto tiler = get_processor_tiler_d(tensor);</code>
+  - EN: Declares the callable or operator `get_processor_tiler_d`.
+  - CN: 声明可调用对象或运算符 `get_processor_tiler_d`。
+- **L529**: <code>    return inner_partition(tensor, tiler, device_idx);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L530**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L531**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L532**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L533**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L534**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L535**: <code>} // namespace cutlass::gemm::distributed</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L536**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L537**: <code>///////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L538**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+
+## Key Concepts / 关键概念
+- Templates / 模板
+- Namespaces / 命名空间
+- Constexpr evaluation / constexpr 求值
+- Compile-time checks / 编译期检查
+- Host-device annotations / 主机设备限定符
+- Symbol focus: `TP_` / 重点符号：`TP_`
+- Symbol focus: `ProcessorTiler_` / 重点符号：`ProcessorTiler_`
+- Symbol focus: `IterationTiler_` / 重点符号：`IterationTiler_`
+- Symbol focus: `PeerDeviceMapping_` / 重点符号：`PeerDeviceMapping_`
+- Symbol focus: `IterationMappingM_` / 重点符号：`IterationMappingM_`
+
+## Dependencies / 依赖关系
+- Project headers / 项目头文件:
+  - `"cute/layout.hpp"`
+  - `"cute/tensor.hpp"`
+  - `"cutlass/cutlass.h"`

@@ -1,0 +1,391 @@
+# utils.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/cute/experimental/utils.py`
+
+## Purpose / 作用
+- EN: Defines 7 functions (get_cta_v_map_ab, get_cta_v_map_c, make_tmem_layout_acc, make_tmem_layout_a, ... (+3 more)) in `CuTeDSL.cutlass.cute.experimental.utils`.
+- CN: 该模块 `CuTeDSL.cutlass.cute.experimental.utils` 定义了 7 个函数（get_cta_v_map_ab, get_cta_v_map_c, make_tmem_layout_acc, make_tmem_layout_a, ... (+3 more)）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `from typing import Callable, Optional, Tuple, Union` — **EN:** Imports Callable, Optional, Tuple, Union from `typing`. **CN:** 从 `typing` 导入 Callable, Optional, Tuple, Union。
+- **L13** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L14** `import cutlass` — **EN:** Imports cutlass for later use. **CN:** 导入 cutlass 供后续使用。
+- **L15** `from cutlass import cute` — **EN:** Imports cute from `cutlass`. **CN:** 从 `cutlass` 导入 cute。
+- **L16** `from cutlass._mlir import ir` — **EN:** Imports ir from `cutlass._mlir`. **CN:** 从 `cutlass._mlir` 导入 ir。
+- **L17** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L18** `from ... import cutlass_dsl as _dsl` — **EN:** Imports cutlass_dsl as _dsl from `...`. **CN:** 从 `...` 导入 cutlass_dsl as _dsl。
+- **L19** `from .pipeline import TMAStorePipeline, TMAToUMMAPipeline` — **EN:** Imports TMAStorePipeline, TMAToUMMAPipeline from `.pipeline`. **CN:** 从 `.pipeline` 导入 TMAStorePipeline, TMAToUMMAPipeline。
+- **L20** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L21** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L22** `def get_cta_v_map_ab(` — **EN:** Defines function `get_cta_v_map_ab`. **CN:** 定义函数 `get_cta_v_map_ab`。
+- **L23** `    gmem_tensor: cute.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L24** `    mma_tiler_mnk: cute.Shape,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L25** `    tiled_mma: cute.TiledMma,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L26** `    input_operand: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L27** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L28** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L29** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L30** `) -> Union[cute.Layout, cute.ComposedLayout]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L31** `    ident = cute.core.make_identity_layout(gmem_tensor.shape, loc=loc, ip=ip)` — **EN:** Assigns a value to ident. **CN:** 将一个值赋给 ident。
+- **L32** `    mode = 0 if (input_operand in ("A", "SFA")) else 1` — **EN:** Assigns a value to mode. **CN:** 将一个值赋给 mode。
+- **L33** `    mma_tiler_mk = (mma_tiler_mnk[mode], *mma_tiler_mnk[2:])  # type: ignore[index]` — **EN:** Assigns a value to mma_tiler_mk. **CN:** 将一个值赋给 mma_tiler_mk。
+- **L34** `    g_tile = cute.core.composition(ident, mma_tiler_mk, loc=loc, ip=ip)` — **EN:** Assigns a value to g_tile. **CN:** 将一个值赋给 g_tile。
+- **L35** `    if input_operand in ("A", "SFA"):` — **EN:** Starts a conditional branch guarded by `input_operand in ('A', 'SFA')`. **CN:** 开始一个由 `input_operand in ('A', 'SFA')` 控制的条件分支。
+- **L36** `        cta_v_map = tiled_mma._thrfrg_A(g_tile)` — **EN:** Assigns a value to cta_v_map. **CN:** 将一个值赋给 cta_v_map。
+- **L37** `    if input_operand in ("B", "SFB"):` — **EN:** Starts a conditional branch guarded by `input_operand in ('B', 'SFB')`. **CN:** 开始一个由 `input_operand in ('B', 'SFB')` 控制的条件分支。
+- **L38** `        cta_v_map = tiled_mma._thrfrg_B(g_tile)` — **EN:** Assigns a value to cta_v_map. **CN:** 将一个值赋给 cta_v_map。
+- **L39** `    cta_v_map = cute.core.get(cta_v_map, mode=[1])  # type: ignore[assignment]` — **EN:** Assigns a value to cta_v_map. **CN:** 将一个值赋给 cta_v_map。
+- **L40** `    cta_v_map = cute.core.dice(cta_v_map, (1, (1,) * cute.core.rank(g_tile)))  # type: ignore[assignment]` — **EN:** Assigns a value to cta_v_map. **CN:** 将一个值赋给 cta_v_map。
+- **L41** `    return cta_v_map  # type: ignore[return-value]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L42** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L43** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L44** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L45** `def get_cta_v_map_c(` — **EN:** Defines function `get_cta_v_map_c`. **CN:** 定义函数 `get_cta_v_map_c`。
+- **L46** `    gmem_tensor: cute.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L47** `    epi_tile: Union[cute.Tile, cute.Shape],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L48** `) -> cute.Layout:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L49** `    return cute.composition(cute.make_identity_layout(gmem_tensor.shape), epi_tile)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L50** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L51** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L52** `def make_tmem_layout_acc(` — **EN:** Defines function `make_tmem_layout_acc`. **CN:** 定义函数 `make_tmem_layout_acc`。
+- **L53** `    tiled_mma: cute.TiledMma,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L54** `    mnk_tiler: cute.Shape,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L55** `    acc_stage: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L56** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L57** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L58** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L59** `) -> cute.Layout:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L60** `    """Return TMEM accumulator buffer layout for a tiled MMA.` — **EN:** Starts the docstring for the function `make_tmem_layout_acc`. **CN:** 开始说明 function `make_tmem_layout_acc` 的文档字符串。
+- **L61** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L62** `    This is a small helper around \`\`tiled_mma.make_fragment_C(...).layout\`\` to` — **EN:** Continues the docstring for the function `make_tmem_layout_acc`. **CN:** 继续说明 function `make_tmem_layout_acc` 的文档字符串。
+- **L63** `    keep example code fragment-free at the call site.` — **EN:** Continues the docstring for the function `make_tmem_layout_acc`. **CN:** 继续说明 function `make_tmem_layout_acc` 的文档字符串。
+- **L64** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L65** `    Args:` — **EN:** Continues the docstring for the function `make_tmem_layout_acc`. **CN:** 继续说明 function `make_tmem_layout_acc` 的文档字符串。
+- **L66** `        tiled_mma: The MMA tiler (\`\`cute.TiledMma\`\`).` — **EN:** Continues the docstring for the function `make_tmem_layout_acc`. **CN:** 继续说明 function `make_tmem_layout_acc` 的文档字符串。
+- **L67** `        mnk_tiler: Full MNK tiler; only the MN components are used for C.` — **EN:** Continues the docstring for the function `make_tmem_layout_acc`. **CN:** 继续说明 function `make_tmem_layout_acc` 的文档字符串。
+- **L68** `        acc_stage: Accumulator pipeline stages.` — **EN:** Continues the docstring for the function `make_tmem_layout_acc`. **CN:** 继续说明 function `make_tmem_layout_acc` 的文档字符串。
+- **L69** `        loc: Optional location for DSL ops.` — **EN:** Continues the docstring for the function `make_tmem_layout_acc`. **CN:** 继续说明 function `make_tmem_layout_acc` 的文档字符串。
+- **L70** `        ip: Optional insertion point for DSL ops.` — **EN:** Continues the docstring for the function `make_tmem_layout_acc`. **CN:** 继续说明 function `make_tmem_layout_acc` 的文档字符串。
+- **L71** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L72** `    Returns:` — **EN:** Continues the docstring for the function `make_tmem_layout_acc`. **CN:** 继续说明 function `make_tmem_layout_acc` 的文档字符串。
+- **L73** `        \`\`cute.Layout\`\` for the accumulator TMEM buffer.` — **EN:** Continues the docstring for the function `make_tmem_layout_acc`. **CN:** 继续说明 function `make_tmem_layout_acc` 的文档字符串。
+- **L74** `    """` — **EN:** Ends the docstring for the function `make_tmem_layout_acc`. **CN:** 结束说明 function `make_tmem_layout_acc` 的文档字符串。
+- **L75** `    acc_shape = tiled_mma.partition_shape_C(mnk_tiler[:2], loc=loc, ip=ip)  # type: ignore[index]` — **EN:** Assigns a value to acc_shape. **CN:** 将一个值赋给 acc_shape。
+- **L76** `    acc_shape_staged = cute.append(acc_shape, acc_stage, loc=loc, ip=ip)` — **EN:** Assigns a value to acc_shape_staged. **CN:** 将一个值赋给 acc_shape_staged。
+- **L77** `    return tiled_mma.make_fragment_C(acc_shape_staged, loc=loc, ip=ip).layout` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L78** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L79** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L80** `def make_tmem_layout_a(` — **EN:** Defines function `make_tmem_layout_a`. **CN:** 定义函数 `make_tmem_layout_a`。
+- **L81** `    tiled_mma: cute.TiledMma,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L82** `    mk_tiler: cute.Shape,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L83** `    stage: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L84** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L85** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L86** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L87** `) -> cute.Layout:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L88** `    """Return TMEM A operand buffer layout for a tiled MMA.` — **EN:** Starts the docstring for the function `make_tmem_layout_a`. **CN:** 开始说明 function `make_tmem_layout_a` 的文档字符串。
+- **L89** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L90** `    Args:` — **EN:** Continues the docstring for the function `make_tmem_layout_a`. **CN:** 继续说明 function `make_tmem_layout_a` 的文档字符串。
+- **L91** `        tiled_mma: The MMA tiler (\`\`cute.TiledMma\`\`).` — **EN:** Continues the docstring for the function `make_tmem_layout_a`. **CN:** 继续说明 function `make_tmem_layout_a` 的文档字符串。
+- **L92** `        mk_tiler: MK tiler used to shape the A operand.` — **EN:** Continues the docstring for the function `make_tmem_layout_a`. **CN:** 继续说明 function `make_tmem_layout_a` 的文档字符串。
+- **L93** `        stage: Pipeline stages for the A operand buffer.` — **EN:** Continues the docstring for the function `make_tmem_layout_a`. **CN:** 继续说明 function `make_tmem_layout_a` 的文档字符串。
+- **L94** `        loc: Optional location for DSL ops.` — **EN:** Continues the docstring for the function `make_tmem_layout_a`. **CN:** 继续说明 function `make_tmem_layout_a` 的文档字符串。
+- **L95** `        ip: Optional insertion point for DSL ops.` — **EN:** Continues the docstring for the function `make_tmem_layout_a`. **CN:** 继续说明 function `make_tmem_layout_a` 的文档字符串。
+- **L96** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L97** `    Returns:` — **EN:** Continues the docstring for the function `make_tmem_layout_a`. **CN:** 继续说明 function `make_tmem_layout_a` 的文档字符串。
+- **L98** `        \`\`cute.Layout\`\` for the A operand TMEM buffer.` — **EN:** Continues the docstring for the function `make_tmem_layout_a`. **CN:** 继续说明 function `make_tmem_layout_a` 的文档字符串。
+- **L99** `    """` — **EN:** Ends the docstring for the function `make_tmem_layout_a`. **CN:** 结束说明 function `make_tmem_layout_a` 的文档字符串。
+- **L100** `    a_shape = tiled_mma.partition_shape_A(mk_tiler, loc=loc, ip=ip)` — **EN:** Assigns a value to a_shape. **CN:** 将一个值赋给 a_shape。
+- **L101** `    a_shape_staged = cute.append(a_shape, stage, loc=loc, ip=ip)` — **EN:** Assigns a value to a_shape_staged. **CN:** 将一个值赋给 a_shape_staged。
+- **L102** `    return tiled_mma.make_fragment_A(a_shape_staged, loc=loc, ip=ip).layout` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L103** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L104** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L105** `def make_t2r_rmem_layout(` — **EN:** Defines function `make_t2r_rmem_layout`. **CN:** 定义函数 `make_t2r_rmem_layout`。
+- **L106** `    tiled_copy_t2r: cute.TiledCopy,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L107** `    gC_mnl_epi: cute.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L108** `    tidx: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L109** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L110** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L111** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L112** `) -> Union[cute.Layout, cute.ComposedLayout]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L113** `    """Return RMEM buffer layout for the T2R epilogue destination.` — **EN:** Starts the docstring for the function `make_t2r_rmem_layout`. **CN:** 开始说明 function `make_t2r_rmem_layout` 的文档字符串。
+- **L114** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L115** `    Computes the per-thread RMEM buffer layout produced by a TMEM->RMEM copy` — **EN:** Continues the docstring for the function `make_t2r_rmem_layout`. **CN:** 继续说明 function `make_t2r_rmem_layout` 的文档字符串。
+- **L116** `    for a single epilogue iteration.` — **EN:** Continues the docstring for the function `make_t2r_rmem_layout`. **CN:** 继续说明 function `make_t2r_rmem_layout` 的文档字符串。
+- **L117** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L118** `    Args:` — **EN:** Continues the docstring for the function `make_t2r_rmem_layout`. **CN:** 继续说明 function `make_t2r_rmem_layout` 的文档字符串。
+- **L119** `        tiled_copy_t2r: The TMEM->RMEM tiled copy op (\`\`cute.TiledCopy\`\`).` — **EN:** Continues the docstring for the function `make_t2r_rmem_layout`. **CN:** 继续说明 function `make_t2r_rmem_layout` 的文档字符串。
+- **L120** `        gC_mnl_epi: Global C tensor partitioned by epilogue tile.` — **EN:** Continues the docstring for the function `make_t2r_rmem_layout`. **CN:** 继续说明 function `make_t2r_rmem_layout` 的文档字符串。
+- **L121** `        tidx: Thread index for the copy slice.` — **EN:** Continues the docstring for the function `make_t2r_rmem_layout`. **CN:** 继续说明 function `make_t2r_rmem_layout` 的文档字符串。
+- **L122** `        loc: Optional location for DSL ops.` — **EN:** Continues the docstring for the function `make_t2r_rmem_layout`. **CN:** 继续说明 function `make_t2r_rmem_layout` 的文档字符串。
+- **L123** `        ip: Optional insertion point for DSL ops.` — **EN:** Continues the docstring for the function `make_t2r_rmem_layout`. **CN:** 继续说明 function `make_t2r_rmem_layout` 的文档字符串。
+- **L124** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L125** `    Returns:` — **EN:** Continues the docstring for the function `make_t2r_rmem_layout`. **CN:** 继续说明 function `make_t2r_rmem_layout` 的文档字符串。
+- **L126** `        \`\`cute.Layout\`\` for the RMEM buffer.` — **EN:** Continues the docstring for the function `make_t2r_rmem_layout`. **CN:** 继续说明 function `make_t2r_rmem_layout` 的文档字符串。
+- **L127** `    """` — **EN:** Ends the docstring for the function `make_t2r_rmem_layout`. **CN:** 结束说明 function `make_t2r_rmem_layout` 的文档字符串。
+- **L128** `    thr_copy_t2r = tiled_copy_t2r.get_slice(tidx)` — **EN:** Assigns a value to thr_copy_t2r. **CN:** 将一个值赋给 thr_copy_t2r。
+- **L129** `    tTR_gC = thr_copy_t2r.partition_D(gC_mnl_epi, loc=loc, ip=ip)` — **EN:** Assigns a value to tTR_gC. **CN:** 将一个值赋给 tTR_gC。
+- **L130** `    return cute.make_fragment_like(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L131** `        tTR_gC[(None, None, None, 0, 0)].layout, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L132** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L133** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L134** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L135** `@_dsl.CuteExperimentalDSL.jit` — **EN:** Applies decorator `_dsl.CuteExperimentalDSL.jit` to the following definition. **CN:** 将装饰器 `_dsl.CuteExperimentalDSL.jit` 应用于后面的定义。
+- **L136** `def epilogue_tma_store(` — **EN:** Defines function `epilogue_tma_store`. **CN:** 定义函数 `epilogue_tma_store`。
+- **L137** `    cta_tile_shape_mnk: cute.Shape,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L138** `    use_2cta_instrs: bool,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L139** `    tmem_acc_buffer_staged: cute.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L140** `    gmem_d: cute.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L141** `    cta_d_tile_coord: cute.Coord,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L142** `    tma_store_pipeline: TMAStorePipeline,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L143** `    tma_store_warp_id: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L144** `    epilogue_op: Callable[[cute.Tensor], cute.Tensor],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L145** `    d_major_mode: Optional["LayoutEnum"] = None,  # type: ignore[name-defined]` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L146** `    tid_x_in_group: Optional[int] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L147** `) -> TMAStorePipeline:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L148** `    """` — **EN:** Starts the docstring for the function `epilogue_tma_store`. **CN:** 开始说明 function `epilogue_tma_store` 的文档字符串。
+- **L149** `    Epilogue phase: copy accumulator from TMEM to GMEM via RMEM and TMA store.` — **EN:** Continues the docstring for the function `epilogue_tma_store`. **CN:** 继续说明 function `epilogue_tma_store` 的文档字符串。
+- **L150** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L151** `    This function implements the epilogue for GEMM on Blackwell (SM100): it consumes` — **EN:** Continues the docstring for the function `epilogue_tma_store`. **CN:** 继续说明 function `epilogue_tma_store` 的文档字符串。
+- **L152** `    the accumulator produced by the MMA warp and writes the output tile to global` — **EN:** Continues the docstring for the function `epilogue_tma_store`. **CN:** 继续说明 function `epilogue_tma_store` 的文档字符串。
+- **L153** `    memory. The data flow is:` — **EN:** Continues the docstring for the function `epilogue_tma_store`. **CN:** 继续说明 function `epilogue_tma_store` 的文档字符串。
+- **L154** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L155** `        TMEM --copy--> RMEM --epilogue op--> RMEM --copy--> SMEM --TMA--> GMEM` — **EN:** Continues the docstring for the function `epilogue_tma_store`. **CN:** 继续说明 function `epilogue_tma_store` 的文档字符串。
+- **L156** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L157** `    The TMA store pipeline coordinates multiple warps writing to SMEM before a single` — **EN:** Continues the docstring for the function `epilogue_tma_store`. **CN:** 继续说明 function `epilogue_tma_store` 的文档字符串。
+- **L158** `    warp (tma_store_warp_id) issues the TMA store. Pipeline protocol per sub-tile:` — **EN:** Continues the docstring for the function `epilogue_tma_store`. **CN:** 继续说明 function `epilogue_tma_store` 的文档字符串。
+- **L159** `    acquire_sync() -> RMEM->SMEM copy -> commit_sync() -> TMA store (TMA warp only)` — **EN:** Continues the docstring for the function `epilogue_tma_store`. **CN:** 继续说明 function `epilogue_tma_store` 的文档字符串。
+- **L160** `    -> release_advance(). tail() is called at the end to wait for in-flight TMA stores.` — **EN:** Continues the docstring for the function `epilogue_tma_store`. **CN:** 继续说明 function `epilogue_tma_store` 的文档字符串。
+- **L161** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L162** `    Args:` — **EN:** Continues the docstring for the function `epilogue_tma_store`. **CN:** 继续说明 function `epilogue_tma_store` 的文档字符串。
+- **L163** `        cta_tile_shape_mnk: Effective (M, N, K) tile shape per CTA for epilogue tiling` — **EN:** Continues the docstring for the function `epilogue_tma_store`. **CN:** 继续说明 function `epilogue_tma_store` 的文档字符串。
+- **L164** `        use_2cta_instrs: True if using 2-CTA MMA instructions (affects epilogue tile shape)` — **EN:** Continues the docstring for the function `epilogue_tma_store`. **CN:** 继续说明 function `epilogue_tma_store` 的文档字符串。
+- **L165** `        tmem_acc_buffer_staged: One stage slice from the full accumulator pipeline for` — **EN:** Continues the docstring for the function `epilogue_tma_store`. **CN:** 继续说明 function `epilogue_tma_store` 的文档字符串。
+- **L166** `            this CTA's tile, should have shape` — **EN:** Continues the docstring for the function `epilogue_tma_store`. **CN:** 继续说明 function `epilogue_tma_store` 的文档字符串。
+- **L167** `            (cta_tile_shape_mnk[0], cta_tile_shape_mnk[1], 1, 1)` — **EN:** Continues the docstring for the function `epilogue_tma_store`. **CN:** 继续说明 function `epilogue_tma_store` 的文档字符串。
+- **L168** `        gmem_d: Global output tensor D` — **EN:** Continues the docstring for the function `epilogue_tma_store`. **CN:** 继续说明 function `epilogue_tma_store` 的文档字符串。
+- **L169** `        cta_d_tile_coord: Coordinate of this CTA's output tile, e.g. (cta_m, cta_n, cta_l)` — **EN:** Continues the docstring for the function `epilogue_tma_store`. **CN:** 继续说明 function `epilogue_tma_store` 的文档字符串。
+- **L170** `        tma_store_pipeline: TMAStorePipeline instance` — **EN:** Continues the docstring for the function `epilogue_tma_store`. **CN:** 继续说明 function `epilogue_tma_store` 的文档字符串。
+- **L171** `        tma_store_warp_id: Warp index that issues TMA stores` — **EN:** Continues the docstring for the function `epilogue_tma_store`. **CN:** 继续说明 function `epilogue_tma_store` 的文档字符串。
+- **L172** `        epilogue_op: Callable applied in registers to accumulator values before store` — **EN:** Continues the docstring for the function `epilogue_tma_store`. **CN:** 继续说明 function `epilogue_tma_store` 的文档字符串。
+- **L173** `        d_major_mode: LayoutEnum for d_tensor, the function will automatically detect` — **EN:** Continues the docstring for the function `epilogue_tma_store`. **CN:** 继续说明 function `epilogue_tma_store` 的文档字符串。
+- **L174** `            the d_major_mode from gmem_d if not provided` — **EN:** Continues the docstring for the function `epilogue_tma_store`. **CN:** 继续说明 function `epilogue_tma_store` 的文档字符串。
+- **L175** `        tid_x_in_group: Thread index in the group of warps that issue TMA stores. For` — **EN:** Continues the docstring for the function `epilogue_tma_store`. **CN:** 继续说明 function `epilogue_tma_store` 的文档字符串。
+- **L176** `            example, if warps 4-7 are in the same group and calling this function,` — **EN:** Continues the docstring for the function `epilogue_tma_store`. **CN:** 继续说明 function `epilogue_tma_store` 的文档字符串。
+- **L177** `            tid_x_in_group should be 0-127 instead of 128-255. If not provided, the` — **EN:** Continues the docstring for the function `epilogue_tma_store`. **CN:** 继续说明 function `epilogue_tma_store` 的文档字符串。
+- **L178** `            function will use cute.arch.thread_idx().` — **EN:** Continues the docstring for the function `epilogue_tma_store`. **CN:** 继续说明 function `epilogue_tma_store` 的文档字符串。
+- **L179** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L180** `    Returns:` — **EN:** Continues the docstring for the function `epilogue_tma_store`. **CN:** 继续说明 function `epilogue_tma_store` 的文档字符串。
+- **L181** `        tma_store_pipeline: The updated TMAStorePipeline instance` — **EN:** Continues the docstring for the function `epilogue_tma_store`. **CN:** 继续说明 function `epilogue_tma_store` 的文档字符串。
+- **L182** `    """` — **EN:** Ends the docstring for the function `epilogue_tma_store`. **CN:** 结束说明 function `epilogue_tma_store` 的文档字符串。
+- **L183** `    from .algorithm import partition_and_copy` — **EN:** Imports partition_and_copy from `.algorithm`. **CN:** 从 `.algorithm` 导入 partition_and_copy。
+- **L184** `    from .memory import allocate, tma_store` — **EN:** Imports allocate, tma_store from `.memory`. **CN:** 从 `.memory` 导入 allocate, tma_store。
+- **L185** `    import cutlass.utils.blackwell_helpers as blackwell_helpers` — **EN:** Imports cutlass.utils.blackwell_helpers as blackwell_helpers for later use. **CN:** 导入 cutlass.utils.blackwell_helpers as blackwell_helpers 供后续使用。
+- **L186** `    from cutlass import utils as utils` — **EN:** Imports utils as utils from `cutlass`. **CN:** 从 `cutlass` 导入 utils as utils。
+- **L187** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L188** `    if cutlass.const_expr(tid_x_in_group is None):` — **EN:** Starts a conditional branch guarded by `cutlass.const_expr(tid_x_in_group is None)`. **CN:** 开始一个由 `cutlass.const_expr(tid_x_in_group is None)` 控制的条件分支。
+- **L189** `        tid_x_in_group, _, _ = cute.arch.thread_idx()` — **EN:** Assigns a value to (tid_x_in_group, _, _). **CN:** 将一个值赋给 (tid_x_in_group, _, _)。
+- **L190** `        tid_x_in_group = tid_x_in_group % 128` — **EN:** Assigns a value to tid_x_in_group. **CN:** 将一个值赋给 tid_x_in_group。
+- **L191** `    warp_idx = cute.arch.warp_idx()` — **EN:** Assigns a value to warp_idx. **CN:** 将一个值赋给 warp_idx。
+- **L192** `    warp_idx = cute.arch.make_warp_uniform(warp_idx)` — **EN:** Assigns a value to warp_idx. **CN:** 将一个值赋给 warp_idx。
+- **L193** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L194** `    acc_dtype = tmem_acc_buffer_staged.element_type` — **EN:** Assigns a value to acc_dtype. **CN:** 将一个值赋给 acc_dtype。
+- **L195** `    d_dtype = gmem_d.element_type` — **EN:** Assigns a value to d_dtype. **CN:** 将一个值赋给 d_dtype。
+- **L196** `    if cutlass.const_expr(d_major_mode is None):` — **EN:** Starts a conditional branch guarded by `cutlass.const_expr(d_major_mode is None)`. **CN:** 开始一个由 `cutlass.const_expr(d_major_mode is None)` 控制的条件分支。
+- **L197** `        d_major_mode = utils.LayoutEnum.from_tensor(gmem_d)` — **EN:** Assigns a value to d_major_mode. **CN:** 将一个值赋给 d_major_mode。
+- **L198** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L199** `    epi_tile_shape = blackwell_helpers.compute_epilogue_tile_shape(` — **EN:** Assigns a value to epi_tile_shape. **CN:** 将一个值赋给 epi_tile_shape。
+- **L200** `        cta_tile_shape_mnk,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L201** `        use_2cta_instrs,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L202** `        d_major_mode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L203** `        d_dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L204** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L205** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L206** `    copy_atom_t2r = blackwell_helpers.get_tmem_load_op(` — **EN:** Assigns a value to copy_atom_t2r. **CN:** 将一个值赋给 copy_atom_t2r。
+- **L207** `        cta_tile_shape_mnk,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L208** `        d_major_mode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L209** `        d_dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L210** `        acc_dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L211** `        epi_tile_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L212** `        use_2cta_instrs,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L213** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L214** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L215** `    acc_epi_div_tiled = cute.flat_divide(tmem_acc_buffer_staged, epi_tile_shape)` — **EN:** Assigns a value to acc_epi_div_tiled. **CN:** 将一个值赋给 acc_epi_div_tiled。
+- **L216** `    acc_epi_div_slice = acc_epi_div_tiled[None, None, 0, 0]` — **EN:** Assigns a value to acc_epi_div_slice. **CN:** 将一个值赋给 acc_epi_div_slice。
+- **L217** `    tiled_copy_t2r = cute.nvgpu.tcgen05.make_tmem_copy(copy_atom_t2r, acc_epi_div_slice)` — **EN:** Assigns a value to tiled_copy_t2r. **CN:** 将一个值赋给 tiled_copy_t2r。
+- **L218** `    tiled_copy_r2s = cute.make_tiled_copy_D(` — **EN:** Assigns a value to tiled_copy_r2s. **CN:** 将一个值赋给 tiled_copy_r2s。
+- **L219** `        cute.make_copy_atom(cute.nvgpu.CopyUniversalOp(), d_dtype),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L220** `        tiled_copy_t2r,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L221** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L222** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L223** `    tiler_mn = (cta_tile_shape_mnk[0], cta_tile_shape_mnk[1])  # type: ignore[index]` — **EN:** Assigns a value to tiler_mn. **CN:** 将一个值赋给 tiler_mn。
+- **L224** `    gmem_d_mn_tiled = cute.zipped_divide(gmem_d, tiler_mn)` — **EN:** Assigns a value to gmem_d_mn_tiled. **CN:** 将一个值赋给 gmem_d_mn_tiled。
+- **L225** `    gmem_d_tile = gmem_d_mn_tiled[(None, None), cta_d_tile_coord]` — **EN:** Assigns a value to gmem_d_tile. **CN:** 将一个值赋给 gmem_d_tile。
+- **L226** `    gmem_d_epi_tma = cute.flat_divide(gmem_d_tile, epi_tile_shape)  # type: ignore[arg-type]` — **EN:** Assigns a value to gmem_d_epi_tma. **CN:** 将一个值赋给 gmem_d_epi_tma。
+- **L227** `    epi_subtile_cnt = gmem_d_epi_tma.shape[3]  # type: ignore[index]` — **EN:** Assigns a value to epi_subtile_cnt. **CN:** 将一个值赋给 epi_subtile_cnt。
+- **L228** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L229** `    acc_d_rmem_layout = make_t2r_rmem_layout(` — **EN:** Assigns a value to acc_d_rmem_layout. **CN:** 将一个值赋给 acc_d_rmem_layout。
+- **L230** `        tiled_copy_t2r,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L231** `        gmem_d_epi_tma,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L232** `        tid_x_in_group,  # type: ignore[arg-type]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L233** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L234** `    rmem_acc_buffer = allocate(` — **EN:** Assigns a value to rmem_acc_buffer. **CN:** 将一个值赋给 rmem_acc_buffer。
+- **L235** `        acc_dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L236** `        cute.AddressSpace.rmem,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L237** `        acc_d_rmem_layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L238** `        alignment=32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L239** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L240** `    rmem_d_buffer = allocate(` — **EN:** Assigns a value to rmem_d_buffer. **CN:** 将一个值赋给 rmem_d_buffer。
+- **L241** `        d_dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L242** `        cute.AddressSpace.rmem,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L243** `        acc_d_rmem_layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L244** `        alignment=32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L245** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L246** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L247** `    d_smem_layout_staged = blackwell_helpers.make_smem_layout_epi(` — **EN:** Assigns a value to d_smem_layout_staged. **CN:** 将一个值赋给 d_smem_layout_staged。
+- **L248** `        d_dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L249** `        d_major_mode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L250** `        epi_tile_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L251** `        tma_store_pipeline.get_num_stages(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L252** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L253** `    smem_d_buffer = allocate(` — **EN:** Assigns a value to smem_d_buffer. **CN:** 将一个值赋给 smem_d_buffer。
+- **L254** `        d_dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L255** `        cute.AddressSpace.smem,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L256** `        d_smem_layout_staged,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L257** `        alignment=1024,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L258** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L259** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L260** `    for epi_subtile_idx in range(epi_subtile_cnt):  # type: ignore[arg-type]` — **EN:** Starts a loop assigning items from `range(epi_subtile_cnt)` to `epi_subtile_idx`. **CN:** 开始一个循环，将 `range(epi_subtile_cnt)` 的元素赋给 `epi_subtile_idx`。
+- **L261** `        # TMEM -> RMEM` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L262** `        partition_and_copy(` — **EN:** Invokes `partition_and_copy` as a standalone call. **CN:** 以独立语句方式调用 `partition_and_copy`。
+- **L263** `            tiled_copy_t2r.get_slice(tid_x_in_group),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L264** `            acc_epi_div_tiled[None, None, 0, epi_subtile_idx],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L265** `            rmem_acc_buffer,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L266** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L267** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L268** `        # RMEM -> RMEM and epilogue Op` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L269** `        acc_vec = rmem_acc_buffer.load()` — **EN:** Assigns a value to acc_vec. **CN:** 将一个值赋给 acc_vec。
+- **L270** `        epilogue_out = epilogue_op(acc_vec.to(d_dtype))` — **EN:** Assigns a value to epilogue_out. **CN:** 将一个值赋给 epilogue_out。
+- **L271** `        rmem_d_buffer.store(epilogue_out)` — **EN:** Invokes `rmem_d_buffer.store` as a standalone call. **CN:** 以独立语句方式调用 `rmem_d_buffer.store`。
+- **L272** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L273** `        # RMEM -> SMEM` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L274** `        # The TMA store pipeline coordinates multiple warps writing to SMEM` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L275** `        # before a single warp issues the TMA store.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L276** `        # acquire_sync():` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L277** `        # - TMA warp waits for any in-flight TMA ops to complete` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L278** `        # - All warps synchronize via a named barrier` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L279** `        tma_store_pipeline.acquire_sync()` — **EN:** Invokes `tma_store_pipeline.acquire_sync` as a standalone call. **CN:** 以独立语句方式调用 `tma_store_pipeline.acquire_sync`。
+- **L280** `        store_idx = tma_store_pipeline.get_index()` — **EN:** Assigns a value to store_idx. **CN:** 将一个值赋给 store_idx。
+- **L281** `        partition_and_copy(` — **EN:** Invokes `partition_and_copy` as a standalone call. **CN:** 以独立语句方式调用 `partition_and_copy`。
+- **L282** `            tiled_copy_r2s.get_slice(tid_x_in_group),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L283** `            rmem_d_buffer,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L284** `            smem_d_buffer[None, None, store_idx],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L285** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L286** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L287** `        # commit_sync():` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L288** `        # - Fences SMEM writes to ensure visibility for TMA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L289** `        # - All warps synchronize before TMA store` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L290** `        # This is CRITICAL: TMA must see committed SMEM writes` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L291** `        tma_store_pipeline.commit_sync()` — **EN:** Invokes `tma_store_pipeline.commit_sync` as a standalone call. **CN:** 以独立语句方式调用 `tma_store_pipeline.commit_sync`。
+- **L292** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L293** `        # SMEM -> GMEM` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L294** `        if warp_idx == tma_store_warp_id:` — **EN:** Starts a conditional branch guarded by `warp_idx == tma_store_warp_id`. **CN:** 开始一个由 `warp_idx == tma_store_warp_id` 控制的条件分支。
+- **L295** `            tma_store(` — **EN:** Invokes `tma_store` as a standalone call. **CN:** 以独立语句方式调用 `tma_store`。
+- **L296** `                smem_d_buffer[None, None, store_idx],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L297** `                gmem_d_epi_tma[None, None, 0, epi_subtile_idx],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L298** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L299** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L300** `        # release_advance():` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L301** `        # - TMA warp commits TMA ops to bulk group` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L302** `        # - All warps advance to the next pipeline stage` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L303** `        tma_store_pipeline.release_advance()` — **EN:** Invokes `tma_store_pipeline.release_advance` as a standalone call. **CN:** 以独立语句方式调用 `tma_store_pipeline.release_advance`。
+- **L304** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L305** `    tma_store_pipeline.tail()` — **EN:** Invokes `tma_store_pipeline.tail` as a standalone call. **CN:** 以独立语句方式调用 `tma_store_pipeline.tail`。
+- **L306** `    return tma_store_pipeline` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L307** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L308** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L309** `@_dsl.CuteExperimentalDSL.jit` — **EN:** Applies decorator `_dsl.CuteExperimentalDSL.jit` to the following definition. **CN:** 将装饰器 `_dsl.CuteExperimentalDSL.jit` 应用于后面的定义。
+- **L310** `def mainloop_mma(` — **EN:** Defines function `mainloop_mma`. **CN:** 定义函数 `mainloop_mma`。
+- **L311** `    tiled_mma: cute.TiledMma,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L312** `    a_buffer: cute.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L313** `    b_buffer: cute.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L314** `    acc_buffer: cute.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L315** `    k_tile_start: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L316** `    k_tile_end: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L317** `    mma_inst_tile_k: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L318** `    a_buffer_pipeline: TMAToUMMAPipeline,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L319** `    b_buffer_pipeline: TMAToUMMAPipeline,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L320** `    ab_buffer_same_pipeline: bool = True,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L321** `    accumulate_to_acc: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L322** `) -> Tuple[TMAToUMMAPipeline, TMAToUMMAPipeline]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L323** `    """` — **EN:** Starts the docstring for the function `mainloop_mma`. **CN:** 开始说明 function `mainloop_mma` 的文档字符串。
+- **L324** `    Mainloop MMA phase: consume A/B tiles from the pipeline and compute into TMEM accumulator.` — **EN:** Continues the docstring for the function `mainloop_mma`. **CN:** 继续说明 function `mainloop_mma` 的文档字符串。
+- **L325** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L326** `    This function is the consumer side of the TMA load -> MMA pipeline. It waits` — **EN:** Continues the docstring for the function `mainloop_mma`. **CN:** 继续说明 function `mainloop_mma` 的文档字符串。
+- **L327** `    for the TMA load warp to fill a pipeline stage, then runs multiple MMA` — **EN:** Continues the docstring for the function `mainloop_mma`. **CN:** 继续说明 function `mainloop_mma` 的文档字符串。
+- **L328** `    instructions over the K-tile (inner loop over mma_inst_tile_k), and releases the stage.` — **EN:** Continues the docstring for the function `mainloop_mma`. **CN:** 继续说明 function `mainloop_mma` 的文档字符串。
+- **L329** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L330** `    Args:` — **EN:** Continues the docstring for the function `mainloop_mma`. **CN:** 继续说明 function `mainloop_mma` 的文档字符串。
+- **L331** `        tiled_mma: Tiled MMA descriptor (e.g. from blackwell_helpers.make_trivial_tiled_mma)` — **EN:** Continues the docstring for the function `mainloop_mma`. **CN:** 继续说明 function `mainloop_mma` 的文档字符串。
+- **L332** `        a_buffer: A operand buffer, shape (..., mma_inst_tile_k, num_a_buffer_stages)` — **EN:** Continues the docstring for the function `mainloop_mma`. **CN:** 继续说明 function `mainloop_mma` 的文档字符串。
+- **L333** `        b_buffer: B operand buffer, shape (..., mma_inst_tile_k, num_b_buffer_stages)` — **EN:** Continues the docstring for the function `mainloop_mma`. **CN:** 继续说明 function `mainloop_mma` 的文档字符串。
+- **L334** `        acc_buffer: Accumulator buffer for this CTA's tile` — **EN:** Continues the docstring for the function `mainloop_mma`. **CN:** 继续说明 function `mainloop_mma` 的文档字符串。
+- **L335** `        k_tile_start: Start index of the K-tile to iterate over (outer loop)` — **EN:** Continues the docstring for the function `mainloop_mma`. **CN:** 继续说明 function `mainloop_mma` 的文档字符串。
+- **L336** `        k_tile_end: End index of the K-tile to iterate over (outer loop)` — **EN:** Continues the docstring for the function `mainloop_mma`. **CN:** 继续说明 function `mainloop_mma` 的文档字符串。
+- **L337** `        mma_inst_tile_k: Number of MMA instructions per K-tile (inner loop)` — **EN:** Continues the docstring for the function `mainloop_mma`. **CN:** 继续说明 function `mainloop_mma` 的文档字符串。
+- **L338** `        a_buffer_pipeline: TMAToUMMAPipeline to sync with TMA load producer for A buffer` — **EN:** Continues the docstring for the function `mainloop_mma`. **CN:** 继续说明 function `mainloop_mma` 的文档字符串。
+- **L339** `        b_buffer_pipeline: TMAToUMMAPipeline to sync with TMA load producer for B buffer` — **EN:** Continues the docstring for the function `mainloop_mma`. **CN:** 继续说明 function `mainloop_mma` 的文档字符串。
+- **L340** `        ab_buffer_same_pipeline: If the TMA load producers for A and B are the same pipeline` — **EN:** Continues the docstring for the function `mainloop_mma`. **CN:** 继续说明 function `mainloop_mma` 的文档字符串。
+- **L341** `        accumulate_to_acc: If the first K-tile should accumulate to the accumulator,` — **EN:** Continues the docstring for the function `mainloop_mma`. **CN:** 继续说明 function `mainloop_mma` 的文档字符串。
+- **L342** `            otherwise the result will be overwritten.` — **EN:** Continues the docstring for the function `mainloop_mma`. **CN:** 继续说明 function `mainloop_mma` 的文档字符串。
+- **L343** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L344** `    Returns:` — **EN:** Continues the docstring for the function `mainloop_mma`. **CN:** 继续说明 function `mainloop_mma` 的文档字符串。
+- **L345** `        a_buffer_pipeline: The updated TMAToUMMAPipeline for A buffer` — **EN:** Continues the docstring for the function `mainloop_mma`. **CN:** 继续说明 function `mainloop_mma` 的文档字符串。
+- **L346** `        b_buffer_pipeline: The updated TMAToUMMAPipeline for B buffer` — **EN:** Continues the docstring for the function `mainloop_mma`. **CN:** 继续说明 function `mainloop_mma` 的文档字符串。
+- **L347** `    """` — **EN:** Ends the docstring for the function `mainloop_mma`. **CN:** 结束说明 function `mainloop_mma` 的文档字符串。
+- **L348** `    from .math import dot` — **EN:** Imports dot from `.math`. **CN:** 从 `.math` 导入 dot。
+- **L349** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L350** `    mma_atom = cute.make_mma_atom(tiled_mma.op)` — **EN:** Assigns a value to mma_atom. **CN:** 将一个值赋给 mma_atom。
+- **L351** `    mma_atom.set(cute.nvgpu.tcgen05.Field.ACCUMULATE, accumulate_to_acc)` — **EN:** Invokes `mma_atom.set` as a standalone call. **CN:** 以独立语句方式调用 `mma_atom.set`。
+- **L352** `    for _k_tile in cutlass.range(k_tile_start, k_tile_end, 1, unroll=1):` — **EN:** Starts a loop assigning items from `cutlass.range(k_tile_start, k_tile_end, 1, unro...` to `_k_tile`. **CN:** 开始一个循环，将 `cutlass.range(k_tile_start, k_tile_end, 1, unro...` 的元素赋给 `_k_tile`。
+- **L353** `        _, a_buffer_stage_idx = a_buffer_pipeline.consumer_wait_and_get_stage()` — **EN:** Assigns a value to (_, a_buffer_stage_idx). **CN:** 将一个值赋给 (_, a_buffer_stage_idx)。
+- **L354** `        if cutlass.const_expr(ab_buffer_same_pipeline):` — **EN:** Starts a conditional branch guarded by `cutlass.const_expr(ab_buffer_same_pipeline)`. **CN:** 开始一个由 `cutlass.const_expr(ab_buffer_same_pipeline)` 控制的条件分支。
+- **L355** `            b_buffer_stage_idx = a_buffer_stage_idx` — **EN:** Assigns a value to b_buffer_stage_idx. **CN:** 将一个值赋给 b_buffer_stage_idx。
+- **L356** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L357** `            _, b_buffer_stage_idx = b_buffer_pipeline.consumer_wait_and_get_stage()` — **EN:** Assigns a value to (_, b_buffer_stage_idx). **CN:** 将一个值赋给 (_, b_buffer_stage_idx)。
+- **L358** `        for k_instr_tile in cutlass.range(mma_inst_tile_k, unroll_full=True):` — **EN:** Starts a loop assigning items from `cutlass.range(mma_inst_tile_k, unroll_full=True)` to `k_instr_tile`. **CN:** 开始一个循环，将 `cutlass.range(mma_inst_tile_k, unroll_full=True)` 的元素赋给 `k_instr_tile`。
+- **L359** `            a_buffer_sliced = a_buffer[None, None, k_instr_tile, a_buffer_stage_idx]` — **EN:** Assigns a value to a_buffer_sliced. **CN:** 将一个值赋给 a_buffer_sliced。
+- **L360** `            b_buffer_sliced = b_buffer[None, None, k_instr_tile, b_buffer_stage_idx]` — **EN:** Assigns a value to b_buffer_sliced. **CN:** 将一个值赋给 b_buffer_sliced。
+- **L361** `            dot(` — **EN:** Invokes `dot` as a standalone call. **CN:** 以独立语句方式调用 `dot`。
+- **L362** `                mma_atom,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L363** `                cute.append_ones(a_buffer_sliced, up_to_rank=3),  # type: ignore[arg-type]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L364** `                cute.append_ones(b_buffer_sliced, up_to_rank=3),  # type: ignore[arg-type]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L365** `                acc_buffer,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L366** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L367** `            mma_atom.set(cute.nvgpu.tcgen05.Field.ACCUMULATE, True)` — **EN:** Invokes `mma_atom.set` as a standalone call. **CN:** 以独立语句方式调用 `mma_atom.set`。
+- **L368** `        a_buffer_pipeline.consumer_release_and_advance()` — **EN:** Invokes `a_buffer_pipeline.consumer_release_and_advance` as a standalone call. **CN:** 以独立语句方式调用 `a_buffer_pipeline.consumer_release_and_advance`。
+- **L369** `        if not cutlass.const_expr(ab_buffer_same_pipeline):` — **EN:** Starts a conditional branch guarded by `not cutlass.const_expr(ab_buffer_same_pipeline)`. **CN:** 开始一个由 `not cutlass.const_expr(ab_buffer_same_pipeline)` 控制的条件分支。
+- **L370** `            b_buffer_pipeline.consumer_release_and_advance()` — **EN:** Invokes `b_buffer_pipeline.consumer_release_and_advance` as a standalone call. **CN:** 以独立语句方式调用 `b_buffer_pipeline.consumer_release_and_advance`。
+- **L371** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L372** `    return a_buffer_pipeline, b_buffer_pipeline` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.cute.experimental.utils`. CN: 模块名为 `CuTeDSL.cutlass.cute.experimental.utils`。
+- EN: Top-level functions: get_cta_v_map_ab, get_cta_v_map_c, make_tmem_layout_acc, make_tmem_layout_a, make_t2r_rmem_layout, epilogue_tma_store, mainloop_mma CN: 顶层函数包括：get_cta_v_map_ab, get_cta_v_map_c, make_tmem_layout_acc, make_tmem_layout_a, make_t2r_rmem_layout, epilogue_tma_store, mainloop_mma
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass, cutlass:cute, cutlass._mlir:ir, ...:cutlass_dsl, .pipeline:TMAStorePipeline,TMAToUMMAPipeline, .algorithm:partition_and_copy, .memory:allocate,tma_store, cutlass.utils.blackwell_helpers, cutlass:utils, .math:dot CN: 内部依赖：cutlass, cutlass:cute, cutlass._mlir:ir, ...:cutlass_dsl, .pipeline:TMAStorePipeline,TMAToUMMAPipeline, .algorithm:partition_and_copy, .memory:allocate,tma_store, cutlass.utils.blackwell_helpers, cutlass:utils, .math:dot
+- EN: External or standard-library dependencies: typing:Callable,Optional,Tuple,Union CN: 外部或标准库依赖：typing:Callable,Optional,Tuple,Union

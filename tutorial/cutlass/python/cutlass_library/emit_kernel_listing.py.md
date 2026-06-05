@@ -1,0 +1,943 @@
+# emit_kernel_listing.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_library/emit_kernel_listing.py`
+
+## Purpose / 作用
+- EN: Defines 10 functions (hash_cutlass_string, transform_hashed_string, get_kernel_features, get_kernel_params, ... (+6 more)) in `cutlass_library.emit_kernel_listing`.
+- CN: 该模块 `cutlass_library.emit_kernel_listing` 定义了 10 个函数（hash_cutlass_string, transform_hashed_string, get_kernel_features, get_kernel_params, ... (+6 more)）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2024 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L34** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L35** `# \brief Generates the CUTLASS kernel listing with kernel filtering` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L36** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L37** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L38** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L39** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L40** `###############################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L41** `# Example usage:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L42** `# generator.py --operations all --generator-target kernel_listing \` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L43** `# --architectures "70;75;80" --kernels "*" --disable-cutlass-package-imports` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L44** `###############################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L45** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L46** `import collections` — **EN:** Imports collections for later use. **CN:** 导入 collections 供后续使用。
+- **L47** `import csv` — **EN:** Imports csv for later use. **CN:** 导入 csv 供后续使用。
+- **L48** `import json` — **EN:** Imports json for later use. **CN:** 导入 json 供后续使用。
+- **L49** `import math` — **EN:** Imports math for later use. **CN:** 导入 math 供后续使用。
+- **L50** `import os` — **EN:** Imports os for later use. **CN:** 导入 os 供后续使用。
+- **L51** `import re` — **EN:** Imports re for later use. **CN:** 导入 re 供后续使用。
+- **L52** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L53** `try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L54** `  import builtins` — **EN:** Imports builtins for later use. **CN:** 导入 builtins 供后续使用。
+- **L55** `  if hasattr(builtins, "CUTLASS_IGNORE_PACKAGE") and CUTLASS_IGNORE_PACKAGE == True:` — **EN:** Starts a conditional branch guarded by `hasattr(builtins, 'CUTLASS_IGNORE_PACKAGE') and CUTLASS_I...`. **CN:** 开始一个由 `hasattr(builtins, 'CUTLASS_IGNORE_PACKAGE') and CUTLASS_I...` 控制的条件分支。
+- **L56** `    raise ImportError("Disabling attempt to import cutlass_library")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L57** `  from cutlass_library.library import *` — **EN:** Imports * from `cutlass_library.library`. **CN:** 从 `cutlass_library.library` 导入 *。
+- **L58** `except ImportError:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L59** `  from library import *` — **EN:** Imports * from `library`. **CN:** 从 `library` 导入 *。
+- **L60** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L61** `audit_csv_fields = [` — **EN:** Assigns a value to audit_csv_fields. **CN:** 将一个值赋给 audit_csv_fields。
+- **L62** `  "KernelType", "KernelName", "Type_A", "Type_B", "Type_C", "Type_Acc", "Type_EpilogueScale", "Type_D", "Type_SFA", "Type_SFD",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L63** `  "Layout_A", "Layout_B", "Layout_C", "Layout_D", ` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L64** `  "Alignment_A", "Alignment_B", "Alignment_C", "Alignment_D",  ` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L65** `  "1SM/2SM", ` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L66** `  "StreamK Enabled", "Support Runtime_Cluster_Shape", "Support Runtime_Input_Types",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L67** `  "Test Counts"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L68** `]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L69** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L70** `audit_csv_runtime_fields = [` — **EN:** Assigns a value to audit_csv_runtime_fields. **CN:** 将一个值赋给 audit_csv_runtime_fields。
+- **L71** `  "KerneIndex", "KernelName", ` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L72** `  "Inst_M", "Inst_N", "Inst_K", "Tile_M", "Tile_N", "Tile_K",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L73** `  "Cluster_M", "Cluster_N", "Cluster_K", "Preferred_Cluster_M", "Preferred_Cluster_N", "Preferred_Cluster_K", "Fallback_Cluster_M", "Fallback_Cluster_N", "Fallback_Cluster_K",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L74** `  "M", "N", "K", "L", "Alpha_val", "Beta_val",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L75** `  "Runtime_Input_Types Enabled", "Runtime_Cluster_Shape Enabled"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L76** `]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L77** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L78** `def hash_cutlass_string(input_string):` — **EN:** Defines function `hash_cutlass_string`. **CN:** 定义函数 `hash_cutlass_string`。
+- **L79** `  mma_cluster_shape_pattern = r"_\d+x\d+x\d+"         # Matches MMA and Cluster shapes (e.g., '_128x128x256', '_0x0x1')` — **EN:** Assigns a value to mma_cluster_shape_pattern. **CN:** 将一个值赋给 mma_cluster_shape_pattern。
+- **L80** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L81** `  # Remove MMA and Cluster shapes (e.g., '_128x128x256', '_0x0x1')` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L82** `  output = re.sub(mma_cluster_shape_pattern, "", input_string)` — **EN:** Assigns a value to output. **CN:** 将一个值赋给 output。
+- **L83** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L84** `  return output` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L85** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L86** `def transform_hashed_string(hashed_kernel_name, runtime_datatype_a, runtime_datatype_b):` — **EN:** Defines function `transform_hashed_string`. **CN:** 定义函数 `transform_hashed_string`。
+- **L87** `  # Define a dictionary mapping the detected types to runtime values` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L88** `  datatype_map = {` — **EN:** Assigns a value to datatype_map. **CN:** 将一个值赋给 datatype_map。
+- **L89** `    'f4_f4': runtime_datatype_a + '_' + runtime_datatype_b,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L90** `    'f4_f6': runtime_datatype_a + '_' + runtime_datatype_b,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L91** `    'f4_f8': runtime_datatype_a + '_' + runtime_datatype_b,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L92** `    'f6_f4': runtime_datatype_a + '_' + runtime_datatype_b,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L93** `    'f6_f6': runtime_datatype_a + '_' + runtime_datatype_b,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L94** `    'f6_f8': runtime_datatype_a + '_' + runtime_datatype_b,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L95** `    'f8_f4': runtime_datatype_a + '_' + runtime_datatype_b,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L96** `    'f8_f6': runtime_datatype_a + '_' + runtime_datatype_b,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L97** `    'f8_f8': runtime_datatype_a + '_' + runtime_datatype_b,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L98** `    'ue8m0xf4_ue8m0xf4': 'ue8m0x' + runtime_datatype_a + '_ue8m0x' + runtime_datatype_b,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L99** `    'ue4m3xf4_ue4m3xf4': 'ue4m3x' + runtime_datatype_a + '_ue4m3x' + runtime_datatype_b,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L100** `    'ue8m0xf4_ue8m0xf6': 'ue8m0x' + runtime_datatype_a + '_ue8m0x' + runtime_datatype_b,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L101** `    'ue8m0xf4_ue8m0xf8': 'ue8m0x' + runtime_datatype_a + '_ue8m0x' + runtime_datatype_b,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L102** `    'ue8m0xf6_ue8m0xf4': 'ue8m0x' + runtime_datatype_a + '_ue8m0x' + runtime_datatype_b,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L103** `    'ue8m0xf6_ue8m0xf6': 'ue8m0x' + runtime_datatype_a + '_ue8m0x' + runtime_datatype_b,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L104** `    'ue8m0xf8_ue8m0xf4': 'ue8m0x' + runtime_datatype_a + '_ue8m0x' + runtime_datatype_b,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L105** `    'ue8m0xf8_ue8m0xf6': 'ue8m0x' + runtime_datatype_a + '_ue8m0x' + runtime_datatype_b,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L106** `    'ue8m0xf8_ue8m0xf8': 'ue8m0x' + runtime_datatype_a + '_ue8m0x' + runtime_datatype_b,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L107** `  }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L108** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L109** `  # Regular expression to detect all the keys in datatype_map` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L110** `  pattern = re.compile(r'(' + '|'.join(map(re.escape, datatype_map.keys())) + r')')` — **EN:** Assigns a value to pattern. **CN:** 将一个值赋给 pattern。
+- **L111** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L112** `  # Replace detected patterns using the dictionary` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L113** `  updated_kernel_name = pattern.sub(lambda match: datatype_map[match.group(0)], hashed_kernel_name)` — **EN:** Assigns a value to updated_kernel_name. **CN:** 将一个值赋给 updated_kernel_name。
+- **L114** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L115** `  return updated_kernel_name` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L116** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L117** `# This helper function reports foundational kernel features: datatypes, layouts, alignment and stream-k.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L118** `def get_kernel_features(operation, kernel_name,` — **EN:** Defines function `get_kernel_features`. **CN:** 定义函数 `get_kernel_features`。
+- **L119** `              dynamic_datatype, runtime_input_datatype):` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L120** `  numcta_inst = "2sm" if "2sm" in kernel_name else "1sm"` — **EN:** Assigns a value to numcta_inst. **CN:** 将一个值赋给 numcta_inst。
+- **L121** `  math_inst = operation.tile_description.math_instruction` — **EN:** Assigns a value to math_inst. **CN:** 将一个值赋给 math_inst。
+- **L122** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L123** `  if dynamic_datatype:` — **EN:** Starts a conditional branch guarded by `dynamic_datatype`. **CN:** 开始一个由 `dynamic_datatype` 控制的条件分支。
+- **L124** `      dtype_name_A = runtime_input_datatype[0]` — **EN:** Assigns a value to dtype_name_A. **CN:** 将一个值赋给 dtype_name_A。
+- **L125** `      dtype_name_B = runtime_input_datatype[1]` — **EN:** Assigns a value to dtype_name_B. **CN:** 将一个值赋给 dtype_name_B。
+- **L126** `  else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L127** `      dtype_name_A = DataTypeNames[operation.A.element]` — **EN:** Assigns a value to dtype_name_A. **CN:** 将一个值赋给 dtype_name_A。
+- **L128** `      dtype_name_B = DataTypeNames[operation.B.element]` — **EN:** Assigns a value to dtype_name_B. **CN:** 将一个值赋给 dtype_name_B。
+- **L129** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L130** `  layout_name_A = ShortLayoutTypeNames[operation.A.layout]` — **EN:** Assigns a value to layout_name_A. **CN:** 将一个值赋给 layout_name_A。
+- **L131** `  layout_name_B = ShortLayoutTypeNames[operation.B.layout]` — **EN:** Assigns a value to layout_name_B. **CN:** 将一个值赋给 layout_name_B。
+- **L132** `  layout_name_C = ShortLayoutTypeNames[operation.C.layout]` — **EN:** Assigns a value to layout_name_C. **CN:** 将一个值赋给 layout_name_C。
+- **L133** `  layout_name_D = ShortLayoutTypeNames[operation.D.layout]` — **EN:** Assigns a value to layout_name_D. **CN:** 将一个值赋给 layout_name_D。
+- **L134** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L135** `  scale_factor_D_type = operation.ScaleFactorD.element if hasattr(operation, "ScaleFactorD") else DataType.void` — **EN:** Assigns a value to scale_factor_D_type. **CN:** 将一个值赋给 scale_factor_D_type。
+- **L136** `  scale_factor_A_type = getattr(operation, "ScaleFactorA", DataType.void)` — **EN:** Assigns a value to scale_factor_A_type. **CN:** 将一个值赋给 scale_factor_A_type。
+- **L137** `  audit_vals = [` — **EN:** Assigns a value to audit_vals. **CN:** 将一个值赋给 audit_vals。
+- **L138** `          "BlockScaledGEMM" if math_inst.opcode_class == OpcodeClass.BlockScaledTensorOp else "GEMM",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L139** `          kernel_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L140** `          dtype_name_A,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L141** `          dtype_name_B,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L142** `          DataTypeNames[operation.C.element],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L143** `          DataTypeNames[operation.tile_description.math_instruction.element_accumulator],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L144** `          DataTypeNames[operation.element_epilogue],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L145** `          DataTypeNames[operation.D.element],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L146** `          DataTypeNames[scale_factor_D_type],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L147** `          DataTypeNames[scale_factor_A_type],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L148** `          layout_name_A,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L149** `          layout_name_B,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L150** `          layout_name_C,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L151** `          layout_name_D,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L152** `          str(operation.A.alignment),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L153** `          str(operation.B.alignment),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L154** `          str(operation.C.alignment),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L155** `          str(operation.D.alignment),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L156** `          numcta_inst,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L157** `          "Y" if 'stream_k' in kernel_name else "N",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L158** `  ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L159** `  return audit_vals` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L160** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L161** `# This helper function reports other performance-related kernel parameters and those can be specified at runtime: cluster_shape, instruction shap, m/n/k and alpha/beta.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L162** `def get_kernel_params(operation, kernel_name, cluster_shape, fallback_cluster_shape, problem_shape, alpha, beta, dynamic_datatype, dynamic_cluster):` — **EN:** Defines function `get_kernel_params`. **CN:** 定义函数 `get_kernel_params`。
+- **L163** `  math_inst = operation.tile_description.math_instruction` — **EN:** Assigns a value to math_inst. **CN:** 将一个值赋给 math_inst。
+- **L164** `  audit_vals = [` — **EN:** Assigns a value to audit_vals. **CN:** 将一个值赋给 audit_vals。
+- **L165** `          str(math_inst.instruction_shape[0]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L166** `          str(math_inst.instruction_shape[1]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L167** `          str(math_inst.instruction_shape[2]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L168** `          str(operation.tile_description.threadblock_shape[0]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L169** `          str(operation.tile_description.threadblock_shape[1]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L170** `          str(operation.tile_description.threadblock_shape[2]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L171** `          str(operation.tile_description.cluster_shape[0]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L172** `          str(operation.tile_description.cluster_shape[1]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L173** `          str(operation.tile_description.cluster_shape[2]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L174** `          str(cluster_shape[0]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L175** `          str(cluster_shape[1]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L176** `          str(cluster_shape[2]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L177** `          str(fallback_cluster_shape[0]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L178** `          str(fallback_cluster_shape[1]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L179** `          str(fallback_cluster_shape[2]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L180** `          str(problem_shape[0]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L181** `          str(problem_shape[1]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L182** `          str(problem_shape[2]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L183** `          str(problem_shape[3]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L184** `          str(alpha),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L185** `          str(beta),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L186** `          "Y" if dynamic_datatype else "N",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L187** `          "Y" if dynamic_cluster else "N",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L188** `  ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L189** `  return audit_vals` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L190** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L191** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L192** `def _getSubOperationType(kernel):` — **EN:** Defines function `_getSubOperationType`. **CN:** 定义函数 `_getSubOperationType`。
+- **L193** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L194** `  if kernel.operation_kind == OperationKind.Gemm:` — **EN:** Starts a conditional branch guarded by `kernel.operation_kind == OperationKind.Gemm`. **CN:** 开始一个由 `kernel.operation_kind == OperationKind.Gemm` 控制的条件分支。
+- **L195** `      return GemmKindNames[kernel.gemm_kind]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L196** `  elif kernel.operation_kind == OperationKind.Conv2d:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L197** `    return "conv_" + ConvKindNames[kernel.conv_kind]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L198** `  elif kernel.operation_kind == OperationKind.Syrk:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L199** `    return "syrk_" + SyrkKindNames[kernel.syrk_kind]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L200** `  elif kernel.operation_kind == OperationKind.Trmm:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L201** `    return "trmm_" + TrmmKindNames[kernel.trmm_kind]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L202** `  elif kernel.operation_kind == OperationKind.Symm:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L203** `    return "symm_" + SymmKindNames[kernel.symm_kind]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L204** `  else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L205** `    raise Exception("Unsupported kernel type")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L206** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L207** `def _get_inst_shape(math_instruction):` — **EN:** Defines function `_get_inst_shape`. **CN:** 定义函数 `_get_inst_shape`。
+- **L208** `  return "".join(str(x) for x in math_instruction.instruction_shape)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L209** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L210** `def _is_simt_inst(math_instruction):` — **EN:** Defines function `_is_simt_inst`. **CN:** 定义函数 `_is_simt_inst`。
+- **L211** `  return _get_inst_shape(math_instruction) in ["111","114"]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L212** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L213** `def _getInstType(input_precision, accumulate_precision, math_instruction):` — **EN:** Defines function `_getInstType`. **CN:** 定义函数 `_getInstType`。
+- **L214** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L215** `  # inst_shape` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L216** `  inst_shape = _get_inst_shape(math_instruction)` — **EN:** Assigns a value to inst_shape. **CN:** 将一个值赋给 inst_shape。
+- **L217** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L218** `  # input precision` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L219** `  if input_precision == "fp32" and inst_shape != "111":` — **EN:** Starts a conditional branch guarded by `input_precision == 'fp32' and inst_shape != '111'`. **CN:** 开始一个由 `input_precision == 'fp32' and inst_shape != '111'` 控制的条件分支。
+- **L220** `    inp = "tf32"` — **EN:** Assigns a value to inp. **CN:** 将一个值赋给 inp。
+- **L221** `  else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L222** `    inp = input_precision` — **EN:** Assigns a value to inp. **CN:** 将一个值赋给 inp。
+- **L223** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L224** `  # Handle SIMT op types first` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L225** `  if _is_simt_inst(math_instruction):` — **EN:** Starts a conditional branch guarded by `_is_simt_inst(math_instruction)`. **CN:** 开始一个由 `_is_simt_inst(math_instruction)` 控制的条件分支。
+- **L226** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L227** `    simt_input_precision_to_inst = {` — **EN:** Assigns a value to simt_input_precision_to_inst. **CN:** 将一个值赋给 simt_input_precision_to_inst。
+- **L228** `      "fp32": "FFMA",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L229** `      "fp64": "DFMA",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L230** `      "fp16": "HFMA",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L231** `      "int8": "IDP4A",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L232** `    }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L233** `    inst = simt_input_precision_to_inst[input_precision]` — **EN:** Assigns a value to inst. **CN:** 将一个值赋给 inst。
+- **L234** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L235** `  else: # Tensor op instructions` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L236** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L237** `    if accumulate_precision == "cf64":` — **EN:** Starts a conditional branch guarded by `accumulate_precision == 'cf64'`. **CN:** 开始一个由 `accumulate_precision == 'cf64'` 控制的条件分支。
+- **L238** `      fp64_acc_map = {` — **EN:** Assigns a value to fp64_acc_map. **CN:** 将一个值赋给 fp64_acc_map。
+- **L239** `        MathOperation.multiply_add_complex_gaussian : "gz",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L240** `        MathOperation.multiply_add_complex          : "z",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L241** `      }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L242** `      acc = fp64_acc_map[math_instruction.math_operation]` — **EN:** Assigns a value to acc. **CN:** 将一个值赋给 acc。
+- **L243** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L244** `      tensor_op_acc_map = {` — **EN:** Assigns a value to tensor_op_acc_map. **CN:** 将一个值赋给 tensor_op_acc_map。
+- **L245** `        "fp32" : "s",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L246** `        "cf32" : "s",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L247** `        "fp16" : "h",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L248** `        "int32": "i",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L249** `        "fp64" : "d",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L250** `      }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L251** `      acc = tensor_op_acc_map[accumulate_precision]` — **EN:** Assigns a value to acc. **CN:** 将一个值赋给 acc。
+- **L252** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L253** `    inst = "{}{}{}".format(acc, inst_shape, inp)` — **EN:** Assigns a value to inst. **CN:** 将一个值赋给 inst。
+- **L254** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L255** `  return inst` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L256** `# TODO: Computes FLOps/Bytes for GEMM - revisit for conv` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L257** `def _computeFlopsPerByte(operation, m, n, k, batch_count=1, beta=0.0, num_groups=1):` — **EN:** Defines function `_computeFlopsPerByte`. **CN:** 定义函数 `_computeFlopsPerByte`。
+- **L258** `  assert not (batch_count > 1 and num_groups > 1)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L259** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L260** `  # TODO: adjust for sparsity` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L261** `  gmem_bytes = (` — **EN:** Assigns a value to gmem_bytes. **CN:** 将一个值赋给 gmem_bytes。
+- **L262** `    (DataTypeSize[operation.A.element] * m // 8) * k +` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L263** `    (DataTypeSize[operation.B.element] * n // 8) * k +` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L264** `    (DataTypeSize[operation.C.element] * m // 8) * n` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L265** `  )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L266** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L267** `  # TODO: complex-valued support` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L268** `  flops = 2 * (m * n * k)` — **EN:** Assigns a value to flops. **CN:** 将一个值赋给 flops。
+- **L269** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L270** `  if bool(beta):` — **EN:** Starts a conditional branch guarded by `bool(beta)`. **CN:** 开始一个由 `bool(beta)` 控制的条件分支。
+- **L271** `    gmem_bytes += (DataTypeSize[operation.C.element] * m // 8) * n` — **EN:** Updates gmem_bytes in place. **CN:** 原地更新 gmem_bytes。
+- **L272** `    flops += 2 * m * n` — **EN:** Updates flops in place. **CN:** 原地更新 flops。
+- **L273** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L274** `  multiplier = max(batch_count, num_groups)` — **EN:** Assigns a value to multiplier. **CN:** 将一个值赋给 multiplier。
+- **L275** `  gmem_bytes *= multiplier` — **EN:** Updates gmem_bytes in place. **CN:** 原地更新 gmem_bytes。
+- **L276** `  flops *= multiplier` — **EN:** Updates flops in place. **CN:** 原地更新 flops。
+- **L277** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L278** `  return flops / gmem_bytes` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L279** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L280** `def emit_gemm_kernel_testlist(manifest, curr_build_dir, arch, mode` — **EN:** Defines function `emit_gemm_kernel_testlist`. **CN:** 定义函数 `emit_gemm_kernel_testlist`。
+- **L281** `                              ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L282** `  # For functional testing, we prefer to run reference computing on device if any` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L283** `  reference_device_archs = ["100a", "103a"]` — **EN:** Assigns a value to reference_device_archs. **CN:** 将一个值赋给 reference_device_archs。
+- **L284** `  run_reference_on_device = True if arch in reference_device_archs and mode in ["functional_L0", "functional_L1"] else False` — **EN:** Assigns a value to run_reference_on_device. **CN:** 将一个值赋给 run_reference_on_device。
+- **L285** `  profiler_flags_for_verification = "device" if run_reference_on_device else "host"` — **EN:** Assigns a value to profiler_flags_for_verification. **CN:** 将一个值赋给 profiler_flags_for_verification。
+- **L286** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L287** `  # beta values for L0 and L1` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L288** `  # TODO: randomize beta values for wider coverage` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L289** `  beta_values = [0.5]` — **EN:** Assigns a value to beta_values. **CN:** 将一个值赋给 beta_values。
+- **L290** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L291** `  is_supported_arch = (arch in ["100a", "100f", "101a", "101f", "103a", "110a", "110f", "120a", "120f", "121a", "121f"])` — **EN:** Assigns a value to is_supported_arch. **CN:** 将一个值赋给 is_supported_arch。
+- **L292** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L293** `  is_runtime_datatype_enabled = mode == "functional_L0" and is_supported_arch` — **EN:** Assigns a value to is_runtime_datatype_enabled. **CN:** 将一个值赋给 is_runtime_datatype_enabled。
+- **L294** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L295** `  if (mode == "functional_L0") and is_supported_arch:` — **EN:** Starts a conditional branch guarded by `mode == 'functional_L0' and is_supported_arch`. **CN:** 开始一个由 `mode == 'functional_L0' and is_supported_arch` 控制的条件分支。
+- **L296** `    problem_waves = [0.5, 1.25, 2.5]` — **EN:** Assigns a value to problem_waves. **CN:** 将一个值赋给 problem_waves。
+- **L297** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L298** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L299** `    # Dense Gemm` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L300** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L301** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L302** `    sm100_mma_data_type_general = [` — **EN:** Assigns a value to sm100_mma_data_type_general. **CN:** 将一个值赋给 sm100_mma_data_type_general。
+- **L303** `      'gemm_f16_f16_f16_f16_f16',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L304** `      'gemm_f16_f16_f16_void_f16',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L305** `      #'gemm_f16_f16_f32_f16_f16',` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L306** `      'tf32gemm_f32_f32_f32_f32_f32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L307** `      'bf16gemm_f32_f32_f32_f32_f32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L308** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L309** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L310** `    exclude_archs = arch not in ("103a")` — **EN:** Assigns a value to exclude_archs. **CN:** 将一个值赋给 exclude_archs。
+- **L311** `    if exclude_archs:` — **EN:** Starts a conditional branch guarded by `exclude_archs`. **CN:** 开始一个由 `exclude_archs` 控制的条件分支。
+- **L312** `      sm100_mma_data_type_general.append('gemm_s8_s8_s32_s8_s8')` — **EN:** Invokes `sm100_mma_data_type_general.append` as a standalone call. **CN:** 以独立语句方式调用 `sm100_mma_data_type_general.append`。
+- **L313** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L314** `    sm100_mma_data_type_runtime_dtype = [` — **EN:** Assigns a value to sm100_mma_data_type_runtime_dtype. **CN:** 将一个值赋给 sm100_mma_data_type_runtime_dtype。
+- **L315** `      'gemm.*f4_f4_f32_f32_f32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L316** `      'gemm.*f6_f6_f32_f32_f32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L317** `      'gemm.*f8_f8_f32_f32_f32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L318** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L319** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L320** `    sm100_mma_cluster_size = [` — **EN:** Assigns a value to sm100_mma_cluster_size. **CN:** 将一个值赋给 sm100_mma_cluster_size。
+- **L321** `      '8x1x1',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L322** `      '4x4x1', '2x1x1',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L323** `      '0x0x1' # dynamic cluster` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L324** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L325** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L326** `    # Restrict to two layouts to reduce L0 build and test time.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L327** `    sm100_mma_layouts = [ ` — **EN:** Assigns a value to sm100_mma_layouts. **CN:** 将一个值赋给 sm100_mma_layouts。
+- **L328** `      'tnt', ` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L329** `      'ntn' ` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L330** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L331** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L332** `    # regex list must be in kernel procedural name order` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L333** `    sm100_mma_filter_regex_1sm = "cutlass3x_sm100_tensorop.*(" + ").*(".join([ "|".join(x) for x in [sm100_mma_data_type_general, sm100_mma_cluster_size, sm100_mma_layouts]]) + ").*1sm.*"` — **EN:** Assigns a value to sm100_mma_filter_regex_1sm. **CN:** 将一个值赋给 sm100_mma_filter_regex_1sm。
+- **L334** `    sm100_mma_filter_regex_2sm = "cutlass3x_sm100_tensorop.*(" + ").*(".join([ "|".join(x) for x in [sm100_mma_data_type_general, sm100_mma_cluster_size, sm100_mma_layouts]]) + ").*2sm.*"` — **EN:** Assigns a value to sm100_mma_filter_regex_2sm. **CN:** 将一个值赋给 sm100_mma_filter_regex_2sm。
+- **L335** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L336** `    sm100_mma_filter_regex_1sm_runtime = "cutlass3x_sm100_tensorop.*(" + ").*(".join([ "|".join(x) for x in [sm100_mma_data_type_runtime_dtype, sm100_mma_cluster_size, sm100_mma_layouts]]) + ").*1sm.*"` — **EN:** Assigns a value to sm100_mma_filter_regex_1sm_runtime. **CN:** 将一个值赋给 sm100_mma_filter_regex_1sm_runtime。
+- **L337** `    sm100_mma_filter_regex_2sm_runtime = "cutlass3x_sm100_tensorop.*(" + ").*(".join([ "|".join(x) for x in [sm100_mma_data_type_runtime_dtype, sm100_mma_cluster_size, sm100_mma_layouts]]) + ").*2sm.*"` — **EN:** Assigns a value to sm100_mma_filter_regex_2sm_runtime. **CN:** 将一个值赋给 sm100_mma_filter_regex_2sm_runtime。
+- **L338** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L339** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L340** `    # Block Scale Gemm` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L341** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L342** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L343** `    block_scaled_data_type = [` — **EN:** Assigns a value to block_scaled_data_type. **CN:** 将一个值赋给 block_scaled_data_type。
+- **L344** `      # runtime datatypes` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L345** `      'gemm.*ue8m0xf4_ue8m0xf4_f32_f16_e5m2',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L346** `      'gemm.*ue4m3xf4_ue4m3xf4_f32_f16_e5m2',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L347** `      'gemm.*ue8m0xf4_ue8m0xf6_f32_f16_e5m2',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L348** `      #'gemm.*ue8m0xf4_ue8m0xf4_f32_f16_ue8m0xe2m1',` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L349** `      'gemm.*ue8m0xf6_ue8m0xf6_f32_f16_ue8m0xe3m2',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L350** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L351** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L352** `    block_scaled_tile_k = ['x128_', 'x256_']` — **EN:** Assigns a value to block_scaled_tile_k. **CN:** 将一个值赋给 block_scaled_tile_k。
+- **L353** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L354** `    sm103_block_scaled_data_type = [` — **EN:** Assigns a value to sm103_block_scaled_data_type. **CN:** 将一个值赋给 sm103_block_scaled_data_type。
+- **L355** `      'gemm.*ue8m0xf4_ue8m0xf4_f32_f16_e5m2',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L356** `      'gemm.*ue8m0xf4_ue8m0xf4_f32_f16_ue8m0xe2m1',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L357** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L358** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L359** `    sm103_block_scaled_tile_k = ['x768_']` — **EN:** Assigns a value to sm103_block_scaled_tile_k. **CN:** 将一个值赋给 sm103_block_scaled_tile_k。
+- **L360** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L361** `    block_scaled_cluster_size = [` — **EN:** Assigns a value to block_scaled_cluster_size. **CN:** 将一个值赋给 block_scaled_cluster_size。
+- **L362** `      '4x4x1', '2x1x1',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L363** `      '0x0x1' # dynamic cluster` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L364** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L365** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L366** `    block_scaled_layouts = ['tnt']` — **EN:** Assigns a value to block_scaled_layouts. **CN:** 将一个值赋给 block_scaled_layouts。
+- **L367** `    # regex list must be in kernel procedural name order` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L368** `    block_scaled_filter_regex_1sm = "cutlass3x_sm100_bstensorop.*(" + ").*(".join([ "|".join(x) for x in [block_scaled_data_type, block_scaled_tile_k, block_scaled_cluster_size, block_scaled_layouts]]) + ").*1sm.*"` — **EN:** Assigns a value to block_scaled_filter_regex_1sm. **CN:** 将一个值赋给 block_scaled_filter_regex_1sm。
+- **L369** `    block_scaled_filter_regex_2sm = "cutlass3x_sm100_bstensorop.*(" + ").*(".join([ "|".join(x) for x in [block_scaled_data_type, block_scaled_tile_k, block_scaled_cluster_size, block_scaled_layouts]]) + ").*2sm.*"` — **EN:** Assigns a value to block_scaled_filter_regex_2sm. **CN:** 将一个值赋给 block_scaled_filter_regex_2sm。
+- **L370** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L371** `    sm103_block_scaled_prefetch_policy = ['tmapf']` — **EN:** Assigns a value to sm103_block_scaled_prefetch_policy. **CN:** 将一个值赋给 sm103_block_scaled_prefetch_policy。
+- **L372** `    sm103_block_scaled_filter_regex_1sm = "cutlass3x_sm103_bstensorop.*(" + ").*(".join([ "|".join(x) for x in [sm103_block_scaled_data_type, sm103_block_scaled_tile_k, block_scaled_cluster_size, block_scaled_layouts]]) + ").*1sm.*(" + "|".join(sm103_block_scaled_prefetch_policy) + ").*"` — **EN:** Assigns a value to sm103_block_scaled_filter_regex_1sm. **CN:** 将一个值赋给 sm103_block_scaled_filter_regex_1sm。
+- **L373** `    sm103_block_scaled_filter_regex_2sm = "cutlass3x_sm103_bstensorop.*(" + ").*(".join([ "|".join(x) for x in [sm103_block_scaled_data_type, sm103_block_scaled_tile_k, block_scaled_cluster_size, block_scaled_layouts]]) + ").*2sm.*(" + "|".join(sm103_block_scaled_prefetch_policy) + ").*"` — **EN:** Assigns a value to sm103_block_scaled_filter_regex_2sm. **CN:** 将一个值赋给 sm103_block_scaled_filter_regex_2sm。
+- **L374** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L375** `    if arch in ["100a", "100f"]:` — **EN:** Starts a conditional branch guarded by `arch in ['100a', '100f']`. **CN:** 开始一个由 `arch in ['100a', '100f']` 控制的条件分支。
+- **L376** `      kernel_filter = f"({sm100_mma_filter_regex_1sm})|" \` — **EN:** Assigns a value to kernel_filter. **CN:** 将一个值赋给 kernel_filter。
+- **L377** `                      f"({sm100_mma_filter_regex_2sm})|" \` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L378** `                      f"({sm100_mma_filter_regex_1sm_runtime})|" \` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L379** `                      f"({sm100_mma_filter_regex_2sm_runtime})|" \` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L380** `                      f"({block_scaled_filter_regex_1sm})|" \` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L381** `                      f"({block_scaled_filter_regex_2sm})"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L382** `    elif arch in ["101a", "101f", "110a", "110f"]:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L383** `      kernel_filter = f"({sm100_mma_filter_regex_1sm})|" \` — **EN:** Assigns a value to kernel_filter. **CN:** 将一个值赋给 kernel_filter。
+- **L384** `                      f"({sm100_mma_filter_regex_2sm})|" \` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L385** `                      f"({sm100_mma_filter_regex_1sm_runtime})|" \` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L386** `                      f"({sm100_mma_filter_regex_2sm_runtime})|" \` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L387** `                      f"({block_scaled_filter_regex_1sm})|" \` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L388** `                      f"({block_scaled_filter_regex_2sm})"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L389** `    elif arch in ["103a"]:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L390** `      kernel_filter = f"({sm100_mma_filter_regex_1sm})|" \` — **EN:** Assigns a value to kernel_filter. **CN:** 将一个值赋给 kernel_filter。
+- **L391** `                      f"({sm100_mma_filter_regex_2sm})|" \` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L392** `                      f"({sm100_mma_filter_regex_1sm_runtime})|" \` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L393** `                      f"({sm100_mma_filter_regex_2sm_runtime})|" \` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L394** `                      f"({block_scaled_filter_regex_1sm})|" \` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L395** `                      f"({block_scaled_filter_regex_2sm})|" \` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L396** `                      f"({sm103_block_scaled_filter_regex_1sm})|" \` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L397** `                      f"({sm103_block_scaled_filter_regex_2sm})"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L398** `    elif arch in ["120a", "120f", "121a", "121f"]:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L399** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L400** `      # blockscaled sm120_mma kernels` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L401** `      blockscaled_sm120_mma_kernel_cta_tiles = [` — **EN:** Assigns a value to blockscaled_sm120_mma_kernel_cta_tiles. **CN:** 将一个值赋给 blockscaled_sm120_mma_kernel_cta_tiles。
+- **L402** `        [ '128x128' ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L403** `      ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L404** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L405** `      # Restrict to two layouts to reduce L0 build and test time.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L406** `      blockscaled_sm120_mma_layouts = [ 'tn' ]` — **EN:** Assigns a value to blockscaled_sm120_mma_layouts. **CN:** 将一个值赋给 blockscaled_sm120_mma_layouts。
+- **L407** `      filter_regex_blockscaled_sm120_mma = "cutlass3x_sm120_bstensorop.*(" + ").*(".join([ "|".join(x) for x in [blockscaled_sm120_mma_kernel_cta_tiles[0], blockscaled_sm120_mma_layouts]]) + ").*"` — **EN:** Assigns a value to filter_regex_blockscaled_sm120_mma. **CN:** 将一个值赋给 filter_regex_blockscaled_sm120_mma。
+- **L408** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L409** `      problem_waves = [0.5, 1.25, 2.5]` — **EN:** Assigns a value to problem_waves. **CN:** 将一个值赋给 problem_waves。
+- **L410** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L411** `      kernel_filter = f"({filter_regex_blockscaled_sm120_mma})"` — **EN:** Assigns a value to kernel_filter. **CN:** 将一个值赋给 kernel_filter。
+- **L412** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L413** `      error_message = "unsupported arch, only support sm100a, sm100f, sm101a, sm101f, sm110a, sm110f, sm103a, sm120a, sm120f, sm121a, sm121f"` — **EN:** Assigns a value to error_message. **CN:** 将一个值赋给 error_message。
+- **L414** `      raise Exception(error_message)` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L415** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L416** `  elif mode == "functional_L1":` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L417** `    sm100_mma_data_type_general = [` — **EN:** Assigns a value to sm100_mma_data_type_general. **CN:** 将一个值赋给 sm100_mma_data_type_general。
+- **L418** `      'gemm_f16_f16_f16_f16_f16',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L419** `      'gemm_f16_f16_f16_void_f16',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L420** `      'gemm_f16_f16_f32_f32_f32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L421** `      'gemm_bf16_bf16_f32_bf16_bf16',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L422** `      'gemm_bf16_bf16_f32_f32_f32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L423** `      'gemm_e2m1_e2m1_f32_f32_f32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L424** `      'gemm_e2m1_e3m2_f32_f32_f32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L425** `      'gemm_e2m1_e4m3_f32_f32_f32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L426** `      'gemm_e3m2_e2m1_f32_f32_f32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L427** `      'gemm_e3m2_e3m2_f32_f32_f32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L428** `      'gemm_e3m2_e4m3_f32_f32_f32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L429** `      'gemm_e4m3_e2m1_f32_f32_f32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L430** `      'gemm_e4m3_e3m2_f32_f32_f32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L431** `      'gemm_e4m3_e4m3_f32_bf16_bf16',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L432** `      'gemm_e4m3_e5m2_f32_bf16_e4m3',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L433** `      'gemm_e5m2_e4m3_f32_f16_e4m3',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L434** `      'gemm_s8_s8_s32_s32_s32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L435** `      'gemm_s8_s8_s32_s8_s8',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L436** `      'gemm_f4_f4_f32_f32_f32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L437** `      'gemm_f4_f6_f32_f32_f32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L438** `      'gemm_f4_f8_f32_f32_f32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L439** `      'gemm_f6_f4_f32_f32_f32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L440** `      'gemm_f6_f6_f32_f32_f32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L441** `      'gemm_f6_f8_f32_f32_f32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L442** `      'gemm_f8_f4_f32_f32_f32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L443** `      'gemm_f8_f6_f32_f32_f32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L444** `      'gemm_f8_f8_f32_bf16_bf16',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L445** `      'gemm_f8_f8_f32_bf16_e4m3',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L446** `      'gemm_f8_f8_f32_bf16_e5m2',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L447** `      'gemm_f8_f8_f32_f16_e4m3',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L448** `      'gemm_f8_f8_f32_f16_e5m2',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L449** `      'gemm_f8_f8_f32_f16_f16',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L450** `      'gemm_f8_f8_f32_f32_f32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L451** `      'tf32gemm_*',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L452** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L453** `    sm100_mma_cluster_size = [` — **EN:** Assigns a value to sm100_mma_cluster_size. **CN:** 将一个值赋给 sm100_mma_cluster_size。
+- **L454** `                    '0x0x1' # dynamic cluster` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L455** `                     ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L456** `    # Restrict to two layouts to reduce L1 build and test time.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L457** `    sm100_mma_layouts = ['tnt', 'ntn']` — **EN:** Assigns a value to sm100_mma_layouts. **CN:** 将一个值赋给 sm100_mma_layouts。
+- **L458** `    sm100_mma_filter_regex_1sm = "cutlass3x_sm100_tensorop.*(" + ").*(".join([ "|".join(x) for x in [sm100_mma_data_type_general, sm100_mma_cluster_size, sm100_mma_layouts]]) + ").*1sm.*"` — **EN:** Assigns a value to sm100_mma_filter_regex_1sm. **CN:** 将一个值赋给 sm100_mma_filter_regex_1sm。
+- **L459** `    sm100_mma_filter_regex_2sm = "cutlass3x_sm100_tensorop.*(" + ").*(".join([ "|".join(x) for x in [sm100_mma_data_type_general, sm100_mma_cluster_size, sm100_mma_layouts]]) + ").*2sm.*"` — **EN:** Assigns a value to sm100_mma_filter_regex_2sm. **CN:** 将一个值赋给 sm100_mma_filter_regex_2sm。
+- **L460** `    block_scaled_data_type = [` — **EN:** Assigns a value to block_scaled_data_type. **CN:** 将一个值赋给 block_scaled_data_type。
+- **L461** `      'ue8m0xe2m1_ue8m0xe2m1_f32_f16_e5m2',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L462** `      'ue8m0xe2m1_ue8m0xe2m3_f32_f16_e5m2',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L463** `      'ue8m0xmx8s26_ue8m0xmx8s26_f32_f16_e5m2',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L464** `      'ue8m0xe2m1_ue8m0xe2m1_f32_f16_ue8m0xe2m1',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L465** `      'ue8m0xe2m3_ue8m0xe2m3_f32_f16_ue8m0xe3m2',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L466** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L467** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L468** `    sm103_block_scaled_data_type = [` — **EN:** Assigns a value to sm103_block_scaled_data_type. **CN:** 将一个值赋给 sm103_block_scaled_data_type。
+- **L469** `      'ue8m0xe2m1_ue8m0xe2m1_f32_f16_e5m2',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L470** `      'ue8m0xe2m1_ue8m0xe2m1_f32_f16_ue8m0xe2m1',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L471** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L472** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L473** `    block_scaled_cluster_size = ['0x0x1']` — **EN:** Assigns a value to block_scaled_cluster_size. **CN:** 将一个值赋给 block_scaled_cluster_size。
+- **L474** `    block_scaled_layouts = ['tnt']` — **EN:** Assigns a value to block_scaled_layouts. **CN:** 将一个值赋给 block_scaled_layouts。
+- **L475** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L476** `    # regex list must be in kernel procedural name order` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L477** `    block_scaled_filter_regex_1sm = "cutlass3x_sm100_bstensorop.*(" + ").*(".join([ "|".join(x) for x in [block_scaled_data_type, block_scaled_cluster_size, block_scaled_layouts]]) + ").*1sm.*"` — **EN:** Assigns a value to block_scaled_filter_regex_1sm. **CN:** 将一个值赋给 block_scaled_filter_regex_1sm。
+- **L478** `    block_scaled_filter_regex_2sm = "cutlass3x_sm100_bstensorop.*(" + ").*(".join([ "|".join(x) for x in [block_scaled_data_type, block_scaled_cluster_size, block_scaled_layouts]]) + ").*2sm.*"` — **EN:** Assigns a value to block_scaled_filter_regex_2sm. **CN:** 将一个值赋给 block_scaled_filter_regex_2sm。
+- **L479** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L480** `    sm103_block_scaled_filter_regex_1sm = "cutlass3x_sm103_bstensorop.*(" + ").*(".join([ "|".join(x) for x in [sm103_block_scaled_data_type, block_scaled_cluster_size, block_scaled_layouts]]) + ").*1sm.*"` — **EN:** Assigns a value to sm103_block_scaled_filter_regex_1sm. **CN:** 将一个值赋给 sm103_block_scaled_filter_regex_1sm。
+- **L481** `    sm103_block_scaled_filter_regex_2sm = "cutlass3x_sm103_bstensorop.*(" + ").*(".join([ "|".join(x) for x in [sm103_block_scaled_data_type, block_scaled_cluster_size, block_scaled_layouts]]) + ").*2sm.*"` — **EN:** Assigns a value to sm103_block_scaled_filter_regex_2sm. **CN:** 将一个值赋给 sm103_block_scaled_filter_regex_2sm。
+- **L482** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L483** `    filter_regex_sm100_mma = f"({sm100_mma_filter_regex_1sm})|" \` — **EN:** Assigns a value to filter_regex_sm100_mma. **CN:** 将一个值赋给 filter_regex_sm100_mma。
+- **L484** `                          f"({sm100_mma_filter_regex_2sm})|" \` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L485** `                          f"({block_scaled_filter_regex_1sm})|" \` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L486** `                          f"({block_scaled_filter_regex_2sm})|" \` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L487** `                          f"({sm103_block_scaled_filter_regex_1sm})|" \` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L488** `                          f"({sm103_block_scaled_filter_regex_2sm})"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L489** `    # CTA tiles for sm120 MMA - only run one tile size to reduce build/test times` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L490** `    sm120_mma_kernel_cta_tiles = [` — **EN:** Assigns a value to sm120_mma_kernel_cta_tiles. **CN:** 将一个值赋给 sm120_mma_kernel_cta_tiles。
+- **L491** `      # h1688, s1688, i16832, i8816` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L492** `      [ '256x128' ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L493** `      # d884, c1688,` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L494** `      [ '128x128' ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L495** `      # c1688, z884` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L496** `      [ '128x64' ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L497** `      # gz884` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L498** `      [ '64x64' ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L499** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L500** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L501** `    # sm120 MMA instruction shapes, planar complex type excluded as they are not required` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L502** `    sm120_mma_instruction_shapes = [` — **EN:** Assigns a value to sm120_mma_instruction_shapes. **CN:** 将一个值赋给 sm120_mma_instruction_shapes。
+- **L503** `      [ 'h1688gemm_(?!planar_complex)',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L504** `        's1688gemm_f16',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L505** `        's1688gemm_bf16',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L506** `        's1688gemm_tf32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L507** `        'i16832gemm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L508** `        'i8816gemm' ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L509** `      [ 'd884gemm', 'c1688tf32gemm' ] ,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L510** `      [ 'c1688gemm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L511** `        'z884gemm'  ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L512** `      [ 'gz884gemm']` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L513** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L514** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L515** `    # It's not pretty, but not sure why different instructions support different tile sizes.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L516** `    filter_regex_sm120_mma_0 = "cutlass_tensorop.*(" + ").*(".join([ "|".join(x) for x in [sm120_mma_instruction_shapes[0], sm120_mma_kernel_cta_tiles[0]]]) + ").*"` — **EN:** Assigns a value to filter_regex_sm120_mma_0. **CN:** 将一个值赋给 filter_regex_sm120_mma_0。
+- **L517** `    filter_regex_sm120_mma_1 = "cutlass_tensorop.*(" + ").*(".join([ "|".join(x) for x in [sm120_mma_instruction_shapes[1], sm120_mma_kernel_cta_tiles[1]]]) + ").*"` — **EN:** Assigns a value to filter_regex_sm120_mma_1. **CN:** 将一个值赋给 filter_regex_sm120_mma_1。
+- **L518** `    filter_regex_sm120_mma_2 = "cutlass_tensorop.*(" + ").*(".join([ "|".join(x) for x in [sm120_mma_instruction_shapes[2], sm120_mma_kernel_cta_tiles[2]]]) + ").*"` — **EN:** Assigns a value to filter_regex_sm120_mma_2. **CN:** 将一个值赋给 filter_regex_sm120_mma_2。
+- **L519** `    filter_regex_sm120_mma_3 = "cutlass_tensorop.*(" + ").*(".join([ "|".join(x) for x in [sm120_mma_instruction_shapes[3], sm120_mma_kernel_cta_tiles[3]]]) + ").*"` — **EN:** Assigns a value to filter_regex_sm120_mma_3. **CN:** 将一个值赋给 filter_regex_sm120_mma_3。
+- **L520** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L521** `    filter_regex_sm120_mma = f"({filter_regex_sm120_mma_0})|({filter_regex_sm120_mma_1})|({filter_regex_sm120_mma_2})|({filter_regex_sm120_mma_3})"` — **EN:** Assigns a value to filter_regex_sm120_mma. **CN:** 将一个值赋给 filter_regex_sm120_mma。
+- **L522** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L523** `    problem_waves = [0.5, 2.5]` — **EN:** Assigns a value to problem_waves. **CN:** 将一个值赋给 problem_waves。
+- **L524** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L525** `    if arch in ["120a", "120f", "121a", "121f"]:` — **EN:** Starts a conditional branch guarded by `arch in ['120a', '120f', '121a', '121f']`. **CN:** 开始一个由 `arch in ['120a', '120f', '121a', '121f']` 控制的条件分支。
+- **L526** `      kernel_filter = f"({filter_regex_sm120_mma})"` — **EN:** Assigns a value to kernel_filter. **CN:** 将一个值赋给 kernel_filter。
+- **L527** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L528** `      kernel_filter = f"({filter_regex_sm100_mma})"` — **EN:** Assigns a value to kernel_filter. **CN:** 将一个值赋给 kernel_filter。
+- **L529** `  else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L530** `    raise ValueError()` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L531** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L532** `  outfile_name    = os.path.join(curr_build_dir, f"FK_{mode}_testlist_SM{arch}_cutlass3x_gemm.csv")` — **EN:** Assigns a value to outfile_name. **CN:** 将一个值赋给 outfile_name。
+- **L533** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L534** `  audit_file_name = os.path.join(curr_build_dir, f"FK_{mode}_audit_SM{arch}_cutlass3x_gemm.csv")` — **EN:** Assigns a value to audit_file_name. **CN:** 将一个值赋给 audit_file_name。
+- **L535** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L536** `  audit_file_params_name = os.path.join(curr_build_dir, f"FK_{mode}_audit_params_SM{arch}_cutlass3x_gemm.csv")` — **EN:** Assigns a value to audit_file_params_name. **CN:** 将一个值赋给 audit_file_params_name。
+- **L537** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L538** `  kernel_filter_re = re.compile(kernel_filter)` — **EN:** Assigns a value to kernel_filter_re. **CN:** 将一个值赋给 kernel_filter_re。
+- **L539** `  testcase_counter = 0` — **EN:** Assigns a value to testcase_counter. **CN:** 将一个值赋给 testcase_counter。
+- **L540** `  kernels_emitted = 0` — **EN:** Assigns a value to kernels_emitted. **CN:** 将一个值赋给 kernels_emitted。
+- **L541** `  kernels_total = 0` — **EN:** Assigns a value to kernels_total. **CN:** 将一个值赋给 kernels_total。
+- **L542** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L543** `  perf_json_list = []` — **EN:** Assigns a value to perf_json_list. **CN:** 将一个值赋给 perf_json_list。
+- **L544** `  kernel_name_set = set()` — **EN:** Assigns a value to kernel_name_set. **CN:** 将一个值赋给 kernel_name_set。
+- **L545** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L546** `  testlist_csv_fields = ["testcase", "metadata"]` — **EN:** Assigns a value to testlist_csv_fields. **CN:** 将一个值赋给 testlist_csv_fields。
+- **L547** `  testlist_csv_rows = []` — **EN:** Assigns a value to testlist_csv_rows. **CN:** 将一个值赋给 testlist_csv_rows。
+- **L548** `  auditlist_csv_map = {}` — **EN:** Assigns a value to auditlist_csv_map. **CN:** 将一个值赋给 auditlist_csv_map。
+- **L549** `  auditlist_csv_params_map = {}` — **EN:** Assigns a value to auditlist_csv_params_map. **CN:** 将一个值赋给 auditlist_csv_params_map。
+- **L550** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L551** `  kernel_features = {}` — **EN:** Assigns a value to kernel_features. **CN:** 将一个值赋给 kernel_features。
+- **L552** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L553** `  for cc in manifest.operations[OperationKind.Gemm].keys():` — **EN:** Starts a loop assigning items from `manifest.operations[OperationKind.Gemm].keys()` to `cc`. **CN:** 开始一个循环，将 `manifest.operations[OperationKind.Gemm].keys()` 的元素赋给 `cc`。
+- **L554** `    for kernel_name, operation_l in manifest.operations[OperationKind.Gemm][cc].items():` — **EN:** Starts a loop assigning items from `manifest.operations[OperationKind.Gemm][cc].ite...` to `(kernel_name, operation_l)`. **CN:** 开始一个循环，将 `manifest.operations[OperationKind.Gemm][cc].ite...` 的元素赋给 `(kernel_name, operation_l)`。
+- **L555** `      assert(len(operation_l) == 1)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L556** `      kernels_total += 1` — **EN:** Updates kernels_total in place. **CN:** 原地更新 kernels_total。
+- **L557** `      if len(kernel_filter_re.findall(kernel_name)) == 0:` — **EN:** Starts a conditional branch guarded by `len(kernel_filter_re.findall(kernel_name)) == 0`. **CN:** 开始一个由 `len(kernel_filter_re.findall(kernel_name)) == 0` 控制的条件分支。
+- **L558** `          continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L559** `      # Only test f16 I/O void C kernels in void C kernel set` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L560** `      # Exception: Use void C kernels for more accurate perf testing` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L561** `      if '_void_' in kernel_name and  'perf_' not in mode:` — **EN:** Starts a conditional branch guarded by `'_void_' in kernel_name and 'perf_' not in mode`. **CN:** 开始一个由 `'_void_' in kernel_name and 'perf_' not in mode` 控制的条件分支。
+- **L562** `        if 'f16_f16_f16_void_f16' not in kernel_name :` — **EN:** Starts a conditional branch guarded by `'f16_f16_f16_void_f16' not in kernel_name`. **CN:** 开始一个由 `'f16_f16_f16_void_f16' not in kernel_name` 控制的条件分支。
+- **L563** `          continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L564** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L565** `      kernels_emitted += 1` — **EN:** Updates kernels_emitted in place. **CN:** 原地更新 kernels_emitted。
+- **L566** `      kernel_name_set.add(kernel_name)` — **EN:** Invokes `kernel_name_set.add` as a standalone call. **CN:** 以独立语句方式调用 `kernel_name_set.add`。
+- **L567** `      hashed_kernel_name = hash_cutlass_string(kernel_name)` — **EN:** Assigns a value to hashed_kernel_name. **CN:** 将一个值赋给 hashed_kernel_name。
+- **L568** `      operation = operation_l[0]` — **EN:** Assigns a value to operation. **CN:** 将一个值赋给 operation。
+- **L569** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L570** `      dynamic_cluster = (operation.tile_description.cluster_shape[0] == 0` — **EN:** Assigns a value to dynamic_cluster. **CN:** 将一个值赋给 dynamic_cluster。
+- **L571** `                          or operation.tile_description.cluster_shape[1] == 0)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L572** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L573** `      dynamic_datatype = "f8" in kernel_name or "f6" in kernel_name or "f4" in kernel_name` — **EN:** Assigns a value to dynamic_datatype. **CN:** 将一个值赋给 dynamic_datatype。
+- **L574** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L575** `      runtime_input_datatypes = [None]` — **EN:** Assigns a value to runtime_input_datatypes. **CN:** 将一个值赋给 runtime_input_datatypes。
+- **L576** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L577** `      if dynamic_datatype:` — **EN:** Starts a conditional branch guarded by `dynamic_datatype`. **CN:** 开始一个由 `dynamic_datatype` 控制的条件分支。
+- **L578** `        # Standard runtime datatype kernels encoded as f4_f4 / f6_f6 / f8_f8, etc.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L579** `        if "f4_f4" in kernel_name:` — **EN:** Starts a conditional branch guarded by `'f4_f4' in kernel_name`. **CN:** 开始一个由 `'f4_f4' in kernel_name` 控制的条件分支。
+- **L580** `          runtime_input_datatypes = [['e2m1','e2m1']]` — **EN:** Assigns a value to runtime_input_datatypes. **CN:** 将一个值赋给 runtime_input_datatypes。
+- **L581** `        elif "f4_f6" in kernel_name:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L582** `          runtime_input_datatypes = [['e2m1','e3m2']]` — **EN:** Assigns a value to runtime_input_datatypes. **CN:** 将一个值赋给 runtime_input_datatypes。
+- **L583** `        elif "f4_f8" in kernel_name:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L584** `          runtime_input_datatypes = [['e2m1','e4m3']]` — **EN:** Assigns a value to runtime_input_datatypes. **CN:** 将一个值赋给 runtime_input_datatypes。
+- **L585** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L586** `        elif "f6_f4" in kernel_name:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L587** `          runtime_input_datatypes = [['e3m2','e2m1']]` — **EN:** Assigns a value to runtime_input_datatypes. **CN:** 将一个值赋给 runtime_input_datatypes。
+- **L588** `        elif "f6_f6" in kernel_name:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L589** `          runtime_input_datatypes = [['e3m2','e3m2']]` — **EN:** Assigns a value to runtime_input_datatypes. **CN:** 将一个值赋给 runtime_input_datatypes。
+- **L590** `        elif "f6_f8" in kernel_name:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L591** `          runtime_input_datatypes = [['e3m2','e4m3']]` — **EN:** Assigns a value to runtime_input_datatypes. **CN:** 将一个值赋给 runtime_input_datatypes。
+- **L592** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L593** `        elif "f8_f4" in kernel_name:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L594** `          runtime_input_datatypes = [['e4m3','e2m1']]` — **EN:** Assigns a value to runtime_input_datatypes. **CN:** 将一个值赋给 runtime_input_datatypes。
+- **L595** `        elif "f8_f6" in kernel_name:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L596** `          runtime_input_datatypes = [['e4m3','e3m2']]` — **EN:** Assigns a value to runtime_input_datatypes. **CN:** 将一个值赋给 runtime_input_datatypes。
+- **L597** `        elif "f8_f8" in kernel_name:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L598** `          runtime_input_datatypes = [` — **EN:** Assigns a value to runtime_input_datatypes. **CN:** 将一个值赋给 runtime_input_datatypes。
+- **L599** `                                    # mask out those not covered in statically encoded test cases` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L600** `                                    #  ['e5m2','e4m3'],` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L601** `                                    #  ['e4m3','e5m2'],` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L602** `                                      ['e4m3','e4m3']` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L603** `                                    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L604** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L605** `        # block scaled kernels` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L606** `        elif "ue8m0xf4_ue8m0xf4" in kernel_name:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L607** `          runtime_input_datatypes = [['e2m1','e2m1']]` — **EN:** Assigns a value to runtime_input_datatypes. **CN:** 将一个值赋给 runtime_input_datatypes。
+- **L608** `        elif "ue4m3xf4_ue4m3xf4" in kernel_name:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L609** `          runtime_input_datatypes = [['e2m1','e2m1']]` — **EN:** Assigns a value to runtime_input_datatypes. **CN:** 将一个值赋给 runtime_input_datatypes。
+- **L610** `        elif "ue8m0xf4_ue8m0xf6" in kernel_name:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L611** `          runtime_input_datatypes = [['e2m1','e2m3']]` — **EN:** Assigns a value to runtime_input_datatypes. **CN:** 将一个值赋给 runtime_input_datatypes。
+- **L612** `        elif "ue8m0xf4_ue8m0xf8" in kernel_name:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L613** `          runtime_input_datatypes = [['e2m1','e4m3']]` — **EN:** Assigns a value to runtime_input_datatypes. **CN:** 将一个值赋给 runtime_input_datatypes。
+- **L614** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L615** `        elif "ue8m0xf6_ue8m0xf4" in kernel_name:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L616** `          runtime_input_datatypes = [['e2m3','e2m1']]` — **EN:** Assigns a value to runtime_input_datatypes. **CN:** 将一个值赋给 runtime_input_datatypes。
+- **L617** `        elif "ue8m0xf6_ue8m0xf6" in kernel_name:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L618** `          runtime_input_datatypes = [['e2m3','e2m3']]` — **EN:** Assigns a value to runtime_input_datatypes. **CN:** 将一个值赋给 runtime_input_datatypes。
+- **L619** `        elif "ue8m0xf8_ue8m0xf4" in kernel_name:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L620** `          runtime_input_datatypes = [['e4m3','e2m1']]` — **EN:** Assigns a value to runtime_input_datatypes. **CN:** 将一个值赋给 runtime_input_datatypes。
+- **L621** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L622** `        elif "ue8m0xf8_ue8m0xf4" in kernel_name:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L623** `          runtime_input_datatypes = [['e4m3','e2m1']]` — **EN:** Assigns a value to runtime_input_datatypes. **CN:** 将一个值赋给 runtime_input_datatypes。
+- **L624** `        elif "ue8m0xf8_ue8m0xf6" in kernel_name:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L625** `          runtime_input_datatypes = [['e4m3','e2m3']]` — **EN:** Assigns a value to runtime_input_datatypes. **CN:** 将一个值赋给 runtime_input_datatypes。
+- **L626** `        elif "ue8m0xf8_ue8m0xf8" in kernel_name:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L627** `          runtime_input_datatypes = [['e4m3','e4m3']]` — **EN:** Assigns a value to runtime_input_datatypes. **CN:** 将一个值赋给 runtime_input_datatypes。
+- **L628** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L629** `        # Blockwise runtime-datatype kernels encode the fp8 selector together with the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L630** `        # accumulator precision and block tile, e.g.:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L631** `        #   gemm_64x128f32xf8_32x128f32xf8_...` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L632** `        # which does not contain an "f8_f8" substring. As a fallback, detect this` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L633** `        # encoding and map it to the same runtime input datatypes as the symmetric` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L634** `        # f4_f4 / f6_f6 / f8_f8 cases above.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L635** `        if runtime_input_datatypes == [None]:` — **EN:** Starts a conditional branch guarded by `runtime_input_datatypes == [None]`. **CN:** 开始一个由 `runtime_input_datatypes == [None]` 控制的条件分支。
+- **L636** `          m = re.search(r"f32x(f[468])", kernel_name)` — **EN:** Assigns a value to m. **CN:** 将一个值赋给 m。
+- **L637** `          if m:` — **EN:** Starts a conditional branch guarded by `m`. **CN:** 开始一个由 `m` 控制的条件分支。
+- **L638** `            fp_token = m.group(1)` — **EN:** Assigns a value to fp_token. **CN:** 将一个值赋给 fp_token。
+- **L639** `            if fp_token == "f4":` — **EN:** Starts a conditional branch guarded by `fp_token == 'f4'`. **CN:** 开始一个由 `fp_token == 'f4'` 控制的条件分支。
+- **L640** `              runtime_input_datatypes = [['e2m1', 'e2m1']]` — **EN:** Assigns a value to runtime_input_datatypes. **CN:** 将一个值赋给 runtime_input_datatypes。
+- **L641** `            elif fp_token == "f6":` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L642** `              runtime_input_datatypes = [['e3m2', 'e3m2']]` — **EN:** Assigns a value to runtime_input_datatypes. **CN:** 将一个值赋给 runtime_input_datatypes。
+- **L643** `            elif fp_token == "f8":` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L644** `              runtime_input_datatypes = [['e4m3', 'e4m3']]` — **EN:** Assigns a value to runtime_input_datatypes. **CN:** 将一个值赋给 runtime_input_datatypes。
+- **L645** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L646** `      if "bstensorop" in kernel_name or is_blockwise(manifest.operations_by_name[kernel_name].gemm_kind):` — **EN:** Starts a conditional branch guarded by `'bstensorop' in kernel_name or is_blockwise(manifest.oper...`. **CN:** 开始一个由 `'bstensorop' in kernel_name or is_blockwise(manifest.oper...` 控制的条件分支。
+- **L647** `        profiler_flags_for_verification = "host"` — **EN:** Assigns a value to profiler_flags_for_verification. **CN:** 将一个值赋给 profiler_flags_for_verification。
+- **L648** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L649** `      # reduce L1 test runtime if reference kernel is not running on device.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L650** `      if mode == "functional_L1" and profiler_flags_for_verification == "host" :` — **EN:** Starts a conditional branch guarded by `mode == 'functional_L1' and profiler_flags_for_verificati...`. **CN:** 开始一个由 `mode == 'functional_L1' and profiler_flags_for_verificati...` 控制的条件分支。
+- **L651** `        problem_waves = [0.5, 2.5]` — **EN:** Assigns a value to problem_waves. **CN:** 将一个值赋给 problem_waves。
+- **L652** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L653** `      if dynamic_cluster:` — **EN:** Starts a conditional branch guarded by `dynamic_cluster`. **CN:** 开始一个由 `dynamic_cluster` 控制的条件分支。
+- **L654** `        if mode == "functional_L0":` — **EN:** Starts a conditional branch guarded by `mode == 'functional_L0'`. **CN:** 开始一个由 `mode == 'functional_L0'` 控制的条件分支。
+- **L655** `          runtime_cluster_shapes = [[1,1,1],                   [2,2,1]]` — **EN:** Assigns a value to runtime_cluster_shapes. **CN:** 将一个值赋给 runtime_cluster_shapes。
+- **L656** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L657** `          runtime_cluster_shapes = [[1,1,1], [1,2,1], [2,1,1], [2,2,1], [1,4,1], [4,1,1], [2,4,1], [4,2,1], [4,4,1]]` — **EN:** Assigns a value to runtime_cluster_shapes. **CN:** 将一个值赋给 runtime_cluster_shapes。
+- **L658** `          # reduce L1 test runtime if reference kernel is not running on device.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L659** `          if profiler_flags_for_verification == "host":` — **EN:** Starts a conditional branch guarded by `profiler_flags_for_verification == 'host'`. **CN:** 开始一个由 `profiler_flags_for_verification == 'host'` 控制的条件分支。
+- **L660** `            runtime_cluster_shapes = [[1,1,1], [1,2,1], [2,1,1], [2,2,1], [1,4,1], [4,1,1]]` — **EN:** Assigns a value to runtime_cluster_shapes. **CN:** 将一个值赋给 runtime_cluster_shapes。
+- **L661** `        cta_tile_shape_m, cta_tile_shape_n, cta_tile_shape_k = operation.tile_description.threadblock_shape` — **EN:** Assigns a value to (cta_tile_shape_m, cta_tile_shape_n, cta_tile_shape_k). **CN:** 将一个值赋给 (cta_tile_shape_m, cta_tile_shape_n, cta_tile_shape_k)。
+- **L662** `      else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L663** `        runtime_cluster_shapes = [operation.tile_description.cluster_shape]` — **EN:** Assigns a value to runtime_cluster_shapes. **CN:** 将一个值赋给 runtime_cluster_shapes。
+- **L664** `        cta_tile_shape_m = int(operation.tile_description.threadblock_shape[0] / operation.tile_description.cluster_shape[0])` — **EN:** Assigns a value to cta_tile_shape_m. **CN:** 将一个值赋给 cta_tile_shape_m。
+- **L665** `        cta_tile_shape_n = int(operation.tile_description.threadblock_shape[1] / operation.tile_description.cluster_shape[1])` — **EN:** Assigns a value to cta_tile_shape_n. **CN:** 将一个值赋给 cta_tile_shape_n。
+- **L666** `        cta_tile_shape_k = int(operation.tile_description.threadblock_shape[2] / operation.tile_description.cluster_shape[2])` — **EN:** Assigns a value to cta_tile_shape_k. **CN:** 将一个值赋给 cta_tile_shape_k。
+- **L667** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L668** `      alignment_a = operation.A.alignment` — **EN:** Assigns a value to alignment_a. **CN:** 将一个值赋给 alignment_a。
+- **L669** `      alignment_b = operation.B.alignment` — **EN:** Assigns a value to alignment_b. **CN:** 将一个值赋给 alignment_b。
+- **L670** `      alignment_c = operation.C.alignment` — **EN:** Assigns a value to alignment_c. **CN:** 将一个值赋给 alignment_c。
+- **L671** `      alignment_ab_max = max(alignment_a, alignment_b)` — **EN:** Assigns a value to alignment_ab_max. **CN:** 将一个值赋给 alignment_ab_max。
+- **L672** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L673** `      layout3x = operation.layout_name_3x()` — **EN:** Assigns a value to layout3x. **CN:** 将一个值赋给 layout3x。
+- **L674** `      data_types = operation.datatype_name_3x()` — **EN:** Assigns a value to data_types. **CN:** 将一个值赋给 data_types。
+- **L675** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L676** `      ctas_per_mma_instruction = 1` — **EN:** Assigns a value to ctas_per_mma_instruction. **CN:** 将一个值赋给 ctas_per_mma_instruction。
+- **L677** `      if '_2sm' in kernel_name:` — **EN:** Starts a conditional branch guarded by `'_2sm' in kernel_name`. **CN:** 开始一个由 `'_2sm' in kernel_name` 控制的条件分支。
+- **L678** `        ctas_per_mma_instruction = 2` — **EN:** Assigns a value to ctas_per_mma_instruction. **CN:** 将一个值赋给 ctas_per_mma_instruction。
+- **L679** `        valid_cluster_shapes = []` — **EN:** Assigns a value to valid_cluster_shapes. **CN:** 将一个值赋给 valid_cluster_shapes。
+- **L680** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L681** `        # Remove any cluster shapes that have cluster_m that is not divisible by 2` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L682** `        for cs in runtime_cluster_shapes:` — **EN:** Starts a loop assigning items from `runtime_cluster_shapes` to `cs`. **CN:** 开始一个循环，将 `runtime_cluster_shapes` 的元素赋给 `cs`。
+- **L683** `          if cs[0] % 2 == 0:` — **EN:** Starts a conditional branch guarded by `cs[0] % 2 == 0`. **CN:** 开始一个由 `cs[0] % 2 == 0` 控制的条件分支。
+- **L684** `            valid_cluster_shapes.append(cs)` — **EN:** Invokes `valid_cluster_shapes.append` as a standalone call. **CN:** 以独立语句方式调用 `valid_cluster_shapes.append`。
+- **L685** `        runtime_cluster_shapes = valid_cluster_shapes` — **EN:** Assigns a value to runtime_cluster_shapes. **CN:** 将一个值赋给 runtime_cluster_shapes。
+- **L686** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L687** `      kernel_problem_waves = problem_waves` — **EN:** Assigns a value to kernel_problem_waves. **CN:** 将一个值赋给 kernel_problem_waves。
+- **L688** `      if mode == "functional_L0" or mode == "functional_L1":` — **EN:** Starts a conditional branch guarded by `mode == 'functional_L0' or mode == 'functional_L1'`. **CN:** 开始一个由 `mode == 'functional_L0' or mode == 'functional_L1'` 控制的条件分支。
+- **L689** `        # for functional testing, we want to perturb just a little from even shapes` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L690** `        # large K = 8 is chosen such that some kernels will warp around their smem buffers, and some will not` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L691** `        # -16 ensures that we are TMA aligned even for FP8/Int8` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L692** `        min_k = alignment_ab_max if cta_tile_shape_k == alignment_ab_max else cta_tile_shape_k - alignment_ab_max` — **EN:** Assigns a value to min_k. **CN:** 将一个值赋给 min_k。
+- **L693** `        max_k = (cta_tile_shape_k*8) - alignment_ab_max` — **EN:** Assigns a value to max_k. **CN:** 将一个值赋给 max_k。
+- **L694** `        problem_shapes_k = [min_k, max_k]` — **EN:** Assigns a value to problem_shapes_k. **CN:** 将一个值赋给 problem_shapes_k。
+- **L695** `        sm_count = 16` — **EN:** Assigns a value to sm_count. **CN:** 将一个值赋给 sm_count。
+- **L696** `        swizzle_sizes = [0]` — **EN:** Assigns a value to swizzle_sizes. **CN:** 将一个值赋给 swizzle_sizes。
+- **L697** `        # Larger k and less than half wave trigger streamk +separate reduction case to be generated` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L698** `        if 'stream_k' in kernel_name:` — **EN:** Starts a conditional branch guarded by `'stream_k' in kernel_name`. **CN:** 开始一个由 `'stream_k' in kernel_name` 控制的条件分支。
+- **L699** `          problem_shapes_k = [max_k, cta_tile_shape_k*32]` — **EN:** Assigns a value to problem_shapes_k. **CN:** 将一个值赋给 problem_shapes_k。
+- **L700** `          kernel_problem_waves = [0.125, 1.25, 2.5]` — **EN:** Assigns a value to kernel_problem_waves. **CN:** 将一个值赋给 kernel_problem_waves。
+- **L701** `      else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L702** `        raise ValueError` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L703** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L704** `      if "void" in kernel_name:` — **EN:** Starts a conditional branch guarded by `'void' in kernel_name`. **CN:** 开始一个由 `'void' in kernel_name` 控制的条件分支。
+- **L705** `        beta_values = [0]` — **EN:** Assigns a value to beta_values. **CN:** 将一个值赋给 beta_values。
+- **L706** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L707** `      alignment_shift_m = max(alignment_c, alignment_a)` — **EN:** Assigns a value to alignment_shift_m. **CN:** 将一个值赋给 alignment_shift_m。
+- **L708** `      alignment_shift_n = max(alignment_c, alignment_b)` — **EN:** Assigns a value to alignment_shift_n. **CN:** 将一个值赋给 alignment_shift_n。
+- **L709** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L710** `      is_first_line = True` — **EN:** Assigns a value to is_first_line. **CN:** 将一个值赋给 is_first_line。
+- **L711** `      for index_waves, waves in enumerate(kernel_problem_waves):` — **EN:** Starts a loop assigning items from `enumerate(kernel_problem_waves)` to `(index_waves, waves)`. **CN:** 开始一个循环，将 `enumerate(kernel_problem_waves)` 的元素赋给 `(index_waves, waves)`。
+- **L712** `        for index_k, k in enumerate(problem_shapes_k):` — **EN:** Starts a loop assigning items from `enumerate(problem_shapes_k)` to `(index_k, k)`. **CN:** 开始一个循环，将 `enumerate(problem_shapes_k)` 的元素赋给 `(index_k, k)`。
+- **L713** `          for beta in beta_values:` — **EN:** Starts a loop assigning items from `beta_values` to `beta`. **CN:** 开始一个循环，将 `beta_values` 的元素赋给 `beta`。
+- **L714** `            for cluster_shape in runtime_cluster_shapes:` — **EN:** Starts a loop assigning items from `runtime_cluster_shapes` to `cluster_shape`. **CN:** 开始一个循环，将 `runtime_cluster_shapes` 的元素赋给 `cluster_shape`。
+- **L715** `              for runtime_input_datatype in runtime_input_datatypes:` — **EN:** Starts a loop assigning items from `runtime_input_datatypes` to `runtime_input_datatype`. **CN:** 开始一个循环，将 `runtime_input_datatypes` 的元素赋给 `runtime_input_datatype`。
+- **L716** `                for swizzle_size in swizzle_sizes:` — **EN:** Starts a loop assigning items from `swizzle_sizes` to `swizzle_size`. **CN:** 开始一个循环，将 `swizzle_sizes` 的元素赋给 `swizzle_size`。
+- **L717** `                  grid_size = waves * sm_count` — **EN:** Assigns a value to grid_size. **CN:** 将一个值赋给 grid_size。
+- **L718** `                  cluster_shape_m, cluster_shape_n, cluster_shape_k = tuple(cluster_shape)` — **EN:** Assigns a value to (cluster_shape_m, cluster_shape_n, cluster_shape_k). **CN:** 将一个值赋给 (cluster_shape_m, cluster_shape_n, cluster_shape_k)。
+- **L719** `                  if cluster_shape_m >= cluster_shape_n:` — **EN:** Starts a conditional branch guarded by `cluster_shape_m >= cluster_shape_n`. **CN:** 开始一个由 `cluster_shape_m >= cluster_shape_n` 控制的条件分支。
+- **L720** `                    grid_m = cluster_shape_m` — **EN:** Assigns a value to grid_m. **CN:** 将一个值赋给 grid_m。
+- **L721** `                    grid_n = grid_size / grid_m` — **EN:** Assigns a value to grid_n. **CN:** 将一个值赋给 grid_n。
+- **L722** `                    grid_n = max( int((grid_n + cluster_shape_n - 1) / cluster_shape_n) * cluster_shape_n, 1)` — **EN:** Assigns a value to grid_n. **CN:** 将一个值赋给 grid_n。
+- **L723** `                  else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L724** `                    grid_n = cluster_shape_n` — **EN:** Assigns a value to grid_n. **CN:** 将一个值赋给 grid_n。
+- **L725** `                    grid_m = grid_size / grid_n` — **EN:** Assigns a value to grid_m. **CN:** 将一个值赋给 grid_m。
+- **L726** `                    grid_m = max( int((grid_m + cluster_shape_m - 1) / cluster_shape_m) * cluster_shape_m, 1)` — **EN:** Assigns a value to grid_m. **CN:** 将一个值赋给 grid_m。
+- **L727** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L728** `                  verification_required = False` — **EN:** Assigns a value to verification_required. **CN:** 将一个值赋给 verification_required。
+- **L729** `                  if mode == "functional_L0" or mode == "functional_L1":` — **EN:** Starts a conditional branch guarded by `mode == 'functional_L0' or mode == 'functional_L1'`. **CN:** 开始一个由 `mode == 'functional_L0' or mode == 'functional_L1'` 控制的条件分支。
+- **L730** `                    if '_void_' not in kernel_name:` — **EN:** Starts a conditional branch guarded by `'_void_' not in kernel_name`. **CN:** 开始一个由 `'_void_' not in kernel_name` 控制的条件分支。
+- **L731** `                      verification_required = True` — **EN:** Assigns a value to verification_required. **CN:** 将一个值赋给 verification_required。
+- **L732** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L733** `                    m = max(int(grid_m * cta_tile_shape_m), alignment_ab_max)` — **EN:** Assigns a value to m. **CN:** 将一个值赋给 m。
+- **L734** `                    n = max(int(grid_n * cta_tile_shape_n), alignment_ab_max)` — **EN:** Assigns a value to n. **CN:** 将一个值赋给 n。
+- **L735** `                    k = int(k)` — **EN:** Assigns a value to k. **CN:** 将一个值赋给 k。
+- **L736** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L737** `                    # For functional testing, we want to perturb just a little from even shapes.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L738** `                    # Only do this if the perturbation does not cause one of the dimensions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L739** `                    # problem size to go to zero. This can occur for blockscaling kernels for which` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L740** `                    # the alignment requirements for A and B can be quite large (e.g., 256).` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L741** `                    if m > alignment_shift_m:` — **EN:** Starts a conditional branch guarded by `m > alignment_shift_m`. **CN:** 开始一个由 `m > alignment_shift_m` 控制的条件分支。
+- **L742** `                      m -= alignment_shift_m` — **EN:** Updates m in place. **CN:** 原地更新 m。
+- **L743** `                    if n > alignment_shift_n:` — **EN:** Starts a conditional branch guarded by `n > alignment_shift_n`. **CN:** 开始一个由 `n > alignment_shift_n` 控制的条件分支。
+- **L744** `                      n -= alignment_shift_n` — **EN:** Updates n in place. **CN:** 原地更新 n。
+- **L745** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L746** `                    if '_n32t32_' in kernel_name:` — **EN:** Starts a conditional branch guarded by `'_n32t32_' in kernel_name`. **CN:** 开始一个由 `'_n32t32_' in kernel_name` 控制的条件分支。
+- **L747** `                      continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L748** `                  batch_count = 1` — **EN:** Assigns a value to batch_count. **CN:** 将一个值赋给 batch_count。
+- **L749** `                  if mode == "functional_L0" or mode == "functional_L1" :` — **EN:** Starts a conditional branch guarded by `mode == 'functional_L0' or mode == 'functional_L1'`. **CN:** 开始一个由 `mode == 'functional_L0' or mode == 'functional_L1'` 控制的条件分支。
+- **L750** `                    if index_waves == 0 and index_k == 0 :` — **EN:** Starts a conditional branch guarded by `index_waves == 0 and index_k == 0`. **CN:** 开始一个由 `index_waves == 0 and index_k == 0` 控制的条件分支。
+- **L751** `                      batch_count = 3 if mode == "functional_L0" else 5` — **EN:** Assigns a value to batch_count. **CN:** 将一个值赋给 batch_count。
+- **L752** `                  gemm_op = "gemm"` — **EN:** Assigns a value to gemm_op. **CN:** 将一个值赋给 gemm_op。
+- **L753** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L754** `                  grouped = is_grouped(manifest.operations_by_name[kernel_name].gemm_kind)` — **EN:** Assigns a value to grouped. **CN:** 将一个值赋给 grouped。
+- **L755** `                  num_groups = 1` — **EN:** Assigns a value to num_groups. **CN:** 将一个值赋给 num_groups。
+- **L756** `                  if grouped:` — **EN:** Starts a conditional branch guarded by `grouped`. **CN:** 开始一个由 `grouped` 控制的条件分支。
+- **L757** `                    gemm_op = "grouped_gemm"` — **EN:** Assigns a value to gemm_op. **CN:** 将一个值赋给 gemm_op。
+- **L758** `                    num_groups = 3 # small to limit test time in host block-scaled reference kernels` — **EN:** Assigns a value to num_groups. **CN:** 将一个值赋给 num_groups。
+- **L759** `                    batch_count = 1` — **EN:** Assigns a value to batch_count. **CN:** 将一个值赋给 batch_count。
+- **L760** `                  elif "bstensorop" in kernel_name:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L761** `                    gemm_op = "block_scaled_gemm"` — **EN:** Assigns a value to gemm_op. **CN:** 将一个值赋给 gemm_op。
+- **L762** `                  elif is_blockwise(manifest.operations_by_name[kernel_name].gemm_kind):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L763** `                    gemm_op = "blockwise_gemm"` — **EN:** Assigns a value to gemm_op. **CN:** 将一个值赋给 gemm_op。
+- **L764** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L765** `                  problem_size_category = ['smallK','largeK'][index_k] + '_' + ['beta==0','beta!=0'][bool(beta)]` — **EN:** Assigns a value to problem_size_category. **CN:** 将一个值赋给 problem_size_category。
+- **L766** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L767** `                  assert m > 0 and n > 0 and k > 0` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L768** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L769** `                  # Emit per-testcase metadata for perf testing usage, eventually in perf database` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L770** `                  metadata_dict = {` — **EN:** Assigns a value to metadata_dict. **CN:** 将一个值赋给 metadata_dict。
+- **L771** `                    "input_params": {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L772** `                      'problem_size_category' : problem_size_category,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L773** `                      'operation' : _getSubOperationType(operation),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L774** `                      'datatype' : data_types,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L775** `                      'layout' : layout3x,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L776** `                      'm' : m,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L777** `                      'n' : n,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L778** `                      'k' : k,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L779** `                      'beta' : beta,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L780** `                      'flops_per_byte' : _computeFlopsPerByte(operation, m, n, k, batch_count, beta, num_groups)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L781** `                    },` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L782** `                    "runtime_params": {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L783** `                      'ctas_per_mma_instruction' : ctas_per_mma_instruction,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L784** `                      'tilesize_m' : cta_tile_shape_m,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L785** `                      'tilesize_n' : cta_tile_shape_n,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L786** `                      'tilesize_k' : cta_tile_shape_k,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L787** `                      'cluster_shape_m' : cluster_shape_m,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L788** `                      'cluster_shape_n' : cluster_shape_n,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L789** `                    }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L790** `                  }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L791** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L792** `                  # Fallback cluster shape cannot differ from preferred cluster shape in stream-K kernels.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L793** `                  enable_fallback_cluster = dynamic_cluster and 'stream_k' not in kernel_name` — **EN:** Assigns a value to enable_fallback_cluster. **CN:** 将一个值赋给 enable_fallback_cluster。
+- **L794** `                  cluster_m_fallback = ctas_per_mma_instruction if enable_fallback_cluster else cluster_shape_m` — **EN:** Assigns a value to cluster_m_fallback. **CN:** 将一个值赋给 cluster_m_fallback。
+- **L795** `                  cluster_n_fallback = 1 if enable_fallback_cluster else cluster_shape_n` — **EN:** Assigns a value to cluster_n_fallback. **CN:** 将一个值赋给 cluster_n_fallback。
+- **L796** `                  cluster_k_fallback = 1 if enable_fallback_cluster else cluster_shape_k` — **EN:** Assigns a value to cluster_k_fallback. **CN:** 将一个值赋给 cluster_k_fallback。
+- **L797** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L798** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L799** `                  if dynamic_datatype:` — **EN:** Starts a conditional branch guarded by `dynamic_datatype`. **CN:** 开始一个由 `dynamic_datatype` 控制的条件分支。
+- **L800** `                    runtime_datatype_a, runtime_datatype_b = tuple(runtime_input_datatype)` — **EN:** Assigns a value to (runtime_datatype_a, runtime_datatype_b). **CN:** 将一个值赋给 (runtime_datatype_a, runtime_datatype_b)。
+- **L801** `                    metadata_dict["runtime_params"]["runtime_datatype_a"] = runtime_datatype_a` — **EN:** Assigns a value to metadata_dict['runtime_params']['runtime_datatype_a']. **CN:** 将一个值赋给 metadata_dict['runtime_params']['runtime_datatype_a']。
+- **L802** `                    metadata_dict["runtime_params"]["runtime_datatype_b"] = runtime_datatype_b` — **EN:** Assigns a value to metadata_dict['runtime_params']['runtime_datatype_b']. **CN:** 将一个值赋给 metadata_dict['runtime_params']['runtime_datatype_b']。
+- **L803** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L804** `                  testcase_metadata = [` — **EN:** Assigns a value to testcase_metadata. **CN:** 将一个值赋给 testcase_metadata。
+- **L805** `                    f"cutlass_profiler --operation={gemm_op}" +` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L806** `                    (f" --verification-providers=device --providers=cutlass" if profiler_flags_for_verification == "device" else " --mode=trace") +` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L807** `                    f" --error-on-no-match --error-if-nothing-is-profiled" +` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L808** `                    f" --kernels={kernel_name}" +` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L809** `                    f" --m={str(m)}" +` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L810** `                    f" --n={str(n)}" +` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L811** `                    f" --k={str(k)}" +` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L812** `                    (f" --num_groups={str(num_groups)}" if grouped else "") +` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L813** `                    f" --cluster_m={str(cluster_shape_m)}" +` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L814** `                    f" --cluster_n={str(cluster_shape_n)}" +` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L815** `                    f" --cluster_k={str(cluster_shape_k)}" +` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L816** `                    f" --cluster_m_fallback={str(cluster_m_fallback)}" +` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L817** `                    f" --cluster_n_fallback={str(cluster_n_fallback)}" +` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L818** `                    f" --cluster_k_fallback={str(cluster_k_fallback)}" +` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L819** `                    f" --beta={str(beta)}" +` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L820** `                    ("" if grouped else f" --batch_count={str(batch_count)}") +` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L821** `                    f" --swizzle_size={str(swizzle_size)}" +` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L822** `                    f" --verification-required={str(verification_required).lower()}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L823** `                  ] \` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L824** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L825** `                  output_dynamic_datatype = dynamic_datatype` — **EN:** Assigns a value to output_dynamic_datatype. **CN:** 将一个值赋给 output_dynamic_datatype。
+- **L826** `                  if output_dynamic_datatype:` — **EN:** Starts a conditional branch guarded by `output_dynamic_datatype`. **CN:** 开始一个由 `output_dynamic_datatype` 控制的条件分支。
+- **L827** `                    testcase_metadata[0] += (f" --runtime_input_datatype_a={runtime_datatype_a}" +` — **EN:** Updates testcase_metadata[0] in place. **CN:** 原地更新 testcase_metadata[0]。
+- **L828** `                                              f" --runtime_input_datatype_b={runtime_datatype_b}")` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L829** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L830** `                  testcase_metadata.append(json.dumps(metadata_dict))` — **EN:** Invokes `testcase_metadata.append` as a standalone call. **CN:** 以独立语句方式调用 `testcase_metadata.append`。
+- **L831** `                  testlist_csv_rows.append(testcase_metadata)` — **EN:** Invokes `testlist_csv_rows.append` as a standalone call. **CN:** 以独立语句方式调用 `testlist_csv_rows.append`。
+- **L832** `                  testcase_counter += 1` — **EN:** Updates testcase_counter in place. **CN:** 原地更新 testcase_counter。
+- **L833** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L834** `                  alpha = 1.0` — **EN:** Assigns a value to alpha. **CN:** 将一个值赋给 alpha。
+- **L835** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L836** `                  if dynamic_datatype:` — **EN:** Starts a conditional branch guarded by `dynamic_datatype`. **CN:** 开始一个由 `dynamic_datatype` 控制的条件分支。
+- **L837** `                    hashed_kernel_name = transform_hashed_string(hashed_kernel_name, runtime_datatype_a, runtime_datatype_b)` — **EN:** Assigns a value to hashed_kernel_name. **CN:** 将一个值赋给 hashed_kernel_name。
+- **L838** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L839** `                  # If kernel_name is new, initialize its feature set with defaults` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L840** `                  if hashed_kernel_name not in kernel_features:` — **EN:** Starts a conditional branch guarded by `hashed_kernel_name not in kernel_features`. **CN:** 开始一个由 `hashed_kernel_name not in kernel_features` 控制的条件分支。
+- **L841** `                    kernel_features[hashed_kernel_name] = {` — **EN:** Assigns a value to kernel_features[hashed_kernel_name]. **CN:** 将一个值赋给 kernel_features[hashed_kernel_name]。
+- **L842** `                      "is_support_dynamic_cluster": False,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L843** `                      "is_support_dynamic_datatype": False,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L844** `                    }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L845** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L846** `                  # Update features for the hashed kernel name` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L847** `                  kernel_features[hashed_kernel_name]["is_support_dynamic_cluster"] |= dynamic_cluster` — **EN:** Updates kernel_features[hashed_kernel_name]['is_support_dynamic_c... in place. **CN:** 原地更新 kernel_features[hashed_kernel_name]['is_support_dynamic_c...。
+- **L848** `                  kernel_features[hashed_kernel_name]["is_support_dynamic_datatype"] |= dynamic_datatype` — **EN:** Updates kernel_features[hashed_kernel_name]['is_support_dynamic_d... in place. **CN:** 原地更新 kernel_features[hashed_kernel_name]['is_support_dynamic_d...。
+- **L849** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L850** `                  if hashed_kernel_name not in auditlist_csv_params_map:` — **EN:** Starts a conditional branch guarded by `hashed_kernel_name not in auditlist_csv_params_map`. **CN:** 开始一个由 `hashed_kernel_name not in auditlist_csv_params_map` 控制的条件分支。
+- **L851** `                    auditlist_csv_params_map[hashed_kernel_name] = []` — **EN:** Assigns a value to auditlist_csv_params_map[hashed_kernel_name]. **CN:** 将一个值赋给 auditlist_csv_params_map[hashed_kernel_name]。
+- **L852** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L853** `                  audit_row_params = get_kernel_params(` — **EN:** Assigns a value to audit_row_params. **CN:** 将一个值赋给 audit_row_params。
+- **L854** `                    operation,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L855** `                    hashed_kernel_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L856** `                    (cluster_shape_m, cluster_shape_n, cluster_shape_k),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L857** `                    (cluster_m_fallback, cluster_n_fallback, cluster_k_fallback),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L858** `                    (m, n, k, batch_count),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L859** `                    alpha, beta,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L860** `                    dynamic_datatype, dynamic_cluster` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L861** `                  )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L862** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L863** `                  auditlist_csv_params_map[hashed_kernel_name].append(audit_row_params)` — **EN:** Invokes `auditlist_csv_params_map[hashed_kernel_name].append` as a standalone call. **CN:** 以独立语句方式调用 `auditlist_csv_params_map[hashed_kernel_name].append`。
+- **L864** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L865** `                  if hashed_kernel_name not in auditlist_csv_map:` — **EN:** Starts a conditional branch guarded by `hashed_kernel_name not in auditlist_csv_map`. **CN:** 开始一个由 `hashed_kernel_name not in auditlist_csv_map` 控制的条件分支。
+- **L866** `                    audit_row = get_kernel_features(operation, hashed_kernel_name, dynamic_datatype, runtime_input_datatype)` — **EN:** Assigns a value to audit_row. **CN:** 将一个值赋给 audit_row。
+- **L867** `                    auditlist_csv_map[hashed_kernel_name] = audit_row` — **EN:** Assigns a value to auditlist_csv_map[hashed_kernel_name]. **CN:** 将一个值赋给 auditlist_csv_map[hashed_kernel_name]。
+- **L868** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L869** `  with open(outfile_name, 'w') as testlist_csv:` — **EN:** Starts a context-managed block using open(outfile_name, 'w'). **CN:** 开始一个使用 open(outfile_name, 'w') 的上下文管理代码块。
+- **L870** `    csv_writer = csv.writer(testlist_csv, delimiter=',')` — **EN:** Assigns a value to csv_writer. **CN:** 将一个值赋给 csv_writer。
+- **L871** `    csv_writer.writerow(testlist_csv_fields)` — **EN:** Invokes `csv_writer.writerow` as a standalone call. **CN:** 以独立语句方式调用 `csv_writer.writerow`。
+- **L872** `    csv_writer.writerows(testlist_csv_rows)` — **EN:** Invokes `csv_writer.writerows` as a standalone call. **CN:** 以独立语句方式调用 `csv_writer.writerows`。
+- **L873** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L874** `  with open(audit_file_name, 'w') as auditlist_csv:` — **EN:** Starts a context-managed block using open(audit_file_name, 'w'). **CN:** 开始一个使用 open(audit_file_name, 'w') 的上下文管理代码块。
+- **L875** `    csv_writer = csv.writer(auditlist_csv, delimiter=',')` — **EN:** Assigns a value to csv_writer. **CN:** 将一个值赋给 csv_writer。
+- **L876** `    csv_writer.writerow(audit_csv_fields)` — **EN:** Invokes `csv_writer.writerow` as a standalone call. **CN:** 以独立语句方式调用 `csv_writer.writerow`。
+- **L877** `    for hashed_kernel_name, row in auditlist_csv_map.items():` — **EN:** Starts a loop assigning items from `auditlist_csv_map.items()` to `(hashed_kernel_name, row)`. **CN:** 开始一个循环，将 `auditlist_csv_map.items()` 的元素赋给 `(hashed_kernel_name, row)`。
+- **L878** `      # Append the dynamic features as "Y" or "N"` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L879** `      dynamic_cluster_flag = "Y" if kernel_features[hashed_kernel_name]["is_support_dynamic_cluster"] else "N"` — **EN:** Assigns a value to dynamic_cluster_flag. **CN:** 将一个值赋给 dynamic_cluster_flag。
+- **L880** `      dynamic_datatype_flag = "Y" if kernel_features[hashed_kernel_name]["is_support_dynamic_datatype"] else "N"` — **EN:** Assigns a value to dynamic_datatype_flag. **CN:** 将一个值赋给 dynamic_datatype_flag。
+- **L881** `      test_count = len(auditlist_csv_params_map[hashed_kernel_name])` — **EN:** Assigns a value to test_count. **CN:** 将一个值赋给 test_count。
+- **L882** `      csv_writer.writerow(row + [dynamic_cluster_flag, dynamic_datatype_flag, test_count])` — **EN:** Invokes `csv_writer.writerow` as a standalone call. **CN:** 以独立语句方式调用 `csv_writer.writerow`。
+- **L883** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L884** `  with open(audit_file_params_name, 'w') as auditlist_csv:` — **EN:** Starts a context-managed block using open(audit_file_params_name, 'w'). **CN:** 开始一个使用 open(audit_file_params_name, 'w') 的上下文管理代码块。
+- **L885** `    csv_writer = csv.writer(auditlist_csv, delimiter=',')` — **EN:** Assigns a value to csv_writer. **CN:** 将一个值赋给 csv_writer。
+- **L886** `    csv_writer.writerow(audit_csv_runtime_fields)` — **EN:** Invokes `csv_writer.writerow` as a standalone call. **CN:** 以独立语句方式调用 `csv_writer.writerow`。
+- **L887** `    for kernel_index, (hashed_kernel_name, rows) in enumerate(auditlist_csv_params_map.items(), start=1):` — **EN:** Starts a loop assigning items from `enumerate(auditlist_csv_params_map.items(), sta...` to `(kernel_index, (hashed_kernel_name, r...`. **CN:** 开始一个循环，将 `enumerate(auditlist_csv_params_map.items(), sta...` 的元素赋给 `(kernel_index, (hashed_kernel_name, r...`。
+- **L888** `      for i, row in enumerate(rows):` — **EN:** Starts a loop assigning items from `enumerate(rows)` to `(i, row)`. **CN:** 开始一个循环，将 `enumerate(rows)` 的元素赋给 `(i, row)`。
+- **L889** `        if i == 0:` — **EN:** Starts a conditional branch guarded by `i == 0`. **CN:** 开始一个由 `i == 0` 控制的条件分支。
+- **L890** `          csv_writer.writerow([kernel_index, hashed_kernel_name] + row)` — **EN:** Invokes `csv_writer.writerow` as a standalone call. **CN:** 以独立语句方式调用 `csv_writer.writerow`。
+- **L891** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L892** `          csv_writer.writerow(["", ""] + row)` — **EN:** Invokes `csv_writer.writerow` as a standalone call. **CN:** 以独立语句方式调用 `csv_writer.writerow`。
+- **L893** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L894** `  print(f"Generated a total of {testcase_counter} test cases for {kernels_emitted} kernels out of {kernels_total} total.")` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L895** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L896** `  # Generate a newline separated list of kernel filters` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L897** `  assert(len(kernel_name_set) == kernels_emitted)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L898** `  output_filter_enabled = True` — **EN:** Assigns a value to output_filter_enabled. **CN:** 将一个值赋给 output_filter_enabled。
+- **L899** `  if output_filter_enabled:` — **EN:** Starts a conditional branch guarded by `output_filter_enabled`. **CN:** 开始一个由 `output_filter_enabled` 控制的条件分支。
+- **L900** `    kernel_filter_outfile_name = os.path.join(curr_build_dir, f"FK_{mode}_testlist_SM{arch}_cutlass3x_gemm_kernel_filter.list")` — **EN:** Assigns a value to kernel_filter_outfile_name. **CN:** 将一个值赋给 kernel_filter_outfile_name。
+- **L901** `  with open(kernel_filter_outfile_name, "w") as file:` — **EN:** Starts a context-managed block using open(kernel_filter_outfile_name, 'w'). **CN:** 开始一个使用 open(kernel_filter_outfile_name, 'w') 的上下文管理代码块。
+- **L902** `      kernel_name_set = set(map(lambda x: x.replace("_epi_tma", ""), kernel_name_set))` — **EN:** Assigns a value to kernel_name_set. **CN:** 将一个值赋给 kernel_name_set。
+- **L903** `      for kernel_name in kernel_name_set:` — **EN:** Starts a loop assigning items from `kernel_name_set` to `kernel_name`. **CN:** 开始一个循环，将 `kernel_name_set` 的元素赋给 `kernel_name`。
+- **L904** `          file.write(kernel_name + "\n")` — **EN:** Invokes `file.write` as a standalone call. **CN:** 以独立语句方式调用 `file.write`。
+- **L905** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L906** `  # Sort L0 and L1 kernel list and csv file to avoid mixing cutlass3.x kernels and sm120_mma kernels in cutlass2.x generated together.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L907** `  if mode == "functional_L0" or mode == "functional_L1":` — **EN:** Starts a conditional branch guarded by `mode == 'functional_L0' or mode == 'functional_L1'`. **CN:** 开始一个由 `mode == 'functional_L0' or mode == 'functional_L1'` 控制的条件分支。
+- **L908** `    # Sort the .csv file` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L909** `    outfile_name = os.path.join(curr_build_dir, f"FK_{mode}_testlist_SM{arch}_cutlass3x_gemm.csv")` — **EN:** Assigns a value to outfile_name. **CN:** 将一个值赋给 outfile_name。
+- **L910** `    with open(outfile_name) as file:` — **EN:** Starts a context-managed block using open(outfile_name). **CN:** 开始一个使用 open(outfile_name) 的上下文管理代码块。
+- **L911** `      data = file.readlines()` — **EN:** Assigns a value to data. **CN:** 将一个值赋给 data。
+- **L912** `      data.sort()` — **EN:** Invokes `data.sort` as a standalone call. **CN:** 以独立语句方式调用 `data.sort`。
+- **L913** `    with open(outfile_name, 'w') as file:` — **EN:** Starts a context-managed block using open(outfile_name, 'w'). **CN:** 开始一个使用 open(outfile_name, 'w') 的上下文管理代码块。
+- **L914** `      for i in range(len(data)):` — **EN:** Starts a loop assigning items from `range(len(data))` to `i`. **CN:** 开始一个循环，将 `range(len(data))` 的元素赋给 `i`。
+- **L915** `        file.write(data[i])` — **EN:** Invokes `file.write` as a standalone call. **CN:** 以独立语句方式调用 `file.write`。
+- **L916** `    # Sort the kernel list` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L917** `    kernel_filter_outfile_name = os.path.join(curr_build_dir, f"FK_{mode}_testlist_SM{arch}_cutlass3x_gemm_kernel_filter.list")` — **EN:** Assigns a value to kernel_filter_outfile_name. **CN:** 将一个值赋给 kernel_filter_outfile_name。
+- **L918** `    with open(kernel_filter_outfile_name) as file:` — **EN:** Starts a context-managed block using open(kernel_filter_outfile_name). **CN:** 开始一个使用 open(kernel_filter_outfile_name) 的上下文管理代码块。
+- **L919** `      data = file.readlines()` — **EN:** Assigns a value to data. **CN:** 将一个值赋给 data。
+- **L920** `      data.sort()` — **EN:** Invokes `data.sort` as a standalone call. **CN:** 以独立语句方式调用 `data.sort`。
+- **L921** `    with open(kernel_filter_outfile_name, 'w') as file:` — **EN:** Starts a context-managed block using open(kernel_filter_outfile_name, 'w'). **CN:** 开始一个使用 open(kernel_filter_outfile_name, 'w') 的上下文管理代码块。
+- **L922** `      for i in range(len(data)):` — **EN:** Starts a loop assigning items from `range(len(data))` to `i`. **CN:** 开始一个循环，将 `range(len(data))` 的元素赋给 `i`。
+- **L923** `        file.write(data[i])` — **EN:** Invokes `file.write` as a standalone call. **CN:** 以独立语句方式调用 `file.write`。
+- **L924** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_library.emit_kernel_listing`. CN: 模块名为 `cutlass_library.emit_kernel_listing`。
+- EN: Top-level functions: hash_cutlass_string, transform_hashed_string, get_kernel_features, get_kernel_params, _getSubOperationType, _get_inst_shape, _is_simt_inst, _getInstType, _computeFlopsPerByte, emit_gemm_kernel_testlist CN: 顶层函数包括：hash_cutlass_string, transform_hashed_string, get_kernel_features, get_kernel_params, _getSubOperationType, _get_inst_shape, _is_simt_inst, _getInstType, _computeFlopsPerByte, emit_gemm_kernel_testlist
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_library.library:* CN: 内部依赖：cutlass_library.library:*
+- EN: External or standard-library dependencies: collections, csv, json, math, os, re, builtins, library:* CN: 外部或标准库依赖：collections, csv, json, math, os, re, builtins, library:*

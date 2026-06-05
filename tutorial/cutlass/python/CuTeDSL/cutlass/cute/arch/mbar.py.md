@@ -1,0 +1,391 @@
+# mbar.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/cute/arch/mbar.py`
+
+## Purpose / 作用
+- EN: Defines 9 functions (mbarrier_init, mbarrier_init_fence, mbarrier_arrive_and_expect_tx, mbarrier_expect_tx, ... (+5 more)) in `CuTeDSL.cutlass.cute.arch.mbar`.
+- CN: 该模块 `CuTeDSL.cutlass.cute.arch.mbar` 定义了 9 个函数（mbarrier_init, mbarrier_init_fence, mbarrier_arrive_and_expect_tx, mbarrier_expect_tx, ... (+5 more)）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `from cutlass.base_dsl.arch import Arch` — **EN:** Imports Arch from `cutlass.base_dsl.arch`. **CN:** 从 `cutlass.base_dsl.arch` 导入 Arch。
+- **L12** `from cutlass.cutlass_dsl import BaseDSL, if_generate, dsl_user_op` — **EN:** Imports BaseDSL, if_generate, dsl_user_op from `cutlass.cutlass_dsl`. **CN:** 从 `cutlass.cutlass_dsl` 导入 BaseDSL, if_generate, dsl_user_op。
+- **L13** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L14** `from cutlass._mlir import ir` — **EN:** Imports ir from `cutlass._mlir`. **CN:** 从 `cutlass._mlir` 导入 ir。
+- **L15** `from cutlass._mlir.dialects import nvvm, llvm` — **EN:** Imports nvvm, llvm from `cutlass._mlir.dialects`. **CN:** 从 `cutlass._mlir.dialects` 导入 nvvm, llvm。
+- **L16** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L17** `from ..typing import Optional, Pointer, Int, Boolean, Int32, AddressSpace` — **EN:** Imports Optional, Pointer, Int, Boolean, Int32, AddressSpace from `..typing`. **CN:** 从 `..typing` 导入 Optional, Pointer, Int, Boolean, Int32, AddressSpace。
+- **L18** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L19** `####################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L21** `# Mbarrier management utilities` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L23** `####################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L24** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L25** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L26** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L27** `def mbarrier_init(` — **EN:** Defines function `mbarrier_init`. **CN:** 定义函数 `mbarrier_init`。
+- **L28** `    mbar_ptr: Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L29** `    cnt: Int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L30** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L31** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L32** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L33** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L34** `    """` — **EN:** Starts the docstring for the function `mbarrier_init`. **CN:** 开始说明 function `mbarrier_init` 的文档字符串。
+- **L35** `    Initializes a mbarrier with the specified thread arrival count.` — **EN:** Continues the docstring for the function `mbarrier_init`. **CN:** 继续说明 function `mbarrier_init` 的文档字符串。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `    **Single-Thread Execution Required**: This operation **must** be executed by only one thread` — **EN:** Continues the docstring for the function `mbarrier_init`. **CN:** 继续说明 function `mbarrier_init` 的文档字符串。
+- **L38** `    per CTA. Use :func:\`cute.arch.elect_one\` to ensure proper synchronization:` — **EN:** Continues the docstring for the function `mbarrier_init`. **CN:** 继续说明 function `mbarrier_init` 的文档字符串。
+- **L39** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L40** `    .. code-block:: python` — **EN:** Continues the docstring for the function `mbarrier_init`. **CN:** 继续说明 function `mbarrier_init` 的文档字符串。
+- **L41** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L42** `        with cute.arch.elect_one():` — **EN:** Continues the docstring for the function `mbarrier_init`. **CN:** 继续说明 function `mbarrier_init` 的文档字符串。
+- **L43** `            cute.arch.mbarrier_init(barrier_ptr, arrival_count)` — **EN:** Continues the docstring for the function `mbarrier_init`. **CN:** 继续说明 function `mbarrier_init` 的文档字符串。
+- **L44** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L45** `    **PTX Mapping**: This operation maps to the PTX \`\`mbarrier.init.shared.b64\`\` instruction,` — **EN:** Continues the docstring for the function `mbarrier_init`. **CN:** 继续说明 function `mbarrier_init` 的文档字符串。
+- **L46** `    which must be issued by a single thread for correctness.` — **EN:** Continues the docstring for the function `mbarrier_init`. **CN:** 继续说明 function `mbarrier_init` 的文档字符串。
+- **L47** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L48** `    :param mbar_ptr: A pointer to the mbarrier in SMEM` — **EN:** Continues the docstring for the function `mbarrier_init`. **CN:** 继续说明 function `mbarrier_init` 的文档字符串。
+- **L49** `    :type mbar_ptr:  Pointer` — **EN:** Continues the docstring for the function `mbarrier_init`. **CN:** 继续说明 function `mbarrier_init` 的文档字符串。
+- **L50** `    :param cnt:      The arrival count of the mbarrier` — **EN:** Continues the docstring for the function `mbarrier_init`. **CN:** 继续说明 function `mbarrier_init` 的文档字符串。
+- **L51** `    :type cnt:       Int` — **EN:** Continues the docstring for the function `mbarrier_init`. **CN:** 继续说明 function `mbarrier_init` 的文档字符串。
+- **L52** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L53** `    .. seealso::` — **EN:** Continues the docstring for the function `mbarrier_init`. **CN:** 继续说明 function `mbarrier_init` 的文档字符串。
+- **L54** `       - :func:\`cute.arch.elect_one\` - Required wrapper for single-thread execution` — **EN:** Continues the docstring for the function `mbarrier_init`. **CN:** 继续说明 function `mbarrier_init` 的文档字符串。
+- **L55** `       - :func:\`cute.arch.mbarrier_expect_tx\` - Also requires elect_one` — **EN:** Continues the docstring for the function `mbarrier_init`. **CN:** 继续说明 function `mbarrier_init` 的文档字符串。
+- **L56** `       - PTX ISA documentation on \`\`mbarrier.init\`\`` — **EN:** Continues the docstring for the function `mbarrier_init`. **CN:** 继续说明 function `mbarrier_init` 的文档字符串。
+- **L57** `    """` — **EN:** Ends the docstring for the function `mbarrier_init`. **CN:** 结束说明 function `mbarrier_init` 的文档字符串。
+- **L58** `    nvvm.mbarrier_init_shared(` — **EN:** Invokes `nvvm.mbarrier_init_shared` as a standalone call. **CN:** 以独立语句方式调用 `nvvm.mbarrier_init_shared`。
+- **L59** `        mbar_ptr.to_llvm_ptr(loc=loc, ip=ip),  # type: ignore[attr-defined]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L60** `        Int32(cnt).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L61** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L62** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L63** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L64** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L65** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L66** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L67** `def mbarrier_init_fence(` — **EN:** Defines function `mbarrier_init_fence`. **CN:** 定义函数 `mbarrier_init_fence`。
+- **L68** `    *, loc: Optional[ir.Location] = None, ip: Optional[ir.InsertionPoint] = None` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L69** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L70** `    """` — **EN:** Starts the docstring for the function `mbarrier_init_fence`. **CN:** 开始说明 function `mbarrier_init_fence` 的文档字符串。
+- **L71** `    A fence operation that applies to the mbarrier initializations.` — **EN:** Continues the docstring for the function `mbarrier_init_fence`. **CN:** 继续说明 function `mbarrier_init_fence` 的文档字符串。
+- **L72** `    """` — **EN:** Ends the docstring for the function `mbarrier_init_fence`. **CN:** 结束说明 function `mbarrier_init_fence` 的文档字符串。
+- **L73** `    BaseDSL._get_dsl().check_arch(lambda arch: arch >= Arch.sm_90)` — **EN:** Invokes `BaseDSL._get_dsl().check_arch` as a standalone call. **CN:** 以独立语句方式调用 `BaseDSL._get_dsl().check_arch`。
+- **L74** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L75** `    nvvm.fence_mbarrier_init(loc=loc, ip=ip)` — **EN:** Invokes `nvvm.fence_mbarrier_init` as a standalone call. **CN:** 以独立语句方式调用 `nvvm.fence_mbarrier_init`。
+- **L76** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L77** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L78** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L79** `def mbarrier_arrive_and_expect_tx(` — **EN:** Defines function `mbarrier_arrive_and_expect_tx`. **CN:** 定义函数 `mbarrier_arrive_and_expect_tx`。
+- **L80** `    mbar_ptr: Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L81** `    bytes: Int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L82** `    peer_cta_rank_in_cluster: Optional[Int] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L83** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L84** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L85** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L86** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L87** `    """` — **EN:** Starts the docstring for the function `mbarrier_arrive_and_expect_tx`. **CN:** 开始说明 function `mbarrier_arrive_and_expect_tx` 的文档字符串。
+- **L88** `    Arrives on a mbarrier and expects a specified number of transaction bytes.` — **EN:** Continues the docstring for the function `mbarrier_arrive_and_expect_tx`. **CN:** 继续说明 function `mbarrier_arrive_and_expect_tx` 的文档字符串。
+- **L89** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L90** `    Each thread that executes this operation will increment the arrival count by 1 and` — **EN:** Continues the docstring for the function `mbarrier_arrive_and_expect_tx`. **CN:** 继续说明 function `mbarrier_arrive_and_expect_tx` 的文档字符串。
+- **L91** `    increment the expected transaction bytes by the specified number.` — **EN:** Continues the docstring for the function `mbarrier_arrive_and_expect_tx`. **CN:** 继续说明 function `mbarrier_arrive_and_expect_tx` 的文档字符串。
+- **L92** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L93** `    To ensure proper synchronization, most calls to this function should be wrapped in :func:\`cute.arch.elect_one\`.` — **EN:** Continues the docstring for the function `mbarrier_arrive_and_expect_tx`. **CN:** 继续说明 function `mbarrier_arrive_and_expect_tx` 的文档字符串。
+- **L94** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L95** `    .. code-block:: python` — **EN:** Continues the docstring for the function `mbarrier_arrive_and_expect_tx`. **CN:** 继续说明 function `mbarrier_arrive_and_expect_tx` 的文档字符串。
+- **L96** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L97** `        with cute.arch.elect_one():` — **EN:** Continues the docstring for the function `mbarrier_arrive_and_expect_tx`. **CN:** 继续说明 function `mbarrier_arrive_and_expect_tx` 的文档字符串。
+- **L98** `            cute.arch.mbarrier_arrive_and_expect_tx(barrier_ptr, num_transaction_bytes)` — **EN:** Continues the docstring for the function `mbarrier_arrive_and_expect_tx`. **CN:** 继续说明 function `mbarrier_arrive_and_expect_tx` 的文档字符串。
+- **L99** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L100** `    This is a combined operation that both arrives at the barrier (incrementing the arrival count)` — **EN:** Continues the docstring for the function `mbarrier_arrive_and_expect_tx`. **CN:** 继续说明 function `mbarrier_arrive_and_expect_tx` 的文档字符串。
+- **L101** `    and sets the expected transaction bytes. It is commonly used with TMA operations in pipelined` — **EN:** Continues the docstring for the function `mbarrier_arrive_and_expect_tx`. **CN:** 继续说明 function `mbarrier_arrive_and_expect_tx` 的文档字符串。
+- **L102** `    kernels.` — **EN:** Continues the docstring for the function `mbarrier_arrive_and_expect_tx`. **CN:** 继续说明 function `mbarrier_arrive_and_expect_tx` 的文档字符串。
+- **L103** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L104** `    See the PTX ISA documentation on \`mbarrier.arrive.expect_tx <https://docs.nvidia.com/cuda/parallel-thread-execution/#parallel-synchronization-and-communication-instructions-mbarrier-arrive-expect-tx>\`__.` — **EN:** Continues the docstring for the function `mbarrier_arrive_and_expect_tx`. **CN:** 继续说明 function `mbarrier_arrive_and_expect_tx` 的文档字符串。
+- **L105** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L106** `    :param mbar_ptr:                 A pointer to the mbarrier in SMEM` — **EN:** Continues the docstring for the function `mbarrier_arrive_and_expect_tx`. **CN:** 继续说明 function `mbarrier_arrive_and_expect_tx` 的文档字符串。
+- **L107** `    :type mbar_ptr:                  Pointer` — **EN:** Continues the docstring for the function `mbarrier_arrive_and_expect_tx`. **CN:** 继续说明 function `mbarrier_arrive_and_expect_tx` 的文档字符串。
+- **L108** `    :param bytes:                    The number of transaction bytes` — **EN:** Continues the docstring for the function `mbarrier_arrive_and_expect_tx`. **CN:** 继续说明 function `mbarrier_arrive_and_expect_tx` 的文档字符串。
+- **L109** `    :type bytes:                     Int` — **EN:** Continues the docstring for the function `mbarrier_arrive_and_expect_tx`. **CN:** 继续说明 function `mbarrier_arrive_and_expect_tx` 的文档字符串。
+- **L110** `    :param peer_cta_rank_in_cluster: An optional CTA rank in cluster. If provided, the pointer to` — **EN:** Continues the docstring for the function `mbarrier_arrive_and_expect_tx`. **CN:** 继续说明 function `mbarrier_arrive_and_expect_tx` 的文档字符串。
+- **L111** `                                     the mbarrier is converted to a remote address in the peer CTA's` — **EN:** Continues the docstring for the function `mbarrier_arrive_and_expect_tx`. **CN:** 继续说明 function `mbarrier_arrive_and_expect_tx` 的文档字符串。
+- **L112** `                                     SMEM.` — **EN:** Continues the docstring for the function `mbarrier_arrive_and_expect_tx`. **CN:** 继续说明 function `mbarrier_arrive_and_expect_tx` 的文档字符串。
+- **L113** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L114** `    .. seealso::` — **EN:** Continues the docstring for the function `mbarrier_arrive_and_expect_tx`. **CN:** 继续说明 function `mbarrier_arrive_and_expect_tx` 的文档字符串。
+- **L115** `       - :func:\`cute.arch.elect_one\` - Required wrapper for single-thread execution` — **EN:** Continues the docstring for the function `mbarrier_arrive_and_expect_tx`. **CN:** 继续说明 function `mbarrier_arrive_and_expect_tx` 的文档字符串。
+- **L116** `       - :func:\`cute.arch.mbarrier_init\` - Also requires elect_one` — **EN:** Continues the docstring for the function `mbarrier_arrive_and_expect_tx`. **CN:** 继续说明 function `mbarrier_arrive_and_expect_tx` 的文档字符串。
+- **L117** `       - :func:\`cute.arch.mbarrier_expect_tx\` - Expect_tx without arrive` — **EN:** Continues the docstring for the function `mbarrier_arrive_and_expect_tx`. **CN:** 继续说明 function `mbarrier_arrive_and_expect_tx` 的文档字符串。
+- **L118** `    """` — **EN:** Ends the docstring for the function `mbarrier_arrive_and_expect_tx`. **CN:** 结束说明 function `mbarrier_arrive_and_expect_tx` 的文档字符串。
+- **L119** `    BaseDSL._get_dsl().check_arch(lambda arch: arch >= Arch.sm_90)` — **EN:** Invokes `BaseDSL._get_dsl().check_arch` as a standalone call. **CN:** 以独立语句方式调用 `BaseDSL._get_dsl().check_arch`。
+- **L120** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L121** `    mbar_llvm_ptr = mbar_ptr.to_llvm_ptr(loc=loc, ip=ip)  # type: ignore[attr-defined]` — **EN:** Assigns a value to mbar_llvm_ptr. **CN:** 将一个值赋给 mbar_llvm_ptr。
+- **L122** `    if peer_cta_rank_in_cluster is not None:` — **EN:** Starts a conditional branch guarded by `peer_cta_rank_in_cluster is not None`. **CN:** 开始一个由 `peer_cta_rank_in_cluster is not None` 控制的条件分支。
+- **L123** `        mbar_cluster_type = llvm.PointerType.get(AddressSpace.dsmem)` — **EN:** Assigns a value to mbar_cluster_type. **CN:** 将一个值赋给 mbar_cluster_type。
+- **L124** `        mbar_llvm_ptr = nvvm.mapa(` — **EN:** Assigns a value to mbar_llvm_ptr. **CN:** 将一个值赋给 mbar_llvm_ptr。
+- **L125** `            mbar_cluster_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L126** `            mbar_llvm_ptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L127** `            Int32(peer_cta_rank_in_cluster).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L128** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L129** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L130** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L131** `        mbar_shared_type = llvm.PointerType.get(AddressSpace.smem)` — **EN:** Assigns a value to mbar_shared_type. **CN:** 将一个值赋给 mbar_shared_type。
+- **L132** `        mbar_llvm_ptr = llvm.addrspacecast(mbar_shared_type, mbar_llvm_ptr)` — **EN:** Assigns a value to mbar_llvm_ptr. **CN:** 将一个值赋给 mbar_llvm_ptr。
+- **L133** `        space = nvvm.MBarrierSpaceKind.CLUSTER` — **EN:** Assigns a value to space. **CN:** 将一个值赋给 space。
+- **L134** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L135** `        space = nvvm.MBarrierSpaceKind.CTA` — **EN:** Assigns a value to space. **CN:** 将一个值赋给 space。
+- **L136** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L137** `    nvvm.mbarrier_txn(` — **EN:** Invokes `nvvm.mbarrier_txn` as a standalone call. **CN:** 以独立语句方式调用 `nvvm.mbarrier_txn`。
+- **L138** `        mbar_llvm_ptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L139** `        Int32(bytes).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L140** `        kind=nvvm.MBarrierTxnKind.ARRIVE_EXPECT_TX,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L141** `        space=space,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L142** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L143** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L144** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L145** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L146** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L147** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L148** `def mbarrier_expect_tx(` — **EN:** Defines function `mbarrier_expect_tx`. **CN:** 定义函数 `mbarrier_expect_tx`。
+- **L149** `    mbar_ptr: Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L150** `    bytes: Int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L151** `    peer_cta_rank_in_cluster: Optional[Int] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L152** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L153** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L154** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L155** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L156** `    """` — **EN:** Starts the docstring for the function `mbarrier_expect_tx`. **CN:** 开始说明 function `mbarrier_expect_tx` 的文档字符串。
+- **L157** `    Expects a specified number of transaction bytes without an arrive.` — **EN:** Continues the docstring for the function `mbarrier_expect_tx`. **CN:** 继续说明 function `mbarrier_expect_tx` 的文档字符串。
+- **L158** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L159** `    Each thread that executes this operation will increment the expected transaction bytes by the specified number.` — **EN:** Continues the docstring for the function `mbarrier_expect_tx`. **CN:** 继续说明 function `mbarrier_expect_tx` 的文档字符串。
+- **L160** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L161** `    To ensure proper synchronization, most calls to this function should be wrapped in :func:\`cute.arch.elect_one\`.` — **EN:** Continues the docstring for the function `mbarrier_expect_tx`. **CN:** 继续说明 function `mbarrier_expect_tx` 的文档字符串。
+- **L162** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L163** `    .. code-block:: python` — **EN:** Continues the docstring for the function `mbarrier_expect_tx`. **CN:** 继续说明 function `mbarrier_expect_tx` 的文档字符串。
+- **L164** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L165** `        with cute.arch.elect_one():` — **EN:** Continues the docstring for the function `mbarrier_expect_tx`. **CN:** 继续说明 function `mbarrier_expect_tx` 的文档字符串。
+- **L166** `            cute.arch.mbarrier_expect_tx(barrier_ptr, num_transaction_bytes)` — **EN:** Continues the docstring for the function `mbarrier_expect_tx`. **CN:** 继续说明 function `mbarrier_expect_tx` 的文档字符串。
+- **L167** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L168** `    This is commonly used with TMA operations to set the expected transaction size before` — **EN:** Continues the docstring for the function `mbarrier_expect_tx`. **CN:** 继续说明 function `mbarrier_expect_tx` 的文档字符串。
+- **L169** `    issuing a TMA load.` — **EN:** Continues the docstring for the function `mbarrier_expect_tx`. **CN:** 继续说明 function `mbarrier_expect_tx` 的文档字符串。
+- **L170** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L171** `    See the PTX ISA documentation on \`mbarrier.expect_tx <https://docs.nvidia.com/cuda/parallel-thread-execution/#parallel-synchronization-and-communication-instructions-mbarrier-expect-tx>\`__.` — **EN:** Continues the docstring for the function `mbarrier_expect_tx`. **CN:** 继续说明 function `mbarrier_expect_tx` 的文档字符串。
+- **L172** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L173** `    :param mbar_ptr:                 A pointer to the mbarrier in SMEM` — **EN:** Continues the docstring for the function `mbarrier_expect_tx`. **CN:** 继续说明 function `mbarrier_expect_tx` 的文档字符串。
+- **L174** `    :type mbar_ptr:                  Pointer` — **EN:** Continues the docstring for the function `mbarrier_expect_tx`. **CN:** 继续说明 function `mbarrier_expect_tx` 的文档字符串。
+- **L175** `    :param bytes:                    The number of transaction bytes` — **EN:** Continues the docstring for the function `mbarrier_expect_tx`. **CN:** 继续说明 function `mbarrier_expect_tx` 的文档字符串。
+- **L176** `    :type bytes:                     Int` — **EN:** Continues the docstring for the function `mbarrier_expect_tx`. **CN:** 继续说明 function `mbarrier_expect_tx` 的文档字符串。
+- **L177** `    :param peer_cta_rank_in_cluster: An optional CTA rank in cluster. If provided, the pointer to` — **EN:** Continues the docstring for the function `mbarrier_expect_tx`. **CN:** 继续说明 function `mbarrier_expect_tx` 的文档字符串。
+- **L178** `                                     the mbarrier is converted to a remote address in the peer CTA's` — **EN:** Continues the docstring for the function `mbarrier_expect_tx`. **CN:** 继续说明 function `mbarrier_expect_tx` 的文档字符串。
+- **L179** `                                     SMEM.` — **EN:** Continues the docstring for the function `mbarrier_expect_tx`. **CN:** 继续说明 function `mbarrier_expect_tx` 的文档字符串。
+- **L180** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L181** `    .. seealso::` — **EN:** Continues the docstring for the function `mbarrier_expect_tx`. **CN:** 继续说明 function `mbarrier_expect_tx` 的文档字符串。
+- **L182** `       - :func:\`cute.arch.elect_one\` - Recommended wrapper for single-thread execution` — **EN:** Continues the docstring for the function `mbarrier_expect_tx`. **CN:** 继续说明 function `mbarrier_expect_tx` 的文档字符串。
+- **L183** `       - :func:\`cute.arch.mbarrier_init\` - initialize mbarrier` — **EN:** Continues the docstring for the function `mbarrier_expect_tx`. **CN:** 继续说明 function `mbarrier_expect_tx` 的文档字符串。
+- **L184** `       - :func:\`cute.arch.mbarrier_arrive_and_expect_tx\` - Combined arrive and expect_tx` — **EN:** Continues the docstring for the function `mbarrier_expect_tx`. **CN:** 继续说明 function `mbarrier_expect_tx` 的文档字符串。
+- **L185** `    """` — **EN:** Ends the docstring for the function `mbarrier_expect_tx`. **CN:** 结束说明 function `mbarrier_expect_tx` 的文档字符串。
+- **L186** `    BaseDSL._get_dsl().check_arch(lambda arch: arch >= Arch.sm_90)` — **EN:** Invokes `BaseDSL._get_dsl().check_arch` as a standalone call. **CN:** 以独立语句方式调用 `BaseDSL._get_dsl().check_arch`。
+- **L187** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L188** `    mbar_llvm_ptr = mbar_ptr.to_llvm_ptr(loc=loc, ip=ip)  # type: ignore[attr-defined]` — **EN:** Assigns a value to mbar_llvm_ptr. **CN:** 将一个值赋给 mbar_llvm_ptr。
+- **L189** `    if peer_cta_rank_in_cluster is not None:` — **EN:** Starts a conditional branch guarded by `peer_cta_rank_in_cluster is not None`. **CN:** 开始一个由 `peer_cta_rank_in_cluster is not None` 控制的条件分支。
+- **L190** `        mbar_cluster_type = llvm.PointerType.get(AddressSpace.dsmem)` — **EN:** Assigns a value to mbar_cluster_type. **CN:** 将一个值赋给 mbar_cluster_type。
+- **L191** `        mbar_llvm_ptr = nvvm.mapa(` — **EN:** Assigns a value to mbar_llvm_ptr. **CN:** 将一个值赋给 mbar_llvm_ptr。
+- **L192** `            mbar_cluster_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L193** `            mbar_llvm_ptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L194** `            Int32(peer_cta_rank_in_cluster).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L195** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L196** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L197** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L198** `        mbar_shared_type = llvm.PointerType.get(AddressSpace.smem)` — **EN:** Assigns a value to mbar_shared_type. **CN:** 将一个值赋给 mbar_shared_type。
+- **L199** `        mbar_llvm_ptr = llvm.addrspacecast(mbar_shared_type, mbar_llvm_ptr)` — **EN:** Assigns a value to mbar_llvm_ptr. **CN:** 将一个值赋给 mbar_llvm_ptr。
+- **L200** `        space = nvvm.MBarrierSpaceKind.CLUSTER` — **EN:** Assigns a value to space. **CN:** 将一个值赋给 space。
+- **L201** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L202** `        space = nvvm.MBarrierSpaceKind.CTA` — **EN:** Assigns a value to space. **CN:** 将一个值赋给 space。
+- **L203** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L204** `    nvvm.mbarrier_txn(` — **EN:** Invokes `nvvm.mbarrier_txn` as a standalone call. **CN:** 以独立语句方式调用 `nvvm.mbarrier_txn`。
+- **L205** `        mbar_llvm_ptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L206** `        Int32(bytes).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L207** `        kind=nvvm.MBarrierTxnKind.EXPECT_TX,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L208** `        space=space,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L209** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L210** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L211** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L212** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L213** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L214** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L215** `def mbarrier_wait(` — **EN:** Defines function `mbarrier_wait`. **CN:** 定义函数 `mbarrier_wait`。
+- **L216** `    mbar_ptr: Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L217** `    phase: Int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L218** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L219** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L220** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L221** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L222** `    """` — **EN:** Starts the docstring for the function `mbarrier_wait`. **CN:** 开始说明 function `mbarrier_wait` 的文档字符串。
+- **L223** `    Waits on a mbarrier with a specified phase.` — **EN:** Continues the docstring for the function `mbarrier_wait`. **CN:** 继续说明 function `mbarrier_wait` 的文档字符串。
+- **L224** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L225** `    :param mbar_ptr: A pointer to the mbarrier in SMEM` — **EN:** Continues the docstring for the function `mbarrier_wait`. **CN:** 继续说明 function `mbarrier_wait` 的文档字符串。
+- **L226** `    :type mbar_ptr:  Pointer` — **EN:** Continues the docstring for the function `mbarrier_wait`. **CN:** 继续说明 function `mbarrier_wait` 的文档字符串。
+- **L227** `    :param phase:    The phase to wait for (either 0 or 1)` — **EN:** Continues the docstring for the function `mbarrier_wait`. **CN:** 继续说明 function `mbarrier_wait` 的文档字符串。
+- **L228** `    :type phase:     Int` — **EN:** Continues the docstring for the function `mbarrier_wait`. **CN:** 继续说明 function `mbarrier_wait` 的文档字符串。
+- **L229** `    """` — **EN:** Ends the docstring for the function `mbarrier_wait`. **CN:** 结束说明 function `mbarrier_wait` 的文档字符串。
+- **L230** `    BaseDSL._get_dsl().check_arch(lambda arch: arch >= Arch.sm_90)` — **EN:** Invokes `BaseDSL._get_dsl().check_arch` as a standalone call. **CN:** 以独立语句方式调用 `BaseDSL._get_dsl().check_arch`。
+- **L231** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L232** `    timeout_ns = 10000000` — **EN:** Assigns a value to timeout_ns. **CN:** 将一个值赋给 timeout_ns。
+- **L233** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L234** `    # This NVVM Op is a spin-loop wrapping the mbarrier.try_wait.parity.shared.b64 PTX` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L235** `    # The timeout in ns only applies to the latter and this call is truly blocking` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L236** `    nvvm.mbarrier_try_wait_parity_shared(` — **EN:** Invokes `nvvm.mbarrier_try_wait_parity_shared` as a standalone call. **CN:** 以独立语句方式调用 `nvvm.mbarrier_try_wait_parity_shared`。
+- **L237** `        mbar_ptr.to_llvm_ptr(loc=loc, ip=ip),  # type: ignore[attr-defined]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L238** `        Int32(phase).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L239** `        Int32(timeout_ns).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L240** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L241** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L242** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L243** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L244** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L245** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L246** `def mbarrier_try_wait(` — **EN:** Defines function `mbarrier_try_wait`. **CN:** 定义函数 `mbarrier_try_wait`。
+- **L247** `    mbar_ptr: Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L248** `    phase: Int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L249** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L250** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L251** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L252** `) -> Boolean:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L253** `    """` — **EN:** Starts the docstring for the function `mbarrier_try_wait`. **CN:** 开始说明 function `mbarrier_try_wait` 的文档字符串。
+- **L254** `    Attempts to wait on a mbarrier with a specified phase in a non-blocking fashion.` — **EN:** Continues the docstring for the function `mbarrier_try_wait`. **CN:** 继续说明 function `mbarrier_try_wait` 的文档字符串。
+- **L255** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L256** `    :param mbar_ptr: A pointer to the mbarrier in SMEM` — **EN:** Continues the docstring for the function `mbarrier_try_wait`. **CN:** 继续说明 function `mbarrier_try_wait` 的文档字符串。
+- **L257** `    :type mbar_ptr:  Pointer` — **EN:** Continues the docstring for the function `mbarrier_try_wait`. **CN:** 继续说明 function `mbarrier_try_wait` 的文档字符串。
+- **L258** `    :param phase:    The phase to wait for (either 0 or 1)` — **EN:** Continues the docstring for the function `mbarrier_try_wait`. **CN:** 继续说明 function `mbarrier_try_wait` 的文档字符串。
+- **L259** `    :type phase:     Int` — **EN:** Continues the docstring for the function `mbarrier_try_wait`. **CN:** 继续说明 function `mbarrier_try_wait` 的文档字符串。
+- **L260** `    :return:         A boolean value indicating whether the wait operation was successful` — **EN:** Continues the docstring for the function `mbarrier_try_wait`. **CN:** 继续说明 function `mbarrier_try_wait` 的文档字符串。
+- **L261** `    :rtype:          Boolean` — **EN:** Continues the docstring for the function `mbarrier_try_wait`. **CN:** 继续说明 function `mbarrier_try_wait` 的文档字符串。
+- **L262** `    """` — **EN:** Ends the docstring for the function `mbarrier_try_wait`. **CN:** 结束说明 function `mbarrier_try_wait` 的文档字符串。
+- **L263** `    BaseDSL._get_dsl().check_arch(lambda arch: arch >= Arch.sm_90)` — **EN:** Invokes `BaseDSL._get_dsl().check_arch` as a standalone call. **CN:** 以独立语句方式调用 `BaseDSL._get_dsl().check_arch`。
+- **L264** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L265** `    return Boolean(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L266** `        nvvm.mbarrier_wait_parity(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L267** `            mbar_ptr.to_llvm_ptr(loc=loc, ip=ip),  # type: ignore[attr-defined]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L268** `            Int32(phase).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L269** `            nvvm.MBarrierWaitKind.TRY,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L270** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L271** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L272** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L273** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L274** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L275** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L276** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L277** `def mbarrier_conditional_try_wait(` — **EN:** Defines function `mbarrier_conditional_try_wait`. **CN:** 定义函数 `mbarrier_conditional_try_wait`。
+- **L278** `    cond: Boolean,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L279** `    mbar_ptr: Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L280** `    phase: Int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L281** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L282** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L283** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L284** `) -> Boolean:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L285** `    """` — **EN:** Starts the docstring for the function `mbarrier_conditional_try_wait`. **CN:** 开始说明 function `mbarrier_conditional_try_wait` 的文档字符串。
+- **L286** `    Conditionally attempts to wait on a mbarrier with a specified phase in a non-blocking fashion.` — **EN:** Continues the docstring for the function `mbarrier_conditional_try_wait`. **CN:** 继续说明 function `mbarrier_conditional_try_wait` 的文档字符串。
+- **L287** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L288** `    :param cond:     A boolean predicate` — **EN:** Continues the docstring for the function `mbarrier_conditional_try_wait`. **CN:** 继续说明 function `mbarrier_conditional_try_wait` 的文档字符串。
+- **L289** `    :param mbar_ptr: A pointer to the mbarrier in SMEM` — **EN:** Continues the docstring for the function `mbarrier_conditional_try_wait`. **CN:** 继续说明 function `mbarrier_conditional_try_wait` 的文档字符串。
+- **L290** `    :type mbar_ptr:  Pointer` — **EN:** Continues the docstring for the function `mbarrier_conditional_try_wait`. **CN:** 继续说明 function `mbarrier_conditional_try_wait` 的文档字符串。
+- **L291** `    :param phase:    The phase to wait for (either 0 or 1)` — **EN:** Continues the docstring for the function `mbarrier_conditional_try_wait`. **CN:** 继续说明 function `mbarrier_conditional_try_wait` 的文档字符串。
+- **L292** `    :type phase:     Int` — **EN:** Continues the docstring for the function `mbarrier_conditional_try_wait`. **CN:** 继续说明 function `mbarrier_conditional_try_wait` 的文档字符串。
+- **L293** `    :return:         A boolean value indicating whether the wait operation was successful` — **EN:** Continues the docstring for the function `mbarrier_conditional_try_wait`. **CN:** 继续说明 function `mbarrier_conditional_try_wait` 的文档字符串。
+- **L294** `    :rtype:          Boolean` — **EN:** Continues the docstring for the function `mbarrier_conditional_try_wait`. **CN:** 继续说明 function `mbarrier_conditional_try_wait` 的文档字符串。
+- **L295** `    """` — **EN:** Ends the docstring for the function `mbarrier_conditional_try_wait`. **CN:** 结束说明 function `mbarrier_conditional_try_wait` 的文档字符串。
+- **L296** `    BaseDSL._get_dsl().check_arch(lambda arch: arch >= Arch.sm_90)` — **EN:** Invokes `BaseDSL._get_dsl().check_arch` as a standalone call. **CN:** 以独立语句方式调用 `BaseDSL._get_dsl().check_arch`。
+- **L297** `    return if_generate(  # type: ignore[return-value]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L298** `        cond,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L299** `        lambda: mbarrier_try_wait(mbar_ptr, phase, loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L300** `        lambda: Boolean(True).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L301** `        None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L302** `        [Boolean],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L303** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L304** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L305** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L306** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L307** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L308** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L309** `def mbarrier_arrive(` — **EN:** Defines function `mbarrier_arrive`. **CN:** 定义函数 `mbarrier_arrive`。
+- **L310** `    mbar_ptr: Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L311** `    peer_cta_rank_in_cluster: Optional[Int] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L312** `    arrive_count: Int = 1,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L313** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L314** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L315** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L316** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L317** `    """` — **EN:** Starts the docstring for the function `mbarrier_arrive`. **CN:** 开始说明 function `mbarrier_arrive` 的文档字符串。
+- **L318** `    Arrives on an mbarrier.` — **EN:** Continues the docstring for the function `mbarrier_arrive`. **CN:** 继续说明 function `mbarrier_arrive` 的文档字符串。
+- **L319** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L320** `    :param mbar_ptr:                 A pointer to the mbarrier in SMEM` — **EN:** Continues the docstring for the function `mbarrier_arrive`. **CN:** 继续说明 function `mbarrier_arrive` 的文档字符串。
+- **L321** `    :type mbar_ptr:                  Pointer` — **EN:** Continues the docstring for the function `mbarrier_arrive`. **CN:** 继续说明 function `mbarrier_arrive` 的文档字符串。
+- **L322** `    :param peer_cta_rank_in_cluster: An optional CTA rank in cluster. If provided, the pointer to` — **EN:** Continues the docstring for the function `mbarrier_arrive`. **CN:** 继续说明 function `mbarrier_arrive` 的文档字符串。
+- **L323** `                                     the mbarrier is converted to a remote address in the peer CTA's` — **EN:** Continues the docstring for the function `mbarrier_arrive`. **CN:** 继续说明 function `mbarrier_arrive` 的文档字符串。
+- **L324** `                                     SMEM.` — **EN:** Continues the docstring for the function `mbarrier_arrive`. **CN:** 继续说明 function `mbarrier_arrive` 的文档字符串。
+- **L325** `    """` — **EN:** Ends the docstring for the function `mbarrier_arrive`. **CN:** 结束说明 function `mbarrier_arrive` 的文档字符串。
+- **L326** `    mbar_llvm_ptr = mbar_ptr.to_llvm_ptr(loc=loc, ip=ip)  # type: ignore[attr-defined]` — **EN:** Assigns a value to mbar_llvm_ptr. **CN:** 将一个值赋给 mbar_llvm_ptr。
+- **L327** `    if peer_cta_rank_in_cluster is not None:` — **EN:** Starts a conditional branch guarded by `peer_cta_rank_in_cluster is not None`. **CN:** 开始一个由 `peer_cta_rank_in_cluster is not None` 控制的条件分支。
+- **L328** `        BaseDSL._get_dsl().check_arch(lambda arch: arch >= Arch.sm_90)` — **EN:** Invokes `BaseDSL._get_dsl().check_arch` as a standalone call. **CN:** 以独立语句方式调用 `BaseDSL._get_dsl().check_arch`。
+- **L329** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L330** `        mbar_cluster_type = llvm.PointerType.get(AddressSpace.dsmem)` — **EN:** Assigns a value to mbar_cluster_type. **CN:** 将一个值赋给 mbar_cluster_type。
+- **L331** `        mbar_llvm_ptr = nvvm.mapa(` — **EN:** Assigns a value to mbar_llvm_ptr. **CN:** 将一个值赋给 mbar_llvm_ptr。
+- **L332** `            mbar_cluster_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L333** `            mbar_llvm_ptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L334** `            Int32(peer_cta_rank_in_cluster).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L335** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L336** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L337** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L338** `        mbar_shared_type = llvm.PointerType.get(AddressSpace.smem)` — **EN:** Assigns a value to mbar_shared_type. **CN:** 将一个值赋给 mbar_shared_type。
+- **L339** `        mbar_llvm_ptr = llvm.addrspacecast(mbar_shared_type, mbar_llvm_ptr)` — **EN:** Assigns a value to mbar_llvm_ptr. **CN:** 将一个值赋给 mbar_llvm_ptr。
+- **L340** `        space = nvvm.MBarrierSpaceKind.CLUSTER` — **EN:** Assigns a value to space. **CN:** 将一个值赋给 space。
+- **L341** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L342** `        space = nvvm.MBarrierSpaceKind.CTA` — **EN:** Assigns a value to space. **CN:** 将一个值赋给 space。
+- **L343** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L344** `    nvvm.mbarrier_txn(` — **EN:** Invokes `nvvm.mbarrier_txn` as a standalone call. **CN:** 以独立语句方式调用 `nvvm.mbarrier_txn`。
+- **L345** `        mbar_llvm_ptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L346** `        Int32(arrive_count).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L347** `        kind=nvvm.MBarrierTxnKind.ARRIVE,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L348** `        space=space,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L349** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L350** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L351** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L352** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L353** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L354** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L355** `def cp_async_mbarrier_arrive_noinc(` — **EN:** Defines function `cp_async_mbarrier_arrive_noinc`. **CN:** 定义函数 `cp_async_mbarrier_arrive_noinc`。
+- **L356** `    mbar_ptr: Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L357** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L358** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L359** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L360** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L361** `    """` — **EN:** Starts the docstring for the function `cp_async_mbarrier_arrive_noinc`. **CN:** 开始说明 function `cp_async_mbarrier_arrive_noinc` 的文档字符串。
+- **L362** `    Arrives on an mbarrier for async load **without incrementing** the arrival count` — **EN:** Continues the docstring for the function `cp_async_mbarrier_arrive_noinc`. **CN:** 继续说明 function `cp_async_mbarrier_arrive_noinc` 的文档字符串。
+- **L363** `    (\`cp.async.mbarrier.arrive.shared ..., noinc=1\`).` — **EN:** Continues the docstring for the function `cp_async_mbarrier_arrive_noinc`. **CN:** 继续说明 function `cp_async_mbarrier_arrive_noinc` 的文档字符串。
+- **L364** `    Used in the warp-specialized kernel when the non-TMA load warp(producer) is not the same` — **EN:** Continues the docstring for the function `cp_async_mbarrier_arrive_noinc`. **CN:** 继续说明 function `cp_async_mbarrier_arrive_noinc` 的文档字符串。
+- **L365** `    as the math/epilogue warp(consumer).` — **EN:** Continues the docstring for the function `cp_async_mbarrier_arrive_noinc`. **CN:** 继续说明 function `cp_async_mbarrier_arrive_noinc` 的文档字符串。
+- **L366** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L367** `    :param mbar_ptr: A pointer to the mbarrier in SMEM` — **EN:** Continues the docstring for the function `cp_async_mbarrier_arrive_noinc`. **CN:** 继续说明 function `cp_async_mbarrier_arrive_noinc` 的文档字符串。
+- **L368** `    :type mbar_ptr:  Pointer` — **EN:** Continues the docstring for the function `cp_async_mbarrier_arrive_noinc`. **CN:** 继续说明 function `cp_async_mbarrier_arrive_noinc` 的文档字符串。
+- **L369** `    """` — **EN:** Ends the docstring for the function `cp_async_mbarrier_arrive_noinc`. **CN:** 结束说明 function `cp_async_mbarrier_arrive_noinc` 的文档字符串。
+- **L370** `    BaseDSL._get_dsl().check_arch(lambda arch: arch >= Arch.sm_90)` — **EN:** Invokes `BaseDSL._get_dsl().check_arch` as a standalone call. **CN:** 以独立语句方式调用 `BaseDSL._get_dsl().check_arch`。
+- **L371** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L372** `    mbar_llvm_ptr = mbar_ptr.to_llvm_ptr(loc=loc, ip=ip)  # type: ignore[attr-defined]` — **EN:** Assigns a value to mbar_llvm_ptr. **CN:** 将一个值赋给 mbar_llvm_ptr。
+- **L373** `    nvvm.cp_async_mbarrier_arrive_shared(mbar_llvm_ptr, noinc=True, loc=loc, ip=ip)` — **EN:** Invokes `nvvm.cp_async_mbarrier_arrive_shared` as a standalone call. **CN:** 以独立语句方式调用 `nvvm.cp_async_mbarrier_arrive_shared`。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.cute.arch.mbar`. CN: 模块名为 `CuTeDSL.cutlass.cute.arch.mbar`。
+- EN: Top-level functions: mbarrier_init, mbarrier_init_fence, mbarrier_arrive_and_expect_tx, mbarrier_expect_tx, mbarrier_wait, mbarrier_try_wait, mbarrier_conditional_try_wait, mbarrier_arrive, cp_async_mbarrier_arrive_noinc CN: 顶层函数包括：mbarrier_init, mbarrier_init_fence, mbarrier_arrive_and_expect_tx, mbarrier_expect_tx, mbarrier_wait, mbarrier_try_wait, mbarrier_conditional_try_wait, mbarrier_arrive, cp_async_mbarrier_arrive_noinc
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass.base_dsl.arch:Arch, cutlass.cutlass_dsl:BaseDSL,if_generate,dsl_user_op, cutlass._mlir:ir, cutlass._mlir.dialects:nvvm,llvm, ..typing:Optional,Pointer,Int,Boolean,Int32,AddressSpace CN: 内部依赖：cutlass.base_dsl.arch:Arch, cutlass.cutlass_dsl:BaseDSL,if_generate,dsl_user_op, cutlass._mlir:ir, cutlass._mlir.dialects:nvvm,llvm, ..typing:Optional,Pointer,Int,Boolean,Int32,AddressSpace

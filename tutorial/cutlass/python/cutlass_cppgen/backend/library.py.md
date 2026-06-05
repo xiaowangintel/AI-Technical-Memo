@@ -1,0 +1,530 @@
+# library.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/backend/library.py`
+
+## Purpose / 作用
+- EN: Common data types and string names/tags for them
+- CN: 该模块的文档字符串将其描述为：Common data types and string names/tags for them
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L34** `Common data types and string names/tags for them` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L35** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `import enum` — **EN:** Imports enum for later use. **CN:** 导入 enum 供后续使用。
+- **L38** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L39** `from cutlass_library import (` — **EN:** Imports ComplexTransform, DataType, DataTypeSize, EpilogueScheduleType, KernelScheduleSuffixes, KernelScheduleType, ... (+3 more) from `cutlass_library`. **CN:** 从 `cutlass_library` 导入 ComplexTransform, DataType, DataTypeSize, EpilogueScheduleType, KernelScheduleSuffixes, KernelScheduleType, ... (+3 more)。
+- **L40** `    ComplexTransform,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L41** `    DataType,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L42** `    DataTypeSize,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L43** `    EpilogueScheduleType,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L44** `    KernelScheduleSuffixes,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L45** `    KernelScheduleType,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L46** `    MathOperation,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L47** `    OpcodeClass,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L48** `    TileSchedulerType` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L49** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L50** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L51** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L52** `# The following block implements enum.auto() for Python 3.5 variants that don't include it such` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L53** `# as the default 3.5.2 on Ubuntu 16.04.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L54** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L55** `# https://codereview.stackexchange.com/questions/177309/reimplementing-pythons-enum-auto-for-compatibility` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L56** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L57** `try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L58** `    from enum import auto as enum_auto` — **EN:** Imports auto as enum_auto from `enum`. **CN:** 从 `enum` 导入 auto as enum_auto。
+- **L59** `except ImportError:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L60** `    __cutlass_library_auto_enum = 0` — **EN:** Assigns a value to __cutlass_library_auto_enum. **CN:** 将一个值赋给 __cutlass_library_auto_enum。
+- **L61** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L62** `    def enum_auto() -> int:` — **EN:** Defines function `enum_auto`. **CN:** 定义函数 `enum_auto`。
+- **L63** `        global __cutlass_library_auto_enum` — **EN:** Declares __cutlass_library_auto_enum as module-level globals. **CN:** 将 __cutlass_library_auto_enum 声明为模块级全局变量。
+- **L64** `        i = __cutlass_library_auto_enum` — **EN:** Assigns a value to i. **CN:** 将一个值赋给 i。
+- **L65** `        __cutlass_library_auto_enum += 1` — **EN:** Updates __cutlass_library_auto_enum in place. **CN:** 原地更新 __cutlass_library_auto_enum。
+- **L66** `        return i` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L67** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L68** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L69** `class DataTypeSizeBytes:` — **EN:** Defines class `DataTypeSizeBytes`. **CN:** 定义类 `DataTypeSizeBytes`。
+- **L70** `    """` — **EN:** Starts the docstring for the class `DataTypeSizeBytes`. **CN:** 开始说明 class `DataTypeSizeBytes` 的文档字符串。
+- **L71** `    Static class to mimic the \`DataTypeSize\` dictionary, but with checks for whether the` — **EN:** Continues the docstring for the class `DataTypeSizeBytes`. **CN:** 继续说明 class `DataTypeSizeBytes` 的文档字符串。
+- **L72** `    data type key is less than a full byte or a non-integer number of bytes.` — **EN:** Continues the docstring for the class `DataTypeSizeBytes`. **CN:** 继续说明 class `DataTypeSizeBytes` 的文档字符串。
+- **L73** `    """` — **EN:** Ends the docstring for the class `DataTypeSizeBytes`. **CN:** 结束说明 class `DataTypeSizeBytes` 的文档字符串。
+- **L74** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L75** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L76** `    def __class_getitem__(datatype):` — **EN:** Defines function `__class_getitem__`. **CN:** 定义函数 `__class_getitem__`。
+- **L77** `        """` — **EN:** Starts the docstring for the function `__class_getitem__`. **CN:** 开始说明 function `__class_getitem__` 的文档字符串。
+- **L78** `        Returns the number of bytes in size the data type is. Raises an exception if the data type` — **EN:** Continues the docstring for the function `__class_getitem__`. **CN:** 继续说明 function `__class_getitem__` 的文档字符串。
+- **L79** `        is either less than a full byte or a non-integer number of bytes in size.` — **EN:** Continues the docstring for the function `__class_getitem__`. **CN:** 继续说明 function `__class_getitem__` 的文档字符串。
+- **L80** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L81** `        :param datatype: data type to query` — **EN:** Continues the docstring for the function `__class_getitem__`. **CN:** 继续说明 function `__class_getitem__` 的文档字符串。
+- **L82** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L83** `        :return: number of bytes the data type occupies` — **EN:** Continues the docstring for the function `__class_getitem__`. **CN:** 继续说明 function `__class_getitem__` 的文档字符串。
+- **L84** `        :rtype: int` — **EN:** Continues the docstring for the function `__class_getitem__`. **CN:** 继续说明 function `__class_getitem__` 的文档字符串。
+- **L85** `        """` — **EN:** Ends the docstring for the function `__class_getitem__`. **CN:** 结束说明 function `__class_getitem__` 的文档字符串。
+- **L86** `        bits = DataTypeSize[datatype]` — **EN:** Assigns a value to bits. **CN:** 将一个值赋给 bits。
+- **L87** `        if bits < 8:` — **EN:** Starts a conditional branch guarded by `bits < 8`. **CN:** 开始一个由 `bits < 8` 控制的条件分支。
+- **L88** `            raise Exception(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L89** `                f"Data type {datatype} is less than one byte in size."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L90** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L91** `        elif bits % 8 != 0:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L92** `            raise Exception(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L93** `                f"Data type datatype is not an integer number of bytes."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L94** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L95** `        return bits // 8` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L96** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L97** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L98** `class SchedulerMode(enum.Enum):` — **EN:** Defines class `SchedulerMode` with bases enum.Enum. **CN:** 定义类 `SchedulerMode`，其基类为 enum.Enum。
+- **L99** `    Device = enum_auto()` — **EN:** Assigns a value to Device. **CN:** 将一个值赋给 Device。
+- **L100** `    Host = enum_auto()` — **EN:** Assigns a value to Host. **CN:** 将一个值赋给 Host。
+- **L101** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L102** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L103** `SchedulerModeTag = {` — **EN:** Assigns a value to SchedulerModeTag. **CN:** 将一个值赋给 SchedulerModeTag。
+- **L104** `    SchedulerMode.Device: "cutlass::gemm::kernel::GroupScheduleMode::kDeviceOnly",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L105** `    SchedulerMode.Host: "cutlass::gemm::kernel::GroupScheduleMode::kHostPrecompute",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L106** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L107** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L108** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L109** `ShortSchedulerModeNames = {SchedulerMode.Device: "Device", SchedulerMode.Host: "Host"}` — **EN:** Assigns a value to ShortSchedulerModeNames. **CN:** 将一个值赋给 ShortSchedulerModeNames。
+- **L110** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L111** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L112** `class FunctionalOp(enum.Enum):` — **EN:** Defines class `FunctionalOp` with bases enum.Enum. **CN:** 定义类 `FunctionalOp`，其基类为 enum.Enum。
+- **L113** `    AtomicAdd = enum_auto()` — **EN:** Assigns a value to AtomicAdd. **CN:** 将一个值赋给 AtomicAdd。
+- **L114** `    AtomicMaximum = enum_auto()` — **EN:** Assigns a value to AtomicMaximum. **CN:** 将一个值赋给 AtomicMaximum。
+- **L115** `    Divides = enum_auto()` — **EN:** Assigns a value to Divides. **CN:** 将一个值赋给 Divides。
+- **L116** `    Maximum = enum_auto()` — **EN:** Assigns a value to Maximum. **CN:** 将一个值赋给 Maximum。
+- **L117** `    Minimum = enum_auto()` — **EN:** Assigns a value to Minimum. **CN:** 将一个值赋给 Minimum。
+- **L118** `    Minus = enum_auto()` — **EN:** Assigns a value to Minus. **CN:** 将一个值赋给 Minus。
+- **L119** `    Multiplies = enum_auto()` — **EN:** Assigns a value to Multiplies. **CN:** 将一个值赋给 Multiplies。
+- **L120** `    MultiplyAdd = enum_auto()` — **EN:** Assigns a value to MultiplyAdd. **CN:** 将一个值赋给 MultiplyAdd。
+- **L121** `    Plus = enum_auto()` — **EN:** Assigns a value to Plus. **CN:** 将一个值赋给 Plus。
+- **L122** `    Exp = enum_auto()` — **EN:** Assigns a value to Exp. **CN:** 将一个值赋给 Exp。
+- **L123** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L124** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L125** `FunctionalOpTag = {` — **EN:** Assigns a value to FunctionalOpTag. **CN:** 将一个值赋给 FunctionalOpTag。
+- **L126** `    FunctionalOp.AtomicAdd: "cutlass::atomic_add",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L127** `    FunctionalOp.AtomicMaximum: "cutlass::atomic_maximum",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L128** `    FunctionalOp.Divides: "cutlass::divides",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L129** `    FunctionalOp.Maximum: "cutlass::maximum",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L130** `    FunctionalOp.Minimum: "cutlass::minimum",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L131** `    FunctionalOp.Minus: "cutlass::minus",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L132** `    FunctionalOp.Multiplies: "cutlass::multiplies",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L133** `    FunctionalOp.MultiplyAdd: "cutlass::multiply_add",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L134** `    FunctionalOp.Plus: "cutlass::plus",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L135** `    FunctionalOp.Exp: "cutlass::fast_exp_op",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L136** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L137** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L138** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L139** `class ActivationOp(enum.Enum):` — **EN:** Defines class `ActivationOp` with bases enum.Enum. **CN:** 定义类 `ActivationOp`，其基类为 enum.Enum。
+- **L140** `    DGelu = enum_auto()` — **EN:** Assigns a value to DGelu. **CN:** 将一个值赋给 DGelu。
+- **L141** `    Gelu = enum_auto()` — **EN:** Assigns a value to Gelu. **CN:** 将一个值赋给 Gelu。
+- **L142** `    GeluTaylor = enum_auto()` — **EN:** Assigns a value to GeluTaylor. **CN:** 将一个值赋给 GeluTaylor。
+- **L143** `    HardSwish = enum_auto()` — **EN:** Assigns a value to HardSwish. **CN:** 将一个值赋给 HardSwish。
+- **L144** `    Identity = enum_auto()` — **EN:** Assigns a value to Identity. **CN:** 将一个值赋给 Identity。
+- **L145** `    LeakyReLU = enum_auto()` — **EN:** Assigns a value to LeakyReLU. **CN:** 将一个值赋给 LeakyReLU。
+- **L146** `    ReLU = enum_auto()` — **EN:** Assigns a value to ReLU. **CN:** 将一个值赋给 ReLU。
+- **L147** `    Sigmoid = enum_auto()` — **EN:** Assigns a value to Sigmoid. **CN:** 将一个值赋给 Sigmoid。
+- **L148** `    SiLU = enum_auto()` — **EN:** Assigns a value to SiLU. **CN:** 将一个值赋给 SiLU。
+- **L149** `    Tanh = enum_auto()` — **EN:** Assigns a value to Tanh. **CN:** 将一个值赋给 Tanh。
+- **L150** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L151** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L152** `ActivationOpTag = {` — **EN:** Assigns a value to ActivationOpTag. **CN:** 将一个值赋给 ActivationOpTag。
+- **L153** `    ActivationOp.DGelu: "cutlass::epilogue::thread::dGELU",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L154** `    ActivationOp.Gelu: "cutlass::epilogue::thread::GELU",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L155** `    ActivationOp.GeluTaylor: "cutlass::epilogue::thread::GELU_taylor",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L156** `    ActivationOp.HardSwish: "cutlass::epilogue::thread::HardSwish",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L157** `    ActivationOp.Identity: "cutlass::epilogue::thread::Identity",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L158** `    ActivationOp.LeakyReLU: "cutlass::epilogue::thread::LeakyReLU",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L159** `    ActivationOp.ReLU: "cutlass::epilogue::thread::ReLu",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L160** `    ActivationOp.Sigmoid: "cutlass::epilogue::thread::Sigmoid",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L161** `    ActivationOp.SiLU: "cutlass::epilogue::thread::SiLu",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L162** `    ActivationOp.Tanh: "cutlass::epilogue::thread::Tanh",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L163** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L164** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L165** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L166** `def op_tag(op) -> str:` — **EN:** Defines function `op_tag`. **CN:** 定义函数 `op_tag`。
+- **L167** `    """` — **EN:** Starts the docstring for the function `op_tag`. **CN:** 开始说明 function `op_tag` 的文档字符串。
+- **L168** `    Dispatches \`op\` to the appropriate *Tag dictionary depending on whether` — **EN:** Continues the docstring for the function `op_tag`. **CN:** 继续说明 function `op_tag` 的文档字符串。
+- **L169** `    \`op\` is an ActivationOp or FunctionalOp. This is useful for cases in which` — **EN:** Continues the docstring for the function `op_tag`. **CN:** 继续说明 function `op_tag` 的文档字符串。
+- **L170** `    either type can be used.` — **EN:** Continues the docstring for the function `op_tag`. **CN:** 继续说明 function `op_tag` 的文档字符串。
+- **L171** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L172** `    :param op: operation to emit a tag for` — **EN:** Continues the docstring for the function `op_tag`. **CN:** 继续说明 function `op_tag` 的文档字符串。
+- **L173** `    :type op: ActivationOp | FunctionalOp` — **EN:** Continues the docstring for the function `op_tag`. **CN:** 继续说明 function `op_tag` 的文档字符串。
+- **L174** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L175** `    :return: tag corresponding to op` — **EN:** Continues the docstring for the function `op_tag`. **CN:** 继续说明 function `op_tag` 的文档字符串。
+- **L176** `    :rtype: str` — **EN:** Continues the docstring for the function `op_tag`. **CN:** 继续说明 function `op_tag` 的文档字符串。
+- **L177** `    """` — **EN:** Ends the docstring for the function `op_tag`. **CN:** 结束说明 function `op_tag` 的文档字符串。
+- **L178** `    if isinstance(op, ActivationOp):` — **EN:** Starts a conditional branch guarded by `isinstance(op, ActivationOp)`. **CN:** 开始一个由 `isinstance(op, ActivationOp)` 控制的条件分支。
+- **L179** `        return ActivationOpTag[op]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L180** `    elif isinstance(op, FunctionalOp):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L181** `        return FunctionalOpTag[op]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L182** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L183** `        raise Exception(f"Unexpected op type {op}. Must be one of ActivationOp or FunctionalOp.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L184** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L185** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L186** `class FloatRoundStyle(enum.Enum):` — **EN:** Defines class `FloatRoundStyle` with bases enum.Enum. **CN:** 定义类 `FloatRoundStyle`，其基类为 enum.Enum。
+- **L187** `    ToNearest = enum_auto()` — **EN:** Assigns a value to ToNearest. **CN:** 将一个值赋给 ToNearest。
+- **L188** `    ToNearestSatfinite = enum_auto()` — **EN:** Assigns a value to ToNearestSatfinite. **CN:** 将一个值赋给 ToNearestSatfinite。
+- **L189** `    Indeterminate = enum_auto()` — **EN:** Assigns a value to Indeterminate. **CN:** 将一个值赋给 Indeterminate。
+- **L190** `    TowardZero = enum_auto()` — **EN:** Assigns a value to TowardZero. **CN:** 将一个值赋给 TowardZero。
+- **L191** `    TowardInfinity = enum_auto()` — **EN:** Assigns a value to TowardInfinity. **CN:** 将一个值赋给 TowardInfinity。
+- **L192** `    TowardNegInfinity = enum_auto()` — **EN:** Assigns a value to TowardNegInfinity. **CN:** 将一个值赋给 TowardNegInfinity。
+- **L193** `    HalfUlpTruncDntz = enum_auto()` — **EN:** Assigns a value to HalfUlpTruncDntz. **CN:** 将一个值赋给 HalfUlpTruncDntz。
+- **L194** `    HalfUlpTruncate = enum_auto()` — **EN:** Assigns a value to HalfUlpTruncate. **CN:** 将一个值赋给 HalfUlpTruncate。
+- **L195** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L196** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L197** `FloatRoundStyleTag = {` — **EN:** Assigns a value to FloatRoundStyleTag. **CN:** 将一个值赋给 FloatRoundStyleTag。
+- **L198** `    FloatRoundStyle.ToNearest: "cutlass::FloatRoundStyle::round_to_nearest",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L199** `    FloatRoundStyle.ToNearestSatfinite: "cutlass::FloatRoundStyle::round_to_nearest_satfinite",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L200** `    FloatRoundStyle.Indeterminate: "cutlass::FloatRoundStyle::round_indeterminate",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L201** `    FloatRoundStyle.TowardZero: "cutlass::FloatRoundStyle::round_toward_zero",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L202** `    FloatRoundStyle.TowardInfinity: "cutlass::FloatRoundStyle::round_toward_infinity",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L203** `    FloatRoundStyle.TowardNegInfinity: "cutlass::FloatRoundStyle::round_toward_neg_infinity",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L204** `    FloatRoundStyle.HalfUlpTruncDntz: "cutlass::FloatRoundStyle::round_half_ulp_trunc_dntz",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L205** `    FloatRoundStyle.HalfUlpTruncate: "cutlass::FloatRoundStyle::round_half_ulp_truncate",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L206** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L207** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L208** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L209** `class MathInstruction:` — **EN:** Defines class `MathInstruction`. **CN:** 定义类 `MathInstruction`。
+- **L210** `    """` — **EN:** Starts the docstring for the class `MathInstruction`. **CN:** 开始说明 class `MathInstruction` 的文档字符串。
+- **L211** `    Description of a the lowest-level matrix-multiply-accumulate operation to be used in a kernel` — **EN:** Continues the docstring for the class `MathInstruction`. **CN:** 继续说明 class `MathInstruction` 的文档字符串。
+- **L212** `    """` — **EN:** Ends the docstring for the class `MathInstruction`. **CN:** 结束说明 class `MathInstruction` 的文档字符串。
+- **L213** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L214** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L215** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L216** `        instruction_shape,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L217** `        element_a,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L218** `        element_b,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L219** `        element_accumulator,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L220** `        opcode_class=OpcodeClass.Simt,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L221** `        math_operation=MathOperation.multiply_add,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L222** `    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L223** `        """` — **EN:** Starts the docstring for the function `__init__`. **CN:** 开始说明 function `__init__` 的文档字符串。
+- **L224** `        :param instruction_shape: size of the [M, N, K] dimensions of the instruction` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L225** `        :type instruction_shape: list or tuple` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L226** `        :param element_a: data type of operand A` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L227** `        :param element_b: data type of operand B` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L228** `        :param element_accumulator: data type used in accumulation` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L229** `        :param opcode_class: higher-level class of the instruction (e.g., SIMT or Tensor Core)` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L230** `        :type opcode_class: cutlass_library.library.OpcodeClass` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L231** `        :param math_operation: the type of low-level operation to be performed (e.g., multiply accumulate)` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L232** `        :type math_operation: MathOperation` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L233** `        """` — **EN:** Ends the docstring for the function `__init__`. **CN:** 结束说明 function `__init__` 的文档字符串。
+- **L234** `        self.instruction_shape = instruction_shape` — **EN:** Assigns a value to self.instruction_shape. **CN:** 将一个值赋给 self.instruction_shape。
+- **L235** `        self.element_a = element_a` — **EN:** Assigns a value to self.element_a. **CN:** 将一个值赋给 self.element_a。
+- **L236** `        self.element_b = element_b` — **EN:** Assigns a value to self.element_b. **CN:** 将一个值赋给 self.element_b。
+- **L237** `        self.element_accumulator = element_accumulator` — **EN:** Assigns a value to self.element_accumulator. **CN:** 将一个值赋给 self.element_accumulator。
+- **L238** `        self.opcode_class = opcode_class` — **EN:** Assigns a value to self.opcode_class. **CN:** 将一个值赋给 self.opcode_class。
+- **L239** `        self.math_operation = math_operation` — **EN:** Assigns a value to self.math_operation. **CN:** 将一个值赋给 self.math_operation。
+- **L240** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L241** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L242** `def to_blackwell_threadblock_shape(tile_description, cluster_shape, kernel_schedule):` — **EN:** Defines function `to_blackwell_threadblock_shape`. **CN:** 定义函数 `to_blackwell_threadblock_shape`。
+- **L243** `    blackwell_threadblock_shape = tile_description.threadblock_shape` — **EN:** Assigns a value to blackwell_threadblock_shape. **CN:** 将一个值赋给 blackwell_threadblock_shape。
+- **L244** `    is_2sm = False if kernel_schedule is None else ("2sm" in KernelScheduleSuffixes[kernel_schedule])` — **EN:** Assigns a value to is_2sm. **CN:** 将一个值赋给 is_2sm。
+- **L245** `    if cluster_shape[0] > 0:` — **EN:** Starts a conditional branch guarded by `cluster_shape[0] > 0`. **CN:** 开始一个由 `cluster_shape[0] > 0` 控制的条件分支。
+- **L246** `        blackwell_threadblock_shape = [` — **EN:** Assigns a value to blackwell_threadblock_shape. **CN:** 将一个值赋给 blackwell_threadblock_shape。
+- **L247** `            tile_description.threadblock_shape[0] // cluster_shape[0],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L248** `            tile_description.threadblock_shape[1] // cluster_shape[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L249** `            tile_description.threadblock_shape[2] // cluster_shape[2]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L250** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L251** `        if is_2sm:` — **EN:** Starts a conditional branch guarded by `is_2sm`. **CN:** 开始一个由 `is_2sm` 控制的条件分支。
+- **L252** `            blackwell_threadblock_shape[0] *= 2` — **EN:** Updates blackwell_threadblock_shape[0] in place. **CN:** 原地更新 blackwell_threadblock_shape[0]。
+- **L253** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L254** `        blackwell_threadblock_shape = tile_description.math_instruction.instruction_shape` — **EN:** Assigns a value to blackwell_threadblock_shape. **CN:** 将一个值赋给 blackwell_threadblock_shape。
+- **L255** `    return blackwell_threadblock_shape, is_2sm` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L256** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L257** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L258** `class TileDescription:` — **EN:** Defines class `TileDescription`. **CN:** 定义类 `TileDescription`。
+- **L259** `    """` — **EN:** Starts the docstring for the class `TileDescription`. **CN:** 开始说明 class `TileDescription` 的文档字符串。
+- **L260** `    Description of a tile of computation to be performed in the kernel, encompassing threadblock, cluster, and warp shapes,` — **EN:** Continues the docstring for the class `TileDescription`. **CN:** 继续说明 class `TileDescription` 的文档字符串。
+- **L261** `    stage count, and math instruction specification` — **EN:** Continues the docstring for the class `TileDescription`. **CN:** 继续说明 class `TileDescription` 的文档字符串。
+- **L262** `    """` — **EN:** Ends the docstring for the class `TileDescription`. **CN:** 结束说明 class `TileDescription` 的文档字符串。
+- **L263** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L264** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L265** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L266** `        threadblock_shape,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L267** `        stages,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L268** `        warp_count,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L269** `        math_instruction,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L270** `        cluster_shape=[1, 1, 1],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L271** `        kernel_schedule: KernelScheduleType = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L272** `        epilogue_schedule: EpilogueScheduleType = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L273** `        tile_scheduler: TileSchedulerType = None` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L274** `    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L275** `        """` — **EN:** Starts the docstring for the function `__init__`. **CN:** 开始说明 function `__init__` 的文档字符串。
+- **L276** `        :param threadblock_shape: shape of a threadblock tyle` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L277** `        :type threadblock_shape: list or tuple` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L278** `        :param stages: number of pipline stages in the operation. For SM90 kernels, this can be set to \`None\` and the maximum` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L279** `                       number of stages that can be supported for an operation on a given architecture will be computed at a later time` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L280** `        :type stages: int or None` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L281** `        :param warp_count: number of warps in each [M, N, K] dimension of a threadblock tile` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L282** `        :type warp_count: list, tuple, or None` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L283** `        :param math_instruction: specification of the instruction type and shape to be performed and the types of its operands` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L284** `        :type math_instruction: MathInstruction` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L285** `        :param cluster_shape: number of threadblocks in the [X, Y, Z] dimensions of a threadblock cluster` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L286** `        :param kernel_schedule: type of kernel schedule to use (only available for SM90+)` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L287** `        :type kernel_schedule: cutlass_library.KernelScheduleType` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L288** `        :param epilogue_schedule: type of epilogue schedule to use (only available for SM90+)` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L289** `        :type epilogue_schedule: cutlass_library.EpilogueScheduleType` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L290** `        :param tile_scheduler: type of tile scheduler to use (only available for SM90+)` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L291** `        :type tile_scheduler: cutlass_library.TileSchedulerType` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L292** `        """` — **EN:** Ends the docstring for the function `__init__`. **CN:** 结束说明 function `__init__` 的文档字符串。
+- **L293** `        if ((kernel_schedule is None and epilogue_schedule is not None) or` — **EN:** Starts a conditional branch guarded by `kernel_schedule is None and epilogue_schedule is not None...`. **CN:** 开始一个由 `kernel_schedule is None and epilogue_schedule is not None...` 控制的条件分支。
+- **L294** `            (kernel_schedule is not None and epilogue_schedule is None)):` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L295** `            raise Exception("Kernel and epilogue schedule must either both be Auto or neither be Auto.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L296** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L297** `        self.threadblock_shape = threadblock_shape` — **EN:** Assigns a value to self.threadblock_shape. **CN:** 将一个值赋给 self.threadblock_shape。
+- **L298** `        self.cluster_shape = cluster_shape` — **EN:** Assigns a value to self.cluster_shape. **CN:** 将一个值赋给 self.cluster_shape。
+- **L299** `        self.kernel_schedule = kernel_schedule` — **EN:** Assigns a value to self.kernel_schedule. **CN:** 将一个值赋给 self.kernel_schedule。
+- **L300** `        self.epilogue_schedule = epilogue_schedule` — **EN:** Assigns a value to self.epilogue_schedule. **CN:** 将一个值赋给 self.epilogue_schedule。
+- **L301** `        self.tile_scheduler = tile_scheduler` — **EN:** Assigns a value to self.tile_scheduler. **CN:** 将一个值赋给 self.tile_scheduler。
+- **L302** `        self.stages = stages` — **EN:** Assigns a value to self.stages. **CN:** 将一个值赋给 self.stages。
+- **L303** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L304** `        self.math_instruction = math_instruction` — **EN:** Assigns a value to self.math_instruction. **CN:** 将一个值赋给 self.math_instruction。
+- **L305** `        self.instruction_shape = math_instruction.instruction_shape` — **EN:** Assigns a value to self.instruction_shape. **CN:** 将一个值赋给 self.instruction_shape。
+- **L306** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L307** `        # Number of warps along x, y, z directions` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L308** `        self.warp_count = warp_count` — **EN:** Assigns a value to self.warp_count. **CN:** 将一个值赋给 self.warp_count。
+- **L309** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L310** `        self.blackwell_threadblock_shape, self.is_2sm = to_blackwell_threadblock_shape(self, self.cluster_shape, self.kernel_schedule)` — **EN:** Assigns a value to (self.blackwell_threadblock_shape, self.is_2sm). **CN:** 将一个值赋给 (self.blackwell_threadblock_shape, self.is_2sm)。
+- **L311** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L312** `    def clone_and_update(self, td: dict):` — **EN:** Defines function `clone_and_update`. **CN:** 定义函数 `clone_and_update`。
+- **L313** `        attrs = {` — **EN:** Assigns a value to attrs. **CN:** 将一个值赋给 attrs。
+- **L314** `            "cluster_shape": None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L315** `            "threadblock_shape": None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L316** `            "warp_count": None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L317** `            "stages": None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L318** `            "instruction_shape": None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L319** `            "kernel_schedule": None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L320** `            "epilogue_schedule": None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L321** `            "tile_scheduler": None` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L322** `        }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L323** `        for key in attrs.keys():` — **EN:** Starts a loop assigning items from `attrs.keys()` to `key`. **CN:** 开始一个循环，将 `attrs.keys()` 的元素赋给 `key`。
+- **L324** `            if key in td.keys():` — **EN:** Starts a conditional branch guarded by `key in td.keys()`. **CN:** 开始一个由 `key in td.keys()` 控制的条件分支。
+- **L325** `                attrs[key] = td[key]` — **EN:** Assigns a value to attrs[key]. **CN:** 将一个值赋给 attrs[key]。
+- **L326** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L327** `                attrs[key] = getattr(self, key)` — **EN:** Assigns a value to attrs[key]. **CN:** 将一个值赋给 attrs[key]。
+- **L328** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L329** `        attrs["math_instruction"] = MathInstruction(` — **EN:** Assigns a value to attrs['math_instruction']. **CN:** 将一个值赋给 attrs['math_instruction']。
+- **L330** `            attrs["instruction_shape"],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L331** `            self.math_instruction.element_a,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L332** `            self.math_instruction.element_b,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L333** `            self.math_instruction.element_accumulator,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L334** `            self.math_instruction.opcode_class,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L335** `            self.math_instruction.math_operation` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L336** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L337** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L338** `        # Remove the instruction shape` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L339** `        del attrs["instruction_shape"]` — **EN:** Deletes one or more names or entries. **CN:** 删除一个或多个名称或条目。
+- **L340** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L341** `        return TileDescription(**attrs)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L342** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L343** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L344** `    def num_threads(self):` — **EN:** Defines function `num_threads`. **CN:** 定义函数 `num_threads`。
+- **L345** `        """` — **EN:** Starts the docstring for the function `num_threads`. **CN:** 开始说明 function `num_threads` 的文档字符串。
+- **L346** `        Returns the number of threads in the threadblock` — **EN:** Continues the docstring for the function `num_threads`. **CN:** 继续说明 function `num_threads` 的文档字符串。
+- **L347** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L348** `        :return: number of threads in the threadblock` — **EN:** Continues the docstring for the function `num_threads`. **CN:** 继续说明 function `num_threads` 的文档字符串。
+- **L349** `        :rtype: int or None (if warp count is None)` — **EN:** Continues the docstring for the function `num_threads`. **CN:** 继续说明 function `num_threads` 的文档字符串。
+- **L350** `        """` — **EN:** Ends the docstring for the function `num_threads`. **CN:** 结束说明 function `num_threads` 的文档字符串。
+- **L351** `        if self.warp_count is not None:` — **EN:** Starts a conditional branch guarded by `self.warp_count is not None`. **CN:** 开始一个由 `self.warp_count is not None` 控制的条件分支。
+- **L352** `            threads = 32` — **EN:** Assigns a value to threads. **CN:** 将一个值赋给 threads。
+- **L353** `            for cnt in self.warp_count:` — **EN:** Starts a loop assigning items from `self.warp_count` to `cnt`. **CN:** 开始一个循环，将 `self.warp_count` 的元素赋给 `cnt`。
+- **L354** `                threads *= cnt` — **EN:** Updates threads in place. **CN:** 原地更新 threads。
+- **L355** `            return threads` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L356** `        return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L357** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L358** `    def procedural_name(self):` — **EN:** Defines function `procedural_name`. **CN:** 定义函数 `procedural_name`。
+- **L359** `        """` — **EN:** Starts the docstring for the function `procedural_name`. **CN:** 开始说明 function `procedural_name` 的文档字符串。
+- **L360** `        Returns a name identifying the tile description` — **EN:** Continues the docstring for the function `procedural_name`. **CN:** 继续说明 function `procedural_name` 的文档字符串。
+- **L361** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L362** `        :return: name identifying the tile description` — **EN:** Continues the docstring for the function `procedural_name`. **CN:** 继续说明 function `procedural_name` 的文档字符串。
+- **L363** `        :rtype: int` — **EN:** Continues the docstring for the function `procedural_name`. **CN:** 继续说明 function `procedural_name` 的文档字符串。
+- **L364** `        """` — **EN:** Ends the docstring for the function `procedural_name`. **CN:** 结束说明 function `procedural_name` 的文档字符串。
+- **L365** `        emit_stages = 0 if self.stages is None else self.stages` — **EN:** Assigns a value to emit_stages. **CN:** 将一个值赋给 emit_stages。
+- **L366** `        name = "%dx%dx%d_%dx%d_%dx%d" % (` — **EN:** Assigns a value to name. **CN:** 将一个值赋给 name。
+- **L367** `            self.cluster_shape[0],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L368** `            self.cluster_shape[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L369** `            self.cluster_shape[2],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L370** `            self.threadblock_shape[0],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L371** `            self.threadblock_shape[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L372** `            self.threadblock_shape[2],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L373** `            emit_stages` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L374** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L375** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L376** `        return name` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L377** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L378** `    def procedural_name_2x(self):` — **EN:** Defines function `procedural_name_2x`. **CN:** 定义函数 `procedural_name_2x`。
+- **L379** `        """` — **EN:** Starts the docstring for the function `procedural_name_2x`. **CN:** 开始说明 function `procedural_name_2x` 的文档字符串。
+- **L380** `        Returns a name identifying the tile description` — **EN:** Continues the docstring for the function `procedural_name_2x`. **CN:** 继续说明 function `procedural_name_2x` 的文档字符串。
+- **L381** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L382** `        :return: name identifying the tile description` — **EN:** Continues the docstring for the function `procedural_name_2x`. **CN:** 继续说明 function `procedural_name_2x` 的文档字符串。
+- **L383** `        :rtype: int` — **EN:** Continues the docstring for the function `procedural_name_2x`. **CN:** 继续说明 function `procedural_name_2x` 的文档字符串。
+- **L384** `        """` — **EN:** Ends the docstring for the function `procedural_name_2x`. **CN:** 结束说明 function `procedural_name_2x` 的文档字符串。
+- **L385** `        return "%dx%d_%dx%d" % (self.threadblock_shape[0], self.threadblock_shape[1], self.threadblock_shape[2], self.stages)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L386** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L387** `    def __str__(self):` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L388** `        """` — **EN:** Starts the docstring for the function `__str__`. **CN:** 开始说明 function `__str__` 的文档字符串。
+- **L389** `        Returns a string with containing each of the tile description's values` — **EN:** Continues the docstring for the function `__str__`. **CN:** 继续说明 function `__str__` 的文档字符串。
+- **L390** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L391** `        :return: contents of tile description` — **EN:** Continues the docstring for the function `__str__`. **CN:** 继续说明 function `__str__` 的文档字符串。
+- **L392** `        :rtype: str` — **EN:** Continues the docstring for the function `__str__`. **CN:** 继续说明 function `__str__` 的文档字符串。
+- **L393** `        """` — **EN:** Ends the docstring for the function `__str__`. **CN:** 结束说明 function `__str__` 的文档字符串。
+- **L394** `        if self.kernel_schedule is not None:` — **EN:** Starts a conditional branch guarded by `self.kernel_schedule is not None`. **CN:** 开始一个由 `self.kernel_schedule is not None` 控制的条件分支。
+- **L395** `            kschedule = self.kernel_schedule` — **EN:** Assigns a value to kschedule. **CN:** 将一个值赋给 kschedule。
+- **L396** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L397** `            kschedule = KernelScheduleType.ScheduleAuto` — **EN:** Assigns a value to kschedule. **CN:** 将一个值赋给 kschedule。
+- **L398** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L399** `        if self.epilogue_schedule is not None:` — **EN:** Starts a conditional branch guarded by `self.epilogue_schedule is not None`. **CN:** 开始一个由 `self.epilogue_schedule is not None` 控制的条件分支。
+- **L400** `            eschedule = self.epilogue_schedule` — **EN:** Assigns a value to eschedule. **CN:** 将一个值赋给 eschedule。
+- **L401** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L402** `            eschedule = EpilogueScheduleType.ScheduleAuto` — **EN:** Assigns a value to eschedule. **CN:** 将一个值赋给 eschedule。
+- **L403** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L404** `        if self.tile_scheduler is not None:` — **EN:** Starts a conditional branch guarded by `self.tile_scheduler is not None`. **CN:** 开始一个由 `self.tile_scheduler is not None` 控制的条件分支。
+- **L405** `            tschedule = self.tile_scheduler.name` — **EN:** Assigns a value to tschedule. **CN:** 将一个值赋给 tschedule。
+- **L406** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L407** `            tschedule = "None"` — **EN:** Assigns a value to tschedule. **CN:** 将一个值赋给 tschedule。
+- **L408** `        return f"""` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L409** `{{` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L410** `  ClusterShape: {self.cluster_shape}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L411** `  ThreadblockShape: {self.threadblock_shape}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L412** `  WarpCount: {self.warp_count}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L413** `  Stages: {self.stages if self.stages is not None else 'Auto'}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L414** `  InstructionShape: {self.math_instruction.instruction_shape}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L415** `  Kernel schedule: {kschedule.name}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L416** `  Epilogue schedule: {kschedule.name}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L417** `  TileScheduler: {tschedule}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L418** `}}"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L419** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L420** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L421** `class TensorDescription:` — **EN:** Defines class `TensorDescription`. **CN:** 定义类 `TensorDescription`。
+- **L422** `    def __init__(self, element, layout, alignment=1, complex_transform=ComplexTransform.none):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L423** `        self.element = element` — **EN:** Assigns a value to self.element. **CN:** 将一个值赋给 self.element。
+- **L424** `        self.layout = layout` — **EN:** Assigns a value to self.layout. **CN:** 将一个值赋给 self.layout。
+- **L425** `        if element != DataType.void:` — **EN:** Starts a conditional branch guarded by `element != DataType.void`. **CN:** 开始一个由 `element != DataType.void` 控制的条件分支。
+- **L426** `            self.alignment = min(128 // DataTypeSize[self.element], alignment)` — **EN:** Assigns a value to self.alignment. **CN:** 将一个值赋给 self.alignment。
+- **L427** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L428** `            self.alignment = alignment` — **EN:** Assigns a value to self.alignment. **CN:** 将一个值赋给 self.alignment。
+- **L429** `        self.complex_transform = complex_transform` — **EN:** Assigns a value to self.complex_transform. **CN:** 将一个值赋给 self.complex_transform。
+- **L430** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L431** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L432** `def CalculateSmemUsagePerStage(operation):` — **EN:** Defines function `CalculateSmemUsagePerStage`. **CN:** 定义函数 `CalculateSmemUsagePerStage`。
+- **L433** `    """` — **EN:** Starts the docstring for the function `CalculateSmemUsagePerStage`. **CN:** 开始说明 function `CalculateSmemUsagePerStage` 的文档字符串。
+- **L434** `    Returns the amount of shared memory in bytes consumed in a single stage of a kernel.` — **EN:** Continues the docstring for the function `CalculateSmemUsagePerStage`. **CN:** 继续说明 function `CalculateSmemUsagePerStage` 的文档字符串。
+- **L435** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L436** `    :param op: operation for which the maximum stages should be computed. If stages are` — **EN:** Continues the docstring for the function `CalculateSmemUsagePerStage`. **CN:** 继续说明 function `CalculateSmemUsagePerStage` 的文档字符串。
+- **L437** `               set via the \`op.tile_description.stages\` parameter, this setting is ignored` — **EN:** Continues the docstring for the function `CalculateSmemUsagePerStage`. **CN:** 继续说明 function `CalculateSmemUsagePerStage` 的文档字符串。
+- **L438** `               in the present calculation` — **EN:** Continues the docstring for the function `CalculateSmemUsagePerStage`. **CN:** 继续说明 function `CalculateSmemUsagePerStage` 的文档字符串。
+- **L439** `    :type op: cutlass_cppgen.backend.Operation` — **EN:** Continues the docstring for the function `CalculateSmemUsagePerStage`. **CN:** 继续说明 function `CalculateSmemUsagePerStage` 的文档字符串。
+- **L440** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L441** `    :return: number of bytes of shared memory consumed by a single stage` — **EN:** Continues the docstring for the function `CalculateSmemUsagePerStage`. **CN:** 继续说明 function `CalculateSmemUsagePerStage` 的文档字符串。
+- **L442** `    :rtype: int` — **EN:** Continues the docstring for the function `CalculateSmemUsagePerStage`. **CN:** 继续说明 function `CalculateSmemUsagePerStage` 的文档字符串。
+- **L443** `    """` — **EN:** Ends the docstring for the function `CalculateSmemUsagePerStage`. **CN:** 结束说明 function `CalculateSmemUsagePerStage` 的文档字符串。
+- **L444** `    m, n, k = operation.tile_description.threadblock_shape` — **EN:** Assigns a value to (m, n, k). **CN:** 将一个值赋给 (m, n, k)。
+- **L445** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L446** `    if operation.operation_kind == OperationKind.Gemm:` — **EN:** Starts a conditional branch guarded by `operation.operation_kind == OperationKind.Gemm`. **CN:** 开始一个由 `operation.operation_kind == OperationKind.Gemm` 控制的条件分支。
+- **L447** `        stage_barrier_bytes = 32` — **EN:** Assigns a value to stage_barrier_bytes. **CN:** 将一个值赋给 stage_barrier_bytes。
+- **L448** `        return (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L449** `            (DataTypeSize[operation.A.element] * m * k // 8)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L450** `            + (DataTypeSize[operation.B.element] * k * n // 8)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L451** `            + stage_barrier_bytes` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L452** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L453** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L454** `        raise Exception("Unsupported operation kind {}.".format(operation.operation_kind))` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L455** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L456** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L457** `def CalculateSmemUsage(operation):` — **EN:** Defines function `CalculateSmemUsage`. **CN:** 定义函数 `CalculateSmemUsage`。
+- **L458** `    """` — **EN:** Starts the docstring for the function `CalculateSmemUsage`. **CN:** 开始说明 function `CalculateSmemUsage` 的文档字符串。
+- **L459** `    Returns the amount of shared memory in bytes consumed by a kernel.` — **EN:** Continues the docstring for the function `CalculateSmemUsage`. **CN:** 继续说明 function `CalculateSmemUsage` 的文档字符串。
+- **L460** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L461** `    :param op: operation for which the maximum stages should be computed. If stages are` — **EN:** Continues the docstring for the function `CalculateSmemUsage`. **CN:** 继续说明 function `CalculateSmemUsage` 的文档字符串。
+- **L462** `               set via the \`op.tile_description.stages\` parameter, this setting is ignored` — **EN:** Continues the docstring for the function `CalculateSmemUsage`. **CN:** 继续说明 function `CalculateSmemUsage` 的文档字符串。
+- **L463** `               in the present calculation` — **EN:** Continues the docstring for the function `CalculateSmemUsage`. **CN:** 继续说明 function `CalculateSmemUsage` 的文档字符串。
+- **L464** `    :type op: cutlass_cppgen.backend.Operation` — **EN:** Continues the docstring for the function `CalculateSmemUsage`. **CN:** 继续说明 function `CalculateSmemUsage` 的文档字符串。
+- **L465** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L466** `    :return: int` — **EN:** Continues the docstring for the function `CalculateSmemUsage`. **CN:** 继续说明 function `CalculateSmemUsage` 的文档字符串。
+- **L467** `    """` — **EN:** Ends the docstring for the function `CalculateSmemUsage`. **CN:** 结束说明 function `CalculateSmemUsage` 的文档字符串。
+- **L468** `    return operation.tile_description.stages * CalculateSmemUsagePerStage(operation)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L469** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L470** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L471** `class ApiVersion(enum.Enum):` — **EN:** Defines class `ApiVersion` with bases enum.Enum. **CN:** 定义类 `ApiVersion`，其基类为 enum.Enum。
+- **L472** `    """` — **EN:** Starts the docstring for the class `ApiVersion`. **CN:** 开始说明 class `ApiVersion` 的文档字符串。
+- **L473** `    Differentiate between CUTLASS 2.x and 3.x API versions` — **EN:** Continues the docstring for the class `ApiVersion`. **CN:** 继续说明 class `ApiVersion` 的文档字符串。
+- **L474** `    """` — **EN:** Ends the docstring for the class `ApiVersion`. **CN:** 结束说明 class `ApiVersion` 的文档字符串。
+- **L475** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L476** `    v2x = enum_auto()` — **EN:** Assigns a value to v2x. **CN:** 将一个值赋给 v2x。
+- **L477** `    v3x = enum_auto()` — **EN:** Assigns a value to v3x. **CN:** 将一个值赋给 v3x。
+- **L478** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L479** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L480** `def api_version(arch, opclass, dtype):` — **EN:** Defines function `api_version`. **CN:** 定义函数 `api_version`。
+- **L481** `    """` — **EN:** Starts the docstring for the function `api_version`. **CN:** 开始说明 function `api_version` 的文档字符串。
+- **L482** `    Returns whether the architecture, opcode class, and datatype in question require using CUTLASS 2.x` — **EN:** Continues the docstring for the function `api_version`. **CN:** 继续说明 function `api_version` 的文档字符串。
+- **L483** `    or 3.x for code emission.` — **EN:** Continues the docstring for the function `api_version`. **CN:** 继续说明 function `api_version` 的文档字符串。
+- **L484** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L485** `    :param arch: compute capability of device on which to run` — **EN:** Continues the docstring for the function `api_version`. **CN:** 继续说明 function `api_version` 的文档字符串。
+- **L486** `    :type arch: int` — **EN:** Continues the docstring for the function `api_version`. **CN:** 继续说明 function `api_version` 的文档字符串。
+- **L487** `    :param opclass: class of the operation being performed` — **EN:** Continues the docstring for the function `api_version`. **CN:** 继续说明 function `api_version` 的文档字符串。
+- **L488** `    :type opclass: cutlass_library.OpcodeClass` — **EN:** Continues the docstring for the function `api_version`. **CN:** 继续说明 function `api_version` 的文档字符串。
+- **L489** `    :param dtype: data type to be used in operation (assumes that ElementA and ElementB are the same)` — **EN:** Continues the docstring for the function `api_version`. **CN:** 继续说明 function `api_version` 的文档字符串。
+- **L490** `    :type dtype: cutlass_library.DataType` — **EN:** Continues the docstring for the function `api_version`. **CN:** 继续说明 function `api_version` 的文档字符串。
+- **L491** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L492** `    :return: API version to be used in code emission` — **EN:** Continues the docstring for the function `api_version`. **CN:** 继续说明 function `api_version` 的文档字符串。
+- **L493** `    :rtype: ApiVersion` — **EN:** Continues the docstring for the function `api_version`. **CN:** 继续说明 function `api_version` 的文档字符串。
+- **L494** `    """` — **EN:** Ends the docstring for the function `api_version`. **CN:** 结束说明 function `api_version` 的文档字符串。
+- **L495** `    if (arch in [90, 100, 101, 103] and` — **EN:** Starts a conditional branch guarded by `arch in [90, 100, 101, 103] and opclass == OpcodeClass.Te...`. **CN:** 开始一个由 `arch in [90, 100, 101, 103] and opclass == OpcodeClass.Te...` 控制的条件分支。
+- **L496** `        opclass == OpcodeClass.TensorOp and` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L497** `        (dtype != DataType.f64)):` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L498** `        return ApiVersion.v3x` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L499** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L500** `        return ApiVersion.v2x` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L501** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L502** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L503** `class EmissionType(enum.Enum):` — **EN:** Defines class `EmissionType` with bases enum.Enum. **CN:** 定义类 `EmissionType`，其基类为 enum.Enum。
+- **L504** `    """` — **EN:** Starts the docstring for the class `EmissionType`. **CN:** 开始说明 class `EmissionType` 的文档字符串。
+- **L505** `    Tags for whether to emit a kernel- or device-level operation` — **EN:** Continues the docstring for the class `EmissionType`. **CN:** 继续说明 class `EmissionType` 的文档字符串。
+- **L506** `    """` — **EN:** Ends the docstring for the class `EmissionType`. **CN:** 结束说明 class `EmissionType` 的文档字符串。
+- **L507** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L508** `    Kernel = enum_auto()` — **EN:** Assigns a value to Kernel. **CN:** 将一个值赋给 Kernel。
+- **L509** `    Device = enum_auto()` — **EN:** Assigns a value to Device. **CN:** 将一个值赋给 Device。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.backend.library`. CN: 模块名为 `cutlass_cppgen.backend.library`。
+- EN: Module docstring summary: Common data types and string names/tags for them CN: 模块文档摘要为：Common data types and string names/tags for them
+- EN: Top-level classes: DataTypeSizeBytes, SchedulerMode, FunctionalOp, ActivationOp, FloatRoundStyle, MathInstruction, TileDescription, TensorDescription, ApiVersion, EmissionType CN: 顶层类包括：DataTypeSizeBytes, SchedulerMode, FunctionalOp, ActivationOp, FloatRoundStyle, MathInstruction, TileDescription, TensorDescription, ApiVersion, EmissionType
+- EN: Top-level functions: op_tag, to_blackwell_threadblock_shape, CalculateSmemUsagePerStage, CalculateSmemUsage, api_version CN: 顶层函数包括：op_tag, to_blackwell_threadblock_shape, CalculateSmemUsagePerStage, CalculateSmemUsage, api_version
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_library:ComplexTransform,DataType,DataTypeSize,EpilogueScheduleType,KernelScheduleSuffixes,KernelScheduleType,MathOperation,OpcodeClass,TileSchedulerType CN: 内部依赖：cutlass_library:ComplexTransform,DataType,DataTypeSize,EpilogueScheduleType,KernelScheduleSuffixes,KernelScheduleType,MathOperation,OpcodeClass,TileSchedulerType
+- EN: External or standard-library dependencies: enum, enum:auto CN: 外部或标准库依赖：enum, enum:auto

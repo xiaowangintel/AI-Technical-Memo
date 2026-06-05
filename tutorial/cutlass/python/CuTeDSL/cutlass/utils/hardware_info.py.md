@@ -1,0 +1,237 @@
+# hardware_info.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/utils/hardware_info.py`
+
+## Purpose / 作用
+- EN: Defines 1 classes (HardwareInfo) in `CuTeDSL.cutlass.utils.hardware_info`.
+- CN: 该模块 `CuTeDSL.cutlass.utils.hardware_info` 定义了 1 个类（HardwareInfo）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `from typing import Any` — **EN:** Imports Any from `typing`. **CN:** 从 `typing` 导入 Any。
+- **L12** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L13** `from cuda.bindings import driver` — **EN:** Imports driver from `cuda.bindings`. **CN:** 从 `cuda.bindings` 导入 driver。
+- **L14** `from cutlass import cute` — **EN:** Imports cute from `cutlass`. **CN:** 从 `cutlass` 导入 cute。
+- **L15** `import tempfile` — **EN:** Imports tempfile for later use. **CN:** 导入 tempfile 供后续使用。
+- **L16** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L17** `"""` — **EN:** Provides documentation text as a docstring. **CN:** 以文档字符串形式提供说明文本。
+- **L18** `This class is used to get the hardware info of given GPU device.` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L19** `It provides methods to get the max active clusters for given cluster size.` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L20** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L21** `Prerequisite:` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L22** `- CUDA driver is initialized via \`driver.cuInit\` or other CUDA APIs.` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L23** `- CUDA context is created via \`driver.cuCtxCreate\` or other CUDA APIs.` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L24** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L25** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L26** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L27** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L28** `class HardwareInfo:` — **EN:** Defines class `HardwareInfo`. **CN:** 定义类 `HardwareInfo`。
+- **L29** `    """` — **EN:** Starts the docstring for the class `HardwareInfo`. **CN:** 开始说明 class `HardwareInfo` 的文档字符串。
+- **L30** `    device_id: CUDA device ID to get the hardware info.` — **EN:** Continues the docstring for the class `HardwareInfo`. **CN:** 继续说明 class `HardwareInfo` 的文档字符串。
+- **L31** `    """` — **EN:** Ends the docstring for the class `HardwareInfo`. **CN:** 结束说明 class `HardwareInfo` 的文档字符串。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `    def __init__(self, device_id: int = 0):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L34** `        count = self._checkCudaErrors(driver.cuDeviceGetCount())` — **EN:** Assigns a value to count. **CN:** 将一个值赋给 count。
+- **L35** `        if device_id >= count:` — **EN:** Starts a conditional branch guarded by `device_id >= count`. **CN:** 开始一个由 `device_id >= count` 控制的条件分支。
+- **L36** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L37** `                f"Device ID {device_id} is out of range for device count {count}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L38** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L39** `        self.device_id = device_id` — **EN:** Assigns a value to self.device_id. **CN:** 将一个值赋给 self.device_id。
+- **L40** `        self.device = self._checkCudaErrors(driver.cuDeviceGet(device_id))` — **EN:** Assigns a value to self.device. **CN:** 将一个值赋给 self.device。
+- **L41** `        self.context = self._checkCudaErrors(driver.cuCtxGetCurrent())` — **EN:** Assigns a value to self.context. **CN:** 将一个值赋给 self.context。
+- **L42** `        self.driver_version = self._checkCudaErrors(driver.cuDriverGetVersion())` — **EN:** Assigns a value to self.driver_version. **CN:** 将一个值赋给 self.driver_version。
+- **L43** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L44** `    # Getting the max active clusters for a given cluster size` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L45** `    def get_max_active_clusters(` — **EN:** Defines function `get_max_active_clusters`. **CN:** 定义函数 `get_max_active_clusters`。
+- **L46** `        self, cluster_size: int, stream: driver.CUstream = None` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L47** `    ) -> int:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L48** `        """` — **EN:** Starts the docstring for the function `get_max_active_clusters`. **CN:** 开始说明 function `get_max_active_clusters` 的文档字符串。
+- **L49** `        Get the maximum number of active clusters for a given cluster size.` — **EN:** Continues the docstring for the function `get_max_active_clusters`. **CN:** 继续说明 function `get_max_active_clusters` 的文档字符串。
+- **L50** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L51** `        When a stream from a green context is provided, the occupancy calculation` — **EN:** Continues the docstring for the function `get_max_active_clusters`. **CN:** 继续说明 function `get_max_active_clusters` 的文档字符串。
+- **L52** `        will reflect the reduced SM partition of the green context.` — **EN:** Continues the docstring for the function `get_max_active_clusters`. **CN:** 继续说明 function `get_max_active_clusters` 的文档字符串。
+- **L53** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L54** `        :param cluster_size: Number of blocks per cluster (must be between 1 and 32)` — **EN:** Continues the docstring for the function `get_max_active_clusters`. **CN:** 继续说明 function `get_max_active_clusters` 的文档字符串。
+- **L55** `        :type cluster_size: int` — **EN:** Continues the docstring for the function `get_max_active_clusters`. **CN:** 继续说明 function `get_max_active_clusters` 的文档字符串。
+- **L56** `        :param stream: Optional CUDA stream handle. If provided (especially from a green context),` — **EN:** Continues the docstring for the function `get_max_active_clusters`. **CN:** 继续说明 function `get_max_active_clusters` 的文档字符串。
+- **L57** `                      the occupancy calculation reflects the stream's SM partition.` — **EN:** Continues the docstring for the function `get_max_active_clusters`. **CN:** 继续说明 function `get_max_active_clusters` 的文档字符串。
+- **L58** `        :type stream: driver.CUstream, optional` — **EN:** Continues the docstring for the function `get_max_active_clusters`. **CN:** 继续说明 function `get_max_active_clusters` 的文档字符串。
+- **L59** `        :return: Maximum number of active clusters` — **EN:** Continues the docstring for the function `get_max_active_clusters`. **CN:** 继续说明 function `get_max_active_clusters` 的文档字符串。
+- **L60** `        :rtype: int` — **EN:** Continues the docstring for the function `get_max_active_clusters`. **CN:** 继续说明 function `get_max_active_clusters` 的文档字符串。
+- **L61** `        """` — **EN:** Ends the docstring for the function `get_max_active_clusters`. **CN:** 结束说明 function `get_max_active_clusters` 的文档字符串。
+- **L62** `        if self._cuda_driver_version_lt(11, 8):` — **EN:** Starts a conditional branch guarded by `self._cuda_driver_version_lt(11, 8)`. **CN:** 开始一个由 `self._cuda_driver_version_lt(11, 8)` 控制的条件分支。
+- **L63** `            raise RuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L64** `                "CUDA Driver version < 11.8, cannot get _max_active_clusters"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L65** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L66** `        if cluster_size <= 0 or cluster_size > 32:` — **EN:** Starts a conditional branch guarded by `cluster_size <= 0 or cluster_size > 32`. **CN:** 开始一个由 `cluster_size <= 0 or cluster_size > 32` 控制的条件分支。
+- **L67** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L68** `                f"Cluster size must be between 1 and 32, {cluster_size} is not supported"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L69** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L70** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L71** `        # must do get kernel after set device so runtime context is set correctly` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L72** `        self.kernel = self._get_device_function()` — **EN:** Assigns a value to self.kernel. **CN:** 将一个值赋给 self.kernel。
+- **L73** `        max_shared_memory_per_block = self._checkCudaErrors(` — **EN:** Assigns a value to max_shared_memory_per_block. **CN:** 将一个值赋给 max_shared_memory_per_block。
+- **L74** `            driver.cuDeviceGetAttribute(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L75** `                driver.CUdevice_attribute.CU_DEVICE_ATTRIBUTE_MAX_SHARED_MEMORY_PER_BLOCK_OPTIN,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L76** `                self.device,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L77** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L78** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L79** `        self._checkCudaErrors(` — **EN:** Invokes `self._checkCudaErrors` as a standalone call. **CN:** 以独立语句方式调用 `self._checkCudaErrors`。
+- **L80** `            driver.cuFuncSetAttribute(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L81** `                self.kernel,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L82** `                driver.CUfunction_attribute.CU_FUNC_ATTRIBUTE_MAX_DYNAMIC_SHARED_SIZE_BYTES,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L83** `                max_shared_memory_per_block,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L84** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L85** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L86** `        max_dynamic_shared_memory = self._checkCudaErrors(` — **EN:** Assigns a value to max_dynamic_shared_memory. **CN:** 将一个值赋给 max_dynamic_shared_memory。
+- **L87** `            driver.cuOccupancyAvailableDynamicSMemPerBlock(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L88** `                self.kernel,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L89** `                1,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L90** `                1,  # numBlocks  # blockSize` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L91** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L92** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L93** `        max_active_blocks = self._checkCudaErrors(` — **EN:** Assigns a value to max_active_blocks. **CN:** 将一个值赋给 max_active_blocks。
+- **L94** `            driver.cuOccupancyMaxActiveBlocksPerMultiprocessor(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L95** `                self.kernel,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L96** `                1,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L97** `                max_dynamic_shared_memory,  # blockSize,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L98** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L99** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L100** `        # allow non-portable cluster size to support detection of non-portable cluster size` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L101** `        self._checkCudaErrors(` — **EN:** Invokes `self._checkCudaErrors` as a standalone call. **CN:** 以独立语句方式调用 `self._checkCudaErrors`。
+- **L102** `            driver.cuFuncSetAttribute(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L103** `                self.kernel,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L104** `                driver.CUfunction_attribute.CU_FUNC_ATTRIBUTE_NON_PORTABLE_CLUSTER_SIZE_ALLOWED,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L105** `                1,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L106** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L107** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L108** `        # prepare launch configuration` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L109** `        launch_config = driver.CUlaunchConfig()` — **EN:** Assigns a value to launch_config. **CN:** 将一个值赋给 launch_config。
+- **L110** `        launch_config.blockDimX = 128` — **EN:** Assigns a value to launch_config.blockDimX. **CN:** 将一个值赋给 launch_config.blockDimX。
+- **L111** `        launch_config.blockDimY = 1` — **EN:** Assigns a value to launch_config.blockDimY. **CN:** 将一个值赋给 launch_config.blockDimY。
+- **L112** `        launch_config.blockDimZ = 1` — **EN:** Assigns a value to launch_config.blockDimZ. **CN:** 将一个值赋给 launch_config.blockDimZ。
+- **L113** `        launch_config.sharedMemBytes = max_dynamic_shared_memory` — **EN:** Assigns a value to launch_config.sharedMemBytes. **CN:** 将一个值赋给 launch_config.sharedMemBytes。
+- **L114** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L115** `        # IMPORTANT: Set the stream for green context support` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L116** `        # When hStream is set, cuOccupancyMaxActiveClusters will use the context` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L117** `        # associated with that stream, which includes the green context's SM partition` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L118** `        if stream is not None:` — **EN:** Starts a conditional branch guarded by `stream is not None`. **CN:** 开始一个由 `stream is not None` 控制的条件分支。
+- **L119** `            launch_config.hStream = stream` — **EN:** Assigns a value to launch_config.hStream. **CN:** 将一个值赋给 launch_config.hStream。
+- **L120** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L121** `        launch_config.numAttrs = 1` — **EN:** Assigns a value to launch_config.numAttrs. **CN:** 将一个值赋给 launch_config.numAttrs。
+- **L122** `        # max possible cluster size is 32` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L123** `        cluster_dims_attr = driver.CUlaunchAttribute()` — **EN:** Assigns a value to cluster_dims_attr. **CN:** 将一个值赋给 cluster_dims_attr。
+- **L124** `        cluster_dims_attr.id = (` — **EN:** Assigns a value to cluster_dims_attr.id. **CN:** 将一个值赋给 cluster_dims_attr.id。
+- **L125** `            driver.CUlaunchAttributeID.CU_LAUNCH_ATTRIBUTE_CLUSTER_DIMENSION` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L126** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L127** `        value = driver.CUlaunchAttributeValue()` — **EN:** Assigns a value to value. **CN:** 将一个值赋给 value。
+- **L128** `        value.clusterDim.x = cluster_size` — **EN:** Assigns a value to value.clusterDim.x. **CN:** 将一个值赋给 value.clusterDim.x。
+- **L129** `        value.clusterDim.y = 1` — **EN:** Assigns a value to value.clusterDim.y. **CN:** 将一个值赋给 value.clusterDim.y。
+- **L130** `        value.clusterDim.z = 1` — **EN:** Assigns a value to value.clusterDim.z. **CN:** 将一个值赋给 value.clusterDim.z。
+- **L131** `        cluster_dims_attr.value = value` — **EN:** Assigns a value to cluster_dims_attr.value. **CN:** 将一个值赋给 cluster_dims_attr.value。
+- **L132** `        launch_config.attrs = [cluster_dims_attr]` — **EN:** Assigns a value to launch_config.attrs. **CN:** 将一个值赋给 launch_config.attrs。
+- **L133** `        launch_config.gridDimX = cluster_size` — **EN:** Assigns a value to launch_config.gridDimX. **CN:** 将一个值赋给 launch_config.gridDimX。
+- **L134** `        launch_config.gridDimY = max_active_blocks` — **EN:** Assigns a value to launch_config.gridDimY. **CN:** 将一个值赋给 launch_config.gridDimY。
+- **L135** `        launch_config.gridDimZ = 1` — **EN:** Assigns a value to launch_config.gridDimZ. **CN:** 将一个值赋给 launch_config.gridDimZ。
+- **L136** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L137** `        num_clusters = self._checkCudaErrors(` — **EN:** Assigns a value to num_clusters. **CN:** 将一个值赋给 num_clusters。
+- **L138** `            driver.cuOccupancyMaxActiveClusters(self.kernel, launch_config)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L139** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L140** `        return num_clusters` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L141** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L142** `    def get_l2_cache_size_in_bytes(self) -> int:` — **EN:** Defines function `get_l2_cache_size_in_bytes`. **CN:** 定义函数 `get_l2_cache_size_in_bytes`。
+- **L143** `        return self._checkCudaErrors(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L144** `            driver.cuDeviceGetAttribute(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L145** `                driver.CUdevice_attribute.CU_DEVICE_ATTRIBUTE_L2_CACHE_SIZE,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L146** `                self.device,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L147** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L148** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L149** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L150** `    def get_device_multiprocessor_count(self) -> int:` — **EN:** Defines function `get_device_multiprocessor_count`. **CN:** 定义函数 `get_device_multiprocessor_count`。
+- **L151** `        return self._checkCudaErrors(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L152** `            driver.cuDeviceGetAttribute(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L153** `                driver.CUdevice_attribute.CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L154** `                self.device,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L155** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L156** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L157** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L158** `    def _checkCudaErrors(self, result: Any) -> Any:` — **EN:** Defines function `_checkCudaErrors`. **CN:** 定义函数 `_checkCudaErrors`。
+- **L159** `        if result[0].value:` — **EN:** Starts a conditional branch guarded by `result[0].value`. **CN:** 开始一个由 `result[0].value` 控制的条件分支。
+- **L160** `            raise RuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L161** `                "CUDA error code={}({})".format(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L162** `                    result[0].value, self._cudaGetErrorEnum(result[0])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L163** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L164** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L165** `        # CUDA APIs always return the status as the first element of the result tuple` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L166** `        if len(result) == 1:` — **EN:** Starts a conditional branch guarded by `len(result) == 1`. **CN:** 开始一个由 `len(result) == 1` 控制的条件分支。
+- **L167** `            return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L168** `        elif len(result) == 2:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L169** `            return result[1]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L170** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L171** `            return result[1:]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L172** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L173** `    def _cudaGetErrorEnum(self, error: Any) -> str:` — **EN:** Defines function `_cudaGetErrorEnum`. **CN:** 定义函数 `_cudaGetErrorEnum`。
+- **L174** `        if isinstance(error, driver.CUresult):` — **EN:** Starts a conditional branch guarded by `isinstance(error, driver.CUresult)`. **CN:** 开始一个由 `isinstance(error, driver.CUresult)` 控制的条件分支。
+- **L175** `            err, name = driver.cuGetErrorName(error)` — **EN:** Assigns a value to (err, name). **CN:** 将一个值赋给 (err, name)。
+- **L176** `            return name if err == driver.CUresult.CUDA_SUCCESS else "<unknown>"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L177** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L178** `            raise RuntimeError("Unknown error type: {}".format(error))` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L179** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L180** `    def _cuda_driver_version_ge(self, major: int, minor: int) -> bool:` — **EN:** Defines function `_cuda_driver_version_ge`. **CN:** 定义函数 `_cuda_driver_version_ge`。
+- **L181** `        return self.driver_version >= (major * 1000 + 10 * minor)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L182** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L183** `    def _cuda_driver_version_lt(self, major: int, minor: int) -> bool:` — **EN:** Defines function `_cuda_driver_version_lt`. **CN:** 定义函数 `_cuda_driver_version_lt`。
+- **L184** `        return not self._cuda_driver_version_ge(major, minor)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L185** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L186** `    @cute.kernel` — **EN:** Applies decorator `cute.kernel` to the following definition. **CN:** 将装饰器 `cute.kernel` 应用于后面的定义。
+- **L187** `    def _empty_kernel(self) -> None:` — **EN:** Defines function `_empty_kernel`. **CN:** 定义函数 `_empty_kernel`。
+- **L188** `        return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L189** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L190** `    @cute.jit` — **EN:** Applies decorator `cute.jit` to the following definition. **CN:** 将装饰器 `cute.jit` 应用于后面的定义。
+- **L191** `    def _host_function(self) -> None:` — **EN:** Defines function `_host_function`. **CN:** 定义函数 `_host_function`。
+- **L192** `        self._empty_kernel().launch(` — **EN:** Invokes `self._empty_kernel().launch` as a standalone call. **CN:** 以独立语句方式调用 `self._empty_kernel().launch`。
+- **L193** `            grid=[1, 1, 1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L194** `            block=[1, 1, 1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L195** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L196** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L197** `    # get a empty kernel to compute occupancy` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L198** `    def _get_device_function(self) -> driver.CUfunction:` — **EN:** Defines function `_get_device_function`. **CN:** 定义函数 `_get_device_function`。
+- **L199** `        """` — **EN:** Starts the docstring for the function `_get_device_function`. **CN:** 开始说明 function `_get_device_function` 的文档字符串。
+- **L200** `        Get a device function by compiling a dummy kernel using cuteDSL pipeline.` — **EN:** Continues the docstring for the function `_get_device_function`. **CN:** 继续说明 function `_get_device_function` 的文档字符串。
+- **L201** `        """` — **EN:** Ends the docstring for the function `_get_device_function`. **CN:** 结束说明 function `_get_device_function` 的文档字符串。
+- **L202** `        # Create a temporary directory for dumping artifacts` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L203** `        with tempfile.TemporaryDirectory() as temp_dir:` — **EN:** Starts a context-managed block using tempfile.TemporaryDirectory(). **CN:** 开始一个使用 tempfile.TemporaryDirectory() 的上下文管理代码块。
+- **L204** `            # keep-cubin will keep the cubin in the artifacts` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L205** `            compiled_func = cute.compile(` — **EN:** Assigns a value to compiled_func. **CN:** 将一个值赋给 compiled_func。
+- **L206** `                self._host_function, options=f"--dump-dir={temp_dir} --keep-cubin"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L207** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L208** `            # Get the CUBIN from artifacts` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L209** `            cubin_data = compiled_func.artifacts.CUBIN` — **EN:** Assigns a value to cubin_data. **CN:** 将一个值赋给 cubin_data。
+- **L210** `            cuda_library = self._checkCudaErrors(` — **EN:** Assigns a value to cuda_library. **CN:** 将一个值赋给 cuda_library。
+- **L211** `                driver.cuLibraryLoadData(cubin_data, None, None, 0, None, None, 0)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L212** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L213** `            # Enumerate kernels from the library` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L214** `            kernels = self._checkCudaErrors(` — **EN:** Assigns a value to kernels. **CN:** 将一个值赋给 kernels。
+- **L215** `                driver.cuLibraryEnumerateKernels(1, cuda_library)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L216** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L217** `            # Get the function from the kernel` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L218** `            return self._checkCudaErrors(driver.cuKernelGetFunction(kernels[0]))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.utils.hardware_info`. CN: 模块名为 `CuTeDSL.cutlass.utils.hardware_info`。
+- EN: Top-level classes: HardwareInfo CN: 顶层类包括：HardwareInfo
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass:cute CN: 内部依赖：cutlass:cute
+- EN: External or standard-library dependencies: typing:Any, cuda.bindings:driver, tempfile CN: 外部或标准库依赖：typing:Any, cuda.bindings:driver, tempfile

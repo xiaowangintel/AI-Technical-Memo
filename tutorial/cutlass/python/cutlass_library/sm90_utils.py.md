@@ -1,0 +1,773 @@
+# sm90_utils.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_library/sm90_utils.py`
+
+## Purpose / 作用
+- EN: Utilities for enumerating CUTLASS library SM90 kernels
+- CN: 该模块的文档字符串将其描述为：Utilities for enumerating CUTLASS library SM90 kernels
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2024 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L34** `Utilities for enumerating CUTLASS library SM90 kernels` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L35** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `import argparse` — **EN:** Imports argparse for later use. **CN:** 导入 argparse 供后续使用。
+- **L38** `import enum` — **EN:** Imports enum for later use. **CN:** 导入 enum 供后续使用。
+- **L39** `from itertools import product` — **EN:** Imports product from `itertools`. **CN:** 从 `itertools` 导入 product。
+- **L40** `import math` — **EN:** Imports math for later use. **CN:** 导入 math 供后续使用。
+- **L41** `import logging` — **EN:** Imports logging for later use. **CN:** 导入 logging 供后续使用。
+- **L42** `import os.path` — **EN:** Imports os.path for later use. **CN:** 导入 os.path 供后续使用。
+- **L43** `import shutil` — **EN:** Imports shutil for later use. **CN:** 导入 shutil 供后续使用。
+- **L44** `import sys` — **EN:** Imports sys for later use. **CN:** 导入 sys 供后续使用。
+- **L45** `import copy` — **EN:** Imports copy for later use. **CN:** 导入 copy 供后续使用。
+- **L46** `from typing import Any, Optional, Sequence, Tuple, List` — **EN:** Imports Any, Optional, Sequence, Tuple, List from `typing`. **CN:** 从 `typing` 导入 Any, Optional, Sequence, Tuple, List。
+- **L47** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L48** `try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L49** `  import builtins` — **EN:** Imports builtins for later use. **CN:** 导入 builtins 供后续使用。
+- **L50** `  if hasattr(builtins, "CUTLASS_IGNORE_PACKAGE") and CUTLASS_IGNORE_PACKAGE == True:` — **EN:** Starts a conditional branch guarded by `hasattr(builtins, 'CUTLASS_IGNORE_PACKAGE') and CUTLASS_I...`. **CN:** 开始一个由 `hasattr(builtins, 'CUTLASS_IGNORE_PACKAGE') and CUTLASS_I...` 控制的条件分支。
+- **L51** `    raise ImportError("Disabling attempt to import cutlass_library")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L52** `  from cutlass_library.library import *` — **EN:** Imports * from `cutlass_library.library`. **CN:** 从 `cutlass_library.library` 导入 *。
+- **L53** `except ImportError:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L54** `  from library import *` — **EN:** Imports * from `library`. **CN:** 从 `library` 导入 *。
+- **L55** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L56** `# NOTE: this is a duplicate of CudaToolkitVersionSatisfies in generator.py` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L57** `def CudaToolkitVersionSatisfies(semantic_ver_string, major, minor, patch = 0):` — **EN:** Defines function `CudaToolkitVersionSatisfies`. **CN:** 定义函数 `CudaToolkitVersionSatisfies`。
+- **L58** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L59** `  # by default, use the latest CUDA Toolkit version` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L60** `  cuda_version = [11, 0, 132]` — **EN:** Assigns a value to cuda_version. **CN:** 将一个值赋给 cuda_version。
+- **L61** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L62** `  # Update cuda_version based on parsed string` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L63** `  if semantic_ver_string != '':` — **EN:** Starts a conditional branch guarded by `semantic_ver_string != ''`. **CN:** 开始一个由 `semantic_ver_string != ''` 控制的条件分支。
+- **L64** `    for i, x in enumerate([int(x) for x in semantic_ver_string.split('.')[:3]]):` — **EN:** Starts a loop assigning items from `enumerate([int(x) for x in semantic_ver_string....` to `(i, x)`. **CN:** 开始一个循环，将 `enumerate([int(x) for x in semantic_ver_string....` 的元素赋给 `(i, x)`。
+- **L65** `      if i < len(cuda_version):` — **EN:** Starts a conditional branch guarded by `i < len(cuda_version)`. **CN:** 开始一个由 `i < len(cuda_version)` 控制的条件分支。
+- **L66** `        cuda_version[i] = x` — **EN:** Assigns a value to cuda_version[i]. **CN:** 将一个值赋给 cuda_version[i]。
+- **L67** `      else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L68** `        cuda_version.append(x)` — **EN:** Invokes `cuda_version.append` as a standalone call. **CN:** 以独立语句方式调用 `cuda_version.append`。
+- **L69** `  return cuda_version >= [major, minor, patch]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L70** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L71** `#### Step 0: define levels` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L72** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L73** `# One integer level controls multiple "generators" and how many` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L74** `# combinations they generate. That is the "global" level.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L75** `# "Generators" are WGMMA shapes, MMA multipliers, cluster sizes, and` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L76** `# anything that is eventually involved in the Cartesian product` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L77** `# which yields our kernel configurations.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L78** `# For simplicity, each generator defines their own levels, ` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L79** `# starting from 0. As a rule we assume 10 or fewer levels, making` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L80** `# their level a digit.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L81** `# The "global" level simply stacks these digits and represents them` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L82** `# as a single integer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L83** `# ` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L84** `# For example, level 500 indicates cluster sizes are at level 5, MMA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L85** `# multipliers are at level 0, and WGMMA shapes are at level 0 as well.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L86** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L87** `# Here we define the global level to generator level mappings.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L88** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L89** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L90** `def get_wgmma_level_from_global_level(global_level: int):` — **EN:** Defines function `get_wgmma_level_from_global_level`. **CN:** 定义函数 `get_wgmma_level_from_global_level`。
+- **L91** `    return global_level % 10` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L92** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L93** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L94** `def get_mma_level_from_global_level(global_level: int):` — **EN:** Defines function `get_mma_level_from_global_level`. **CN:** 定义函数 `get_mma_level_from_global_level`。
+- **L95** `    return (global_level // 10) % 10` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L96** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L97** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L98** `def get_cluster_level_from_global_level(global_level: int):` — **EN:** Defines function `get_cluster_level_from_global_level`. **CN:** 定义函数 `get_cluster_level_from_global_level`。
+- **L99** `    return (global_level // 100) % 10` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L100** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L101** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L102** `def get_pruning_level_from_global_level(global_level: int):` — **EN:** Defines function `get_pruning_level_from_global_level`. **CN:** 定义函数 `get_pruning_level_from_global_level`。
+- **L103** `    return (global_level // 1000) % 10` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L104** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L105** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L106** `#### Step 1: generate MMA instruction shapes based on levels` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L107** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L108** `try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L109** `    from .sm90_shapes import (` — **EN:** Imports SM90_MMA_MULTIPLIERS, SM90_CLUSTER_SIZES, SM90_WGMMA_SHAPES_TF32_DENSE, SM90_WGMMA_SHAPES_FP16_BF16_DENSE, SM90_WGMMA_SHAPES_FP8_DENSE, SM90_WGMMA_SHAPES_INT8_DENSE from `.sm90_shapes`. **CN:** 从 `.sm90_shapes` 导入 SM90_MMA_MULTIPLIERS, SM90_CLUSTER_SIZES, SM90_WGMMA_SHAPES_TF32_DENSE, SM90_WGMMA_SHAPES_FP16_BF16_DENSE, SM90_WGMMA_SHAPES_FP8_DENSE, SM90_WGMMA_SHAPES_INT8_DENSE。
+- **L110** `        SM90_MMA_MULTIPLIERS,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L111** `        SM90_CLUSTER_SIZES,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L112** `        SM90_WGMMA_SHAPES_TF32_DENSE,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L113** `        SM90_WGMMA_SHAPES_FP16_BF16_DENSE,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L114** `        SM90_WGMMA_SHAPES_FP8_DENSE,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L115** `        SM90_WGMMA_SHAPES_INT8_DENSE,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L116** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L117** `except:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L118** `    from sm90_shapes import (` — **EN:** Imports SM90_MMA_MULTIPLIERS, SM90_CLUSTER_SIZES, SM90_WGMMA_SHAPES_TF32_DENSE, SM90_WGMMA_SHAPES_FP16_BF16_DENSE, SM90_WGMMA_SHAPES_FP8_DENSE, SM90_WGMMA_SHAPES_INT8_DENSE from `sm90_shapes`. **CN:** 从 `sm90_shapes` 导入 SM90_MMA_MULTIPLIERS, SM90_CLUSTER_SIZES, SM90_WGMMA_SHAPES_TF32_DENSE, SM90_WGMMA_SHAPES_FP16_BF16_DENSE, SM90_WGMMA_SHAPES_FP8_DENSE, SM90_WGMMA_SHAPES_INT8_DENSE。
+- **L119** `        SM90_MMA_MULTIPLIERS,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L120** `        SM90_CLUSTER_SIZES,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L121** `        SM90_WGMMA_SHAPES_TF32_DENSE,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L122** `        SM90_WGMMA_SHAPES_FP16_BF16_DENSE,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L123** `        SM90_WGMMA_SHAPES_FP8_DENSE,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L124** `        SM90_WGMMA_SHAPES_INT8_DENSE,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L125** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L126** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L127** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L128** `def generate_tf32_math_instruction_shapes_sm90(level: int):` — **EN:** Defines function `generate_tf32_math_instruction_shapes_sm90`. **CN:** 定义函数 `generate_tf32_math_instruction_shapes_sm90`。
+- **L129** `    assert isinstance(level, int) and level >= 0` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L130** `    filtered_list_of_wgmma_shapes = [` — **EN:** Assigns a value to filtered_list_of_wgmma_shapes. **CN:** 将一个值赋给 filtered_list_of_wgmma_shapes。
+- **L131** `        wgmma_shape for wgmma_shape, min_level in SM90_WGMMA_SHAPES_TF32_DENSE.items() if level >= min_level` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L132** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L133** `    return filtered_list_of_wgmma_shapes` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L134** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L135** `def generate_fp16_bf16_math_instruction_shapes_sm90(level: int):` — **EN:** Defines function `generate_fp16_bf16_math_instruction_shapes_sm90`. **CN:** 定义函数 `generate_fp16_bf16_math_instruction_shapes_sm90`。
+- **L136** `    assert isinstance(level, int) and level >= 0` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L137** `    filtered_list_of_wgmma_shapes = [` — **EN:** Assigns a value to filtered_list_of_wgmma_shapes. **CN:** 将一个值赋给 filtered_list_of_wgmma_shapes。
+- **L138** `        wgmma_shape for wgmma_shape, min_level in SM90_WGMMA_SHAPES_FP16_BF16_DENSE.items() if level >= min_level` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L139** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L140** `    return filtered_list_of_wgmma_shapes` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L141** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L142** `def generate_fp8_math_instruction_shapes_sm90(level: int):` — **EN:** Defines function `generate_fp8_math_instruction_shapes_sm90`. **CN:** 定义函数 `generate_fp8_math_instruction_shapes_sm90`。
+- **L143** `    assert isinstance(level, int) and level >= 0` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L144** `    filtered_list_of_wgmma_shapes = [` — **EN:** Assigns a value to filtered_list_of_wgmma_shapes. **CN:** 将一个值赋给 filtered_list_of_wgmma_shapes。
+- **L145** `        wgmma_shape for wgmma_shape, min_level in SM90_WGMMA_SHAPES_FP8_DENSE.items() if level >= min_level` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L146** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L147** `    return filtered_list_of_wgmma_shapes` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L148** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L149** `def generate_int8_math_instruction_shapes_sm90(level: int):` — **EN:** Defines function `generate_int8_math_instruction_shapes_sm90`. **CN:** 定义函数 `generate_int8_math_instruction_shapes_sm90`。
+- **L150** `    assert isinstance(level, int) and level >= 0` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L151** `    filtered_list_of_wgmma_shapes = [` — **EN:** Assigns a value to filtered_list_of_wgmma_shapes. **CN:** 将一个值赋给 filtered_list_of_wgmma_shapes。
+- **L152** `        wgmma_shape for wgmma_shape, min_level in SM90_WGMMA_SHAPES_INT8_DENSE.items() if level >= min_level` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L153** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L154** `    return filtered_list_of_wgmma_shapes` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L155** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L156** `def generate_mixed_dtype_math_instructions_shapes_sm90(wgmma_level: int, a_type: DataType, b_type: DataType):` — **EN:** Defines function `generate_mixed_dtype_math_instructions_shapes_sm90`. **CN:** 定义函数 `generate_mixed_dtype_math_instructions_shapes_sm90`。
+- **L157** `    # DataTypeSize are in the unit of bits` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L158** `    a_bytes = DataTypeSize[a_type] // 8` — **EN:** Assigns a value to a_bytes. **CN:** 将一个值赋给 a_bytes。
+- **L159** `    b_bytes = DataTypeSize[b_type] // 8` — **EN:** Assigns a value to b_bytes. **CN:** 将一个值赋给 b_bytes。
+- **L160** `    if a_bytes == 4 or b_bytes == 4:` — **EN:** Starts a conditional branch guarded by `a_bytes == 4 or b_bytes == 4`. **CN:** 开始一个由 `a_bytes == 4 or b_bytes == 4` 控制的条件分支。
+- **L161** `        return generate_tf32_math_instruction_shapes_sm90(wgmma_level)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L162** `    elif a_bytes == 2 or b_bytes == 2:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L163** `        return generate_fp16_bf16_math_instruction_shapes_sm90(wgmma_level)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L164** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L165** `        return generate_fp8_math_instruction_shapes_sm90(wgmma_level)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L166** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L167** `###########` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L168** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L169** `def generate_tf32_math_instructions_sm90(level: int):` — **EN:** Defines function `generate_tf32_math_instructions_sm90`. **CN:** 定义函数 `generate_tf32_math_instructions_sm90`。
+- **L170** `    wgmma_level = get_wgmma_level_from_global_level(level)` — **EN:** Assigns a value to wgmma_level. **CN:** 将一个值赋给 wgmma_level。
+- **L171** `    math_instructions = []` — **EN:** Assigns a value to math_instructions. **CN:** 将一个值赋给 math_instructions。
+- **L172** `    for math_instruction_shape in generate_tf32_math_instruction_shapes_sm90(wgmma_level):` — **EN:** Starts a loop assigning items from `generate_tf32_math_instruction_shapes_sm90(wgmm...` to `math_instruction_shape`. **CN:** 开始一个循环，将 `generate_tf32_math_instruction_shapes_sm90(wgmm...` 的元素赋给 `math_instruction_shape`。
+- **L173** `        math_instructions.append(` — **EN:** Invokes `math_instructions.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions.append`。
+- **L174** `          MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L175** `              math_instruction_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L176** `              DataType.tf32, DataType.tf32, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L177** `              OpcodeClass.TensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L178** `              MathOperation.multiply_add)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L179** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L180** `    return math_instructions` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L181** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L182** `def generate_fp16_bf16_math_instructions_sm90(level: int):` — **EN:** Defines function `generate_fp16_bf16_math_instructions_sm90`. **CN:** 定义函数 `generate_fp16_bf16_math_instructions_sm90`。
+- **L183** `    wgmma_level = get_wgmma_level_from_global_level(level)` — **EN:** Assigns a value to wgmma_level. **CN:** 将一个值赋给 wgmma_level。
+- **L184** `    math_instructions = []` — **EN:** Assigns a value to math_instructions. **CN:** 将一个值赋给 math_instructions。
+- **L185** `    for math_instruction_shape in generate_fp16_bf16_math_instruction_shapes_sm90(wgmma_level):` — **EN:** Starts a loop assigning items from `generate_fp16_bf16_math_instruction_shapes_sm90...` to `math_instruction_shape`. **CN:** 开始一个循环，将 `generate_fp16_bf16_math_instruction_shapes_sm90...` 的元素赋给 `math_instruction_shape`。
+- **L186** `        math_instructions += [` — **EN:** Updates math_instructions in place. **CN:** 原地更新 math_instructions。
+- **L187** `          MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L188** `              math_instruction_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L189** `              DataType.f16, DataType.f16, DataType.f16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L190** `              OpcodeClass.TensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L191** `              MathOperation.multiply_add),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L192** `          MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L193** `              math_instruction_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L194** `              DataType.f16, DataType.f16, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L195** `              OpcodeClass.TensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L196** `              MathOperation.multiply_add),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L197** `          MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L198** `              math_instruction_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L199** `              DataType.bf16, DataType.bf16, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L200** `              OpcodeClass.TensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L201** `              MathOperation.multiply_add),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L202** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L203** `    return math_instructions` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L204** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L205** `def generate_fp8_math_instructions_sm90(level: int):` — **EN:** Defines function `generate_fp8_math_instructions_sm90`. **CN:** 定义函数 `generate_fp8_math_instructions_sm90`。
+- **L206** `    wgmma_level = get_wgmma_level_from_global_level(level)` — **EN:** Assigns a value to wgmma_level. **CN:** 将一个值赋给 wgmma_level。
+- **L207** `    math_instructions = []` — **EN:** Assigns a value to math_instructions. **CN:** 将一个值赋给 math_instructions。
+- **L208** `    for math_instruction_shape in generate_fp8_math_instruction_shapes_sm90(wgmma_level):` — **EN:** Starts a loop assigning items from `generate_fp8_math_instruction_shapes_sm90(wgmma...` to `math_instruction_shape`. **CN:** 开始一个循环，将 `generate_fp8_math_instruction_shapes_sm90(wgmma...` 的元素赋给 `math_instruction_shape`。
+- **L209** `        math_instructions += [` — **EN:** Updates math_instructions in place. **CN:** 原地更新 math_instructions。
+- **L210** `          MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L211** `              math_instruction_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L212** `              DataType.e4m3, DataType.e4m3, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L213** `              OpcodeClass.TensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L214** `              MathOperation.multiply_add),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L215** `          MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L216** `              math_instruction_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L217** `              DataType.e4m3, DataType.e5m2, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L218** `              OpcodeClass.TensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L219** `              MathOperation.multiply_add),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L220** `          MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L221** `              math_instruction_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L222** `              DataType.e5m2, DataType.e4m3, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L223** `              OpcodeClass.TensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L224** `              MathOperation.multiply_add),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L225** `          MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L226** `              math_instruction_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L227** `              DataType.e5m2, DataType.e5m2, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L228** `              OpcodeClass.TensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L229** `              MathOperation.multiply_add),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L230** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L231** `    return math_instructions` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L232** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L233** `def generate_mixed_dtype_math_instructions_sm90(level: int, types_of_a_b_acc: List[Tuple[DataType, DataType, DataType]]):` — **EN:** Defines function `generate_mixed_dtype_math_instructions_sm90`. **CN:** 定义函数 `generate_mixed_dtype_math_instructions_sm90`。
+- **L234** `    wgmma_level = get_wgmma_level_from_global_level(level)` — **EN:** Assigns a value to wgmma_level. **CN:** 将一个值赋给 wgmma_level。
+- **L235** `    math_instructions = []` — **EN:** Assigns a value to math_instructions. **CN:** 将一个值赋给 math_instructions。
+- **L236** `    for a_type, b_type, acc_type in types_of_a_b_acc:` — **EN:** Starts a loop assigning items from `types_of_a_b_acc` to `(a_type, b_type, acc_type)`. **CN:** 开始一个循环，将 `types_of_a_b_acc` 的元素赋给 `(a_type, b_type, acc_type)`。
+- **L237** `        math_instruction_shapes = generate_mixed_dtype_math_instructions_shapes_sm90(wgmma_level, a_type, b_type)` — **EN:** Assigns a value to math_instruction_shapes. **CN:** 将一个值赋给 math_instruction_shapes。
+- **L238** `        for math_instruction_shape in math_instruction_shapes:` — **EN:** Starts a loop assigning items from `math_instruction_shapes` to `math_instruction_shape`. **CN:** 开始一个循环，将 `math_instruction_shapes` 的元素赋给 `math_instruction_shape`。
+- **L239** `            math_instructions += [` — **EN:** Updates math_instructions in place. **CN:** 原地更新 math_instructions。
+- **L240** `                MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L241** `                    math_instruction_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L242** `                    a_type, b_type, acc_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L243** `                    OpcodeClass.TensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L244** `                    MathOperation.multiply_add` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L245** `                ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L246** `            ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L247** `    return math_instructions` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L248** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L249** `def generate_int8_math_instructions_sm90(level: int):` — **EN:** Defines function `generate_int8_math_instructions_sm90`. **CN:** 定义函数 `generate_int8_math_instructions_sm90`。
+- **L250** `    wgmma_level = get_wgmma_level_from_global_level(level)` — **EN:** Assigns a value to wgmma_level. **CN:** 将一个值赋给 wgmma_level。
+- **L251** `    math_instructions = []` — **EN:** Assigns a value to math_instructions. **CN:** 将一个值赋给 math_instructions。
+- **L252** `    for math_instruction_shape in generate_int8_math_instruction_shapes_sm90(wgmma_level):` — **EN:** Starts a loop assigning items from `generate_int8_math_instruction_shapes_sm90(wgmm...` to `math_instruction_shape`. **CN:** 开始一个循环，将 `generate_int8_math_instruction_shapes_sm90(wgmm...` 的元素赋给 `math_instruction_shape`。
+- **L253** `        math_instructions += [` — **EN:** Updates math_instructions in place. **CN:** 原地更新 math_instructions。
+- **L254** `          MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L255** `              math_instruction_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L256** `              DataType.s8, DataType.s8, DataType.s32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L257** `              OpcodeClass.TensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L258** `              MathOperation.multiply_add),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L259** `          MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L260** `              math_instruction_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L261** `              DataType.u8, DataType.u8, DataType.s32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L262** `              OpcodeClass.TensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L263** `              MathOperation.multiply_add),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L264** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L265** `    return math_instructions` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L266** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L267** `def make_sparse_math_instructions(math_instructions):` — **EN:** Defines function `make_sparse_math_instructions`. **CN:** 定义函数 `make_sparse_math_instructions`。
+- **L268** `    sparse_instructions = []` — **EN:** Assigns a value to sparse_instructions. **CN:** 将一个值赋给 sparse_instructions。
+- **L269** `    for inst in math_instructions:` — **EN:** Starts a loop assigning items from `math_instructions` to `inst`. **CN:** 开始一个循环，将 `math_instructions` 的元素赋给 `inst`。
+- **L270** `        if inst.opcode_class == OpcodeClass.TensorOp:` — **EN:** Starts a conditional branch guarded by `inst.opcode_class == OpcodeClass.TensorOp`. **CN:** 开始一个由 `inst.opcode_class == OpcodeClass.TensorOp` 控制的条件分支。
+- **L271** `            sparse_instructions.append(MathInstruction(` — **EN:** Invokes `sparse_instructions.append` as a standalone call. **CN:** 以独立语句方式调用 `sparse_instructions.append`。
+- **L272** `                (inst.instruction_shape[0], inst.instruction_shape[1], inst.instruction_shape[2] * 2),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L273** `                inst.element_a, inst.element_b, inst.element_accumulator,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L274** `                OpcodeClass.SparseTensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L275** `                inst.math_operation),)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L276** `    return sparse_instructions` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L277** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L278** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L279** `#### Step 2: generate tile descriptions from math instruction shapes` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L280** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L281** `def is_tile_desc_valid(tile_description):` — **EN:** Defines function `is_tile_desc_valid`. **CN:** 定义函数 `is_tile_desc_valid`。
+- **L282** `    if tile_description.minimum_compute_capability != 90 or tile_description.maximum_compute_capability != 90:` — **EN:** Starts a conditional branch guarded by `tile_description.minimum_compute_capability != 90 or tile...`. **CN:** 开始一个由 `tile_description.minimum_compute_capability != 90 or tile...` 控制的条件分支。
+- **L283** `        return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L284** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L285** `    element_a, element_b, element_accum = (` — **EN:** Assigns a value to (element_a, element_b, element_accum). **CN:** 将一个值赋给 (element_a, element_b, element_accum)。
+- **L286** `        tile_description.math_instruction.element_a,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L287** `        tile_description.math_instruction.element_b,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L288** `        tile_description.math_instruction.element_accumulator` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L289** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L290** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L291** `    cluster_size, cta_shape = (` — **EN:** Assigns a value to (cluster_size, cta_shape). **CN:** 将一个值赋给 (cluster_size, cta_shape)。
+- **L292** `        tile_description.cluster_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L293** `        tile_description.threadblock_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L294** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L295** `    grid_size = (` — **EN:** Assigns a value to grid_size. **CN:** 将一个值赋给 grid_size。
+- **L296** `        cta_shape[0] * cluster_size[0] +` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L297** `        cta_shape[1] * cluster_size[1] +` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L298** `        cta_shape[2] * cluster_size[2]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L299** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L300** `    num_ctas_in_cluster = cluster_size[0] * cluster_size[1] * cluster_size[2]` — **EN:** Assigns a value to num_ctas_in_cluster. **CN:** 将一个值赋给 num_ctas_in_cluster。
+- **L301** `    cluster_shape = (` — **EN:** Assigns a value to cluster_shape. **CN:** 将一个值赋给 cluster_shape。
+- **L302** `        cluster_size[0] * cta_shape[0],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L303** `        cluster_size[1] * cta_shape[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L304** `        cluster_size[2] * cta_shape[2]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L305** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L306** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L307** `    FP32_TYPES = [DataType.f32, DataType.tf32]` — **EN:** Assigns a value to FP32_TYPES. **CN:** 将一个值赋给 FP32_TYPES。
+- **L308** `    FP16_TYPES = [DataType.f16, DataType.bf16]` — **EN:** Assigns a value to FP16_TYPES. **CN:** 将一个值赋给 FP16_TYPES。
+- **L309** `    is_fp32 = element_a in FP32_TYPES and element_b in FP32_TYPES` — **EN:** Assigns a value to is_fp32. **CN:** 将一个值赋给 is_fp32。
+- **L310** `    is_fp16 = element_a in FP16_TYPES and element_b in FP16_TYPES` — **EN:** Assigns a value to is_fp16. **CN:** 将一个值赋给 is_fp16。
+- **L311** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L312** `    # Maximum number of CTAs per cluster is 8 for Hopper, but up to 16 is` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L313** `    # allowed for non portable clusters.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L314** `    if num_ctas_in_cluster > 16 or num_ctas_in_cluster < 1:` — **EN:** Starts a conditional branch guarded by `num_ctas_in_cluster > 16 or num_ctas_in_cluster < 1`. **CN:** 开始一个由 `num_ctas_in_cluster > 16 or num_ctas_in_cluster < 1` 控制的条件分支。
+- **L315** `        return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L316** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L317** `    if grid_size < 1:` — **EN:** Starts a conditional branch guarded by `grid_size < 1`. **CN:** 开始一个由 `grid_size < 1` 控制的条件分支。
+- **L318** `        return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L319** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L320** `    # SM90 WGMMA shapes are always 64 across M, therefore` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L321** `    # CTA shape across M must always be a multiple of 64.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L322** `    if cta_shape[0] < 64 or cta_shape[0] % 64 != 0:` — **EN:** Starts a conditional branch guarded by `cta_shape[0] < 64 or cta_shape[0] % 64 != 0`. **CN:** 开始一个由 `cta_shape[0] < 64 or cta_shape[0] % 64 != 0` 控制的条件分支。
+- **L323** `        return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L324** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L325** `    # The minimum WGMMA shape across N is 8, and increments` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L326** `    # vary across different dtypes, but they're never smaller` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L327** `    # than 8. The minimum CTA shape allowed across N though is 16.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L328** `    if cta_shape[1] < 16 or cta_shape[1] % 8 != 0:` — **EN:** Starts a conditional branch guarded by `cta_shape[1] < 16 or cta_shape[1] % 8 != 0`. **CN:** 开始一个由 `cta_shape[1] < 16 or cta_shape[1] % 8 != 0` 控制的条件分支。
+- **L329** `        return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L330** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L331** `    # SM90 WGMMA shapes across K are always 8 for 32 bit dense` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L332** `    # operations, 16 for 16 bit, and 32 for 8 bit. In any case,` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L333** `    # the CTA shape across K should be a multiple of 8 and at least` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L334** `    # twice the WGMMA shape across K.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L335** `    if cta_shape[2] < 16 or cta_shape[2] % 8 != 0:` — **EN:** Starts a conditional branch guarded by `cta_shape[2] < 16 or cta_shape[2] % 8 != 0`. **CN:** 开始一个由 `cta_shape[2] < 16 or cta_shape[2] % 8 != 0` 控制的条件分支。
+- **L336** `        return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L337** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L338** `    # Minimum of 2 stages (very rough heuristic that may filter out valid kernel configs)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L339** `    if (cluster_shape[0] >= 128 or cluster_shape[1] >= 128) and cluster_shape[2] >= 256:` — **EN:** Starts a conditional branch guarded by `(cluster_shape[0] >= 128 or cluster_shape[1] >= 128) and ...`. **CN:** 开始一个由 `(cluster_shape[0] >= 128 or cluster_shape[1] >= 128) and ...` 控制的条件分支。
+- **L340** `        return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L341** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L342** `    if is_fp32 and (cluster_shape[0] >= 128 or cluster_shape[1] >= 128) and cluster_shape[2] >= 128:` — **EN:** Starts a conditional branch guarded by `is_fp32 and (cluster_shape[0] >= 128 or cluster_shape[1] ...`. **CN:** 开始一个由 `is_fp32 and (cluster_shape[0] >= 128 or cluster_shape[1] ...` 控制的条件分支。
+- **L343** `        return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L344** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L345** `    if is_fp32 and cluster_shape[0] >= 256 and cluster_shape[1] >= 256 and cluster_shape[2] >= 64:` — **EN:** Starts a conditional branch guarded by `is_fp32 and cluster_shape[0] >= 256 and (cluster_shape[1]...`. **CN:** 开始一个由 `is_fp32 and cluster_shape[0] >= 256 and (cluster_shape[1]...` 控制的条件分支。
+- **L346** `        return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L347** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L348** `    if is_fp16 and cluster_shape[0] >= 256 and cluster_shape[1] >= 256 and cluster_shape[2] >= 128:` — **EN:** Starts a conditional branch guarded by `is_fp16 and cluster_shape[0] >= 256 and (cluster_shape[1]...`. **CN:** 开始一个由 `is_fp16 and cluster_shape[0] >= 256 and (cluster_shape[1]...` 控制的条件分支。
+- **L349** `        return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L350** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L351** `    # CTA shape upper bound: <256, 256, 256>` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L352** `    if cta_shape[0] > 256 or cta_shape[1] > 256 or cta_shape[2] > 256:` — **EN:** Starts a conditional branch guarded by `cta_shape[0] > 256 or cta_shape[1] > 256 or cta_shape[2] ...`. **CN:** 开始一个由 `cta_shape[0] > 256 or cta_shape[1] > 256 or cta_shape[2] ...` 控制的条件分支。
+- **L353** `        return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L354** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L355** `    return True` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L356** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L357** `def get_mma_multipliers(level: int):` — **EN:** Defines function `get_mma_multipliers`. **CN:** 定义函数 `get_mma_multipliers`。
+- **L358** `    assert isinstance(level, int) and level >= 0` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L359** `    mma_level = get_mma_level_from_global_level(level)` — **EN:** Assigns a value to mma_level. **CN:** 将一个值赋给 mma_level。
+- **L360** `    return [` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L361** `        mma_mul for mma_mul, mma_min_level in SM90_MMA_MULTIPLIERS.items() if mma_level >= mma_min_level` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L362** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L363** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L364** `def get_cluster_sizes(level: int, is_aligned: bool):` — **EN:** Defines function `get_cluster_sizes`. **CN:** 定义函数 `get_cluster_sizes`。
+- **L365** `    if not is_aligned:` — **EN:** Starts a conditional branch guarded by `not is_aligned`. **CN:** 开始一个由 `not is_aligned` 控制的条件分支。
+- **L366** `        return [(1, 1, 1)]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L367** `    assert isinstance(level, int) and level >= 0` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L368** `    cluster_level = get_cluster_level_from_global_level(level)` — **EN:** Assigns a value to cluster_level. **CN:** 将一个值赋给 cluster_level。
+- **L369** `    return [` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L370** `        cluster_size for cluster_size, cluster_min_level in SM90_CLUSTER_SIZES.items() if cluster_level >= cluster_min_level` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L371** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L372** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L373** `def generate_tile_descriptions_sm90(math_instructions, is_aligned: bool, level: int):` — **EN:** Defines function `generate_tile_descriptions_sm90`. **CN:** 定义函数 `generate_tile_descriptions_sm90`。
+- **L374** `    tile_descriptions = set()` — **EN:** Assigns a value to tile_descriptions. **CN:** 将一个值赋给 tile_descriptions。
+- **L375** `    mma_multipliers, cluster_sizes = get_mma_multipliers(level), get_cluster_sizes(level, is_aligned)` — **EN:** Assigns a value to (mma_multipliers, cluster_sizes). **CN:** 将一个值赋给 (mma_multipliers, cluster_sizes)。
+- **L376** `    for math_inst, mma_mul, cluster_size in product(math_instructions, mma_multipliers, cluster_sizes):` — **EN:** Starts a loop assigning items from `product(math_instructions, mma_multipliers, clu...` to `(math_inst, mma_mul, cluster_size)`. **CN:** 开始一个循环，将 `product(math_instructions, mma_multipliers, clu...` 的元素赋给 `(math_inst, mma_mul, cluster_size)`。
+- **L377** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L378** `        # generator can stamp out duplicate kernels, because it doesn't explicitly set instruction` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L379** `        # shape for SM90 kernels, and the 3.X collective API doesn't directly expose them when using` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L380** `        # the auto kernel schedule.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L381** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L382** `        math_inst_stub = copy.deepcopy(math_inst)` — **EN:** Assigns a value to math_inst_stub. **CN:** 将一个值赋给 math_inst_stub。
+- **L383** `        math_inst_stub.instruction_shape = [0, 0, 0]` — **EN:** Assigns a value to math_inst_stub.instruction_shape. **CN:** 将一个值赋给 math_inst_stub.instruction_shape。
+- **L384** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L385** `        tile_desc = TileDescription(` — **EN:** Assigns a value to tile_desc. **CN:** 将一个值赋给 tile_desc。
+- **L386** `            threadblock_shape=[` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L387** `                math_inst.instruction_shape[0] * mma_mul[0],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L388** `                math_inst.instruction_shape[1] * mma_mul[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L389** `                math_inst.instruction_shape[2] * mma_mul[2]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L390** `            ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L391** `            stages=0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L392** `            warp_count=[4, 1, 1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L393** `            math_instruction=math_inst_stub,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L394** `            min_compute=90,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L395** `            max_compute=90,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L396** `            cluster_shape=cluster_size)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L397** `        # For sparse kernels K-tile is twice as large (due to 2x MMA-K size)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L398** `        # Reduce it to same size as dense to afford more smem stages` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L399** `        if math_inst.opcode_class == OpcodeClass.SparseTensorOp:` — **EN:** Starts a conditional branch guarded by `math_inst.opcode_class == OpcodeClass.SparseTensorOp`. **CN:** 开始一个由 `math_inst.opcode_class == OpcodeClass.SparseTensorOp` 控制的条件分支。
+- **L400** `            tile_desc.threadblock_shape[2] = tile_desc.threadblock_shape[2] // 2` — **EN:** Assigns a value to tile_desc.threadblock_shape[2]. **CN:** 将一个值赋给 tile_desc.threadblock_shape[2]。
+- **L401** `        if is_tile_desc_valid(tile_desc):` — **EN:** Starts a conditional branch guarded by `is_tile_desc_valid(tile_desc)`. **CN:** 开始一个由 `is_tile_desc_valid(tile_desc)` 控制的条件分支。
+- **L402** `            tile_descriptions.add(tile_desc)` — **EN:** Invokes `tile_descriptions.add` as a standalone call. **CN:** 以独立语句方式调用 `tile_descriptions.add`。
+- **L403** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L404** `    return tile_descriptions` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L405** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L406** `#### Step 3: map tile description to valid schedules` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L407** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L408** `def is_tile_desc_compatible_with_cooperative(tile_description):` — **EN:** Defines function `is_tile_desc_compatible_with_cooperative`. **CN:** 定义函数 `is_tile_desc_compatible_with_cooperative`。
+- **L409** `    # Cooperative kernels require a minimum CTA-M of 128` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L410** `    return tile_description.threadblock_shape[0] % 128 == 0` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L411** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L412** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L413** `def can_tile_desc_use_shmem_in_epilogue(tile_description, data_types):` — **EN:** Defines function `can_tile_desc_use_shmem_in_epilogue`. **CN:** 定义函数 `can_tile_desc_use_shmem_in_epilogue`。
+- **L414** `    dtype_a, dtype_b, dtype_c, dtype_d, dtype_acc, dtype_epi = (` — **EN:** Assigns a value to (dtype_a, dtype_b, dtype_c, dtype_d, dtype_acc, dtype_epi). **CN:** 将一个值赋给 (dtype_a, dtype_b, dtype_c, dtype_d, dtype_acc, dtype_epi)。
+- **L415** `        data_types["a_type"],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L416** `        data_types["b_type"],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L417** `        data_types["c_type"],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L418** `        data_types["d_type"],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L419** `        data_types["acc_type"],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L420** `        data_types["epi_type"]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L421** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L422** `    mn = tile_description.threadblock_shape[0] * tile_description.threadblock_shape[1]` — **EN:** Assigns a value to mn. **CN:** 将一个值赋给 mn。
+- **L423** `    bitsize_c, bitsize_d = DataTypeSize[dtype_c], DataTypeSize[dtype_d]` — **EN:** Assigns a value to (bitsize_c, bitsize_d). **CN:** 将一个值赋给 (bitsize_c, bitsize_d)。
+- **L424** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L425** `    shmem_bits_c, shmem_bits_d = bitsize_c * mn, bitsize_d * mn` — **EN:** Assigns a value to (shmem_bits_c, shmem_bits_d). **CN:** 将一个值赋给 (shmem_bits_c, shmem_bits_d)。
+- **L426** `    shmem_bits_total = shmem_bits_c + shmem_bits_d` — **EN:** Assigns a value to shmem_bits_total. **CN:** 将一个值赋给 shmem_bits_total。
+- **L427** `    # Magic number: 2^20` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L428** `    # Existing logic suggested that tile shape 256x128 (or 128x256)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L429** `    # would run out of shmem if D is FP32, and source is needed.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L430** `    # That would be 256 * 128 * 32 == 2^21 (~262 KB), which is over the limit.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L431** `    # Hopper's max shmem size is 228 KB, and 2^20 ~= 131 KB.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L432** `    # Since epilogue can't possibly use ALL of the shmem available` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L433** `    # we can just settle on 2^20 bits (~ 131 KB) being the upper bound` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L434** `    # we would allow for epilogue.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L435** `    # This can be different for non-persistent kernels where epilogue and` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L436** `    # mainloop shmem is shared.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L437** `    if shmem_bits_total > 2 ** 20:` — **EN:** Starts a conditional branch guarded by `shmem_bits_total > 2 ** 20`. **CN:** 开始一个由 `shmem_bits_total > 2 ** 20` 控制的条件分支。
+- **L438** `        return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L439** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L440** `    return True` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L441** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L442** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L443** `def get_valid_schedules(tile_description, cuda_version, is_aligned, data_types, layout,` — **EN:** Defines function `get_valid_schedules`. **CN:** 定义函数 `get_valid_schedules`。
+- **L444** `                        instantiation_level, enable_fp8_fast_acc=True, gemm_kind=GemmKind.Universal3x):` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L445** `    # Level 0: prune according to existing generator.py behavior` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L446** `    # Level >= 1: no pruning` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L447** `    level = get_pruning_level_from_global_level(instantiation_level)` — **EN:** Assigns a value to level. **CN:** 将一个值赋给 level。
+- **L448** `    schedules = []` — **EN:** Assigns a value to schedules. **CN:** 将一个值赋给 schedules。
+- **L449** `    stream_k_schedules = []` — **EN:** Assigns a value to stream_k_schedules. **CN:** 将一个值赋给 stream_k_schedules。
+- **L450** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L451** `    if not is_tile_desc_valid(tile_description):` — **EN:** Starts a conditional branch guarded by `not is_tile_desc_valid(tile_description)`. **CN:** 开始一个由 `not is_tile_desc_valid(tile_description)` 控制的条件分支。
+- **L452** `        return schedules, stream_k_schedules` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L453** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L454** `    FP16_TYPES = [DataType.f16, DataType.bf16]` — **EN:** Assigns a value to FP16_TYPES. **CN:** 将一个值赋给 FP16_TYPES。
+- **L455** `    is_fp16 = data_types["a_type"] in FP16_TYPES and data_types["b_type"] in FP16_TYPES` — **EN:** Assigns a value to is_fp16. **CN:** 将一个值赋给 is_fp16。
+- **L456** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L457** `    FP8_TYPES = [DataType.e4m3, DataType.e5m2]` — **EN:** Assigns a value to FP8_TYPES. **CN:** 将一个值赋给 FP8_TYPES。
+- **L458** `    is_fp8 = data_types["a_type"] in FP8_TYPES and data_types["b_type"] in FP8_TYPES` — **EN:** Assigns a value to is_fp8. **CN:** 将一个值赋给 is_fp8。
+- **L459** `    can_do_fp8_fast_accum = is_fp8 and enable_fp8_fast_acc` — **EN:** Assigns a value to can_do_fp8_fast_accum. **CN:** 将一个值赋给 can_do_fp8_fast_accum。
+- **L460** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L461** `    FP32_TYPES = [DataType.f32, DataType.tf32]` — **EN:** Assigns a value to FP32_TYPES. **CN:** 将一个值赋给 FP32_TYPES。
+- **L462** `    is_fp32 = data_types["a_type"] in FP32_TYPES and data_types["b_type"] in FP32_TYPES` — **EN:** Assigns a value to is_fp32. **CN:** 将一个值赋给 is_fp32。
+- **L463** `    requires_transposed_epilogue = is_fp32 and layout[0][0] == LayoutType.RowMajor and layout[1][0] == LayoutType.RowMajor` — **EN:** Assigns a value to requires_transposed_epilogue. **CN:** 将一个值赋给 requires_transposed_epilogue。
+- **L464** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L465** `    can_do_cooperative = is_tile_desc_compatible_with_cooperative(tile_description)` — **EN:** Assigns a value to can_do_cooperative. **CN:** 将一个值赋给 can_do_cooperative。
+- **L466** `    can_do_tma_epilogue = is_aligned and not requires_transposed_epilogue and can_tile_desc_use_shmem_in_epilogue(tile_description, data_types)` — **EN:** Assigns a value to can_do_tma_epilogue. **CN:** 将一个值赋给 can_do_tma_epilogue。
+- **L467** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L468** `    default_epilogue = EpilogueScheduleType.NoSmemWarpSpecialized if not requires_transposed_epilogue else EpilogueScheduleType.EpilogueTransposed` — **EN:** Assigns a value to default_epilogue. **CN:** 将一个值赋给 default_epilogue。
+- **L469** `    auto_epilogue = EpilogueScheduleType.ScheduleAuto if not requires_transposed_epilogue else EpilogueScheduleType.EpilogueTransposed` — **EN:** Assigns a value to auto_epilogue. **CN:** 将一个值赋给 auto_epilogue。
+- **L470** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L471** `    cta_m, cta_n, cta_k = (` — **EN:** Assigns a value to (cta_m, cta_n, cta_k). **CN:** 将一个值赋给 (cta_m, cta_n, cta_k)。
+- **L472** `        tile_description.threadblock_shape[0],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L473** `        tile_description.threadblock_shape[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L474** `        tile_description.threadblock_shape[2]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L475** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L476** `    c_type = data_types["c_type"]` — **EN:** Assigns a value to c_type. **CN:** 将一个值赋给 c_type。
+- **L477** `    d_type = data_types["d_type"]` — **EN:** Assigns a value to d_type. **CN:** 将一个值赋给 d_type。
+- **L478** `    is_void_c = c_type == DataType.void` — **EN:** Assigns a value to is_void_c. **CN:** 将一个值赋给 is_void_c。
+- **L479** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L480** `    # Filter out invalid kernels` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L481** `    is_nt = layout[0][0] == LayoutType.ColumnMajor and layout[1][0] == LayoutType.RowMajor` — **EN:** Assigns a value to is_nt. **CN:** 将一个值赋给 is_nt。
+- **L482** `    is_tn = layout[0][0] == LayoutType.RowMajor and layout[1][0] == LayoutType.ColumnMajor` — **EN:** Assigns a value to is_tn. **CN:** 将一个值赋给 is_tn。
+- **L483** `    is_nn = layout[0][0] == LayoutType.ColumnMajor and layout[1][0] == LayoutType.ColumnMajor` — **EN:** Assigns a value to is_nn. **CN:** 将一个值赋给 is_nn。
+- **L484** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L485** `    # static_assert(size<0>(SmemLayoutB{}) % WarpgroupTileSize == 0,` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L486** `    #   "Copy size must evenly divide SMEM tile.");` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L487** `    if is_fp32 and is_nt and (cta_n % cta_k != 0):` — **EN:** Starts a conditional branch guarded by `is_fp32 and is_nt and (cta_n % cta_k != 0)`. **CN:** 开始一个由 `is_fp32 and is_nt and (cta_n % cta_k != 0)` 控制的条件分支。
+- **L488** `        return [], []` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L489** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L490** `    # static_assert(!TransposeB || (cutlass::bits_to_bytes((size<1>(SmemLayoutB{}) * sizeof_bits<InternalElementB>::value))) == 128,` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L491** `    # "SmemLayoutB K must be 128bytes to be transposed.")` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L492** `    if is_fp32 and is_nt and cta_k != 32:` — **EN:** Starts a conditional branch guarded by `is_fp32 and is_nt and (cta_k != 32)`. **CN:** 开始一个由 `is_fp32 and is_nt and (cta_k != 32)` 控制的条件分支。
+- **L493** `        return [], []` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L494** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L495** `    # Static assert failure when instantiating SmemLayoutB` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L496** `    if is_fp32 and (is_tn or is_nn) and (cta_n % cta_k != 0):` — **EN:** Starts a conditional branch guarded by `is_fp32 and (is_tn or is_nn) and (cta_n % cta_k != 0)`. **CN:** 开始一个由 `is_fp32 and (is_tn or is_nn) and (cta_n % cta_k != 0)` 控制的条件分支。
+- **L497** `        return [], []` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L498** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L499** `    grouped = is_grouped(gemm_kind)` — **EN:** Assigns a value to grouped. **CN:** 将一个值赋给 grouped。
+- **L500** `    if grouped:` — **EN:** Starts a conditional branch guarded by `grouped`. **CN:** 开始一个由 `grouped` 控制的条件分支。
+- **L501** `        # the following cases are unsupported by grouped GEMM` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L502** `        if not is_aligned:` — **EN:** Starts a conditional branch guarded by `not is_aligned`. **CN:** 开始一个由 `not is_aligned` 控制的条件分支。
+- **L503** `            return [], []` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L504** `        if requires_transposed_epilogue:` — **EN:** Starts a conditional branch guarded by `requires_transposed_epilogue`. **CN:** 开始一个由 `requires_transposed_epilogue` 控制的条件分支。
+- **L505** `            return [], []` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L506** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L507** `    # Early pruning` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L508** `    if level < 1:` — **EN:** Starts a conditional branch guarded by `level < 1`. **CN:** 开始一个由 `level < 1` 控制的条件分支。
+- **L509** `        # Don't stamp out FP16/BF16 kernels smaller than or equal to 64x128x64` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L510** `        if is_fp16 and cta_m <= 64 and cta_n <= 128 and cta_k <= 64:` — **EN:** Starts a conditional branch guarded by `is_fp16 and cta_m <= 64 and (cta_n <= 128) and (cta_k <= 64)`. **CN:** 开始一个由 `is_fp16 and cta_m <= 64 and (cta_n <= 128) and (cta_k <= 64)` 控制的条件分支。
+- **L511** `            return [], []` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L512** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L513** `        # FP8 configs with CTA tile larger than or equal to 256x128x128 limit data types and schedules` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L514** `        is_large_fp8_tile = is_fp8 and cta_m >= 256 and cta_n >= 128 and cta_k >= 128` — **EN:** Assigns a value to is_large_fp8_tile. **CN:** 将一个值赋给 is_large_fp8_tile。
+- **L515** `        if is_large_fp8_tile:` — **EN:** Starts a conditional branch guarded by `is_large_fp8_tile`. **CN:** 开始一个由 `is_large_fp8_tile` 控制的条件分支。
+- **L516** `            # Only void-C, and only FP8 outputs allowed` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L517** `            if not is_void_c or d_type not in FP8_TYPES:` — **EN:** Starts a conditional branch guarded by `not is_void_c or d_type not in FP8_TYPES`. **CN:** 开始一个由 `not is_void_c or d_type not in FP8_TYPES` 控制的条件分支。
+- **L518** `                return [], []` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L519** `            if CudaToolkitVersionSatisfies(cuda_version, 12, 1) and can_do_cooperative and can_do_tma_epilogue:` — **EN:** Starts a conditional branch guarded by `CudaToolkitVersionSatisfies(cuda_version, 12, 1) and can_...`. **CN:** 开始一个由 `CudaToolkitVersionSatisfies(cuda_version, 12, 1) and can_...` 控制的条件分支。
+- **L520** `                schedules = []` — **EN:** Assigns a value to schedules. **CN:** 将一个值赋给 schedules。
+- **L521** `                if is_blockwise(gemm_kind):` — **EN:** Starts a conditional branch guarded by `is_blockwise(gemm_kind)`. **CN:** 开始一个由 `is_blockwise(gemm_kind)` 控制的条件分支。
+- **L522** `                    schedules.append(` — **EN:** Invokes `schedules.append` as a standalone call. **CN:** 以独立语句方式调用 `schedules.append`。
+- **L523** `                        [` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L524** `                            to_grouped_schedule(KernelScheduleType.BlockwiseTmaWarpSpecializedCooperative, grouped),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L525** `                            to_grouped_schedule(EpilogueScheduleType.TmaWarpSpecializedCooperative, grouped)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L526** `                        ])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L527** `                else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L528** `                    schedules.append(` — **EN:** Invokes `schedules.append` as a standalone call. **CN:** 以独立语句方式调用 `schedules.append`。
+- **L529** `                        [` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L530** `                            to_grouped_schedule(KernelScheduleType.TmaWarpSpecializedCooperative, grouped),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L531** `                            to_grouped_schedule(EpilogueScheduleType.TmaWarpSpecializedCooperative, grouped)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L532** `                        ])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L533** `                    schedules.append(` — **EN:** Invokes `schedules.append` as a standalone call. **CN:** 以独立语句方式调用 `schedules.append`。
+- **L534** `                        [` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L535** `                            to_grouped_schedule(KernelScheduleType.TmaWarpSpecializedCooperativeFP8FastAccum, grouped),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L536** `                            to_grouped_schedule(EpilogueScheduleType.TmaWarpSpecializedCooperative, grouped)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L537** `                        ])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L538** `                return schedules, []` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L539** `            return [], []` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L540** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L541** `        if is_fp8 and not is_large_fp8_tile:` — **EN:** Starts a conditional branch guarded by `is_fp8 and (not is_large_fp8_tile)`. **CN:** 开始一个由 `is_fp8 and (not is_large_fp8_tile)` 控制的条件分支。
+- **L542** `            valid_dtypes_for_c = [DataType.f32, DataType.bf16, DataType.f16, DataType.void]` — **EN:** Assigns a value to valid_dtypes_for_c. **CN:** 将一个值赋给 valid_dtypes_for_c。
+- **L543** `            # Prune all configs with fp8 source, and all configs with non-fp8 output` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L544** `            # that have different dtypes for source and output.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L545** `            if c_type not in valid_dtypes_for_c or (d_type not in FP8_TYPES and c_type != d_type):` — **EN:** Starts a conditional branch guarded by `c_type not in valid_dtypes_for_c or (d_type not in FP8_TY...`. **CN:** 开始一个由 `c_type not in valid_dtypes_for_c or (d_type not in FP8_TY...` 控制的条件分支。
+- **L546** `                return [], []` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L547** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L548** `        # FP32/TF32 kernels don't stamp out void-C` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L549** `        if is_fp32 and is_void_c:` — **EN:** Starts a conditional branch guarded by `is_fp32 and is_void_c`. **CN:** 开始一个由 `is_fp32 and is_void_c` 控制的条件分支。
+- **L550** `            return [], []` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L551** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L552** `    # Void-c only makes a difference for TMA epilogues` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L553** `    if is_void_c and not can_do_tma_epilogue:` — **EN:** Starts a conditional branch guarded by `is_void_c and (not can_do_tma_epilogue)`. **CN:** 开始一个由 `is_void_c and (not can_do_tma_epilogue)` 控制的条件分支。
+- **L554** `        return [], []` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L555** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L556** `    # For mixed input data types` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L557** `    a_type_size = DataTypeSize[data_types["a_type"]]` — **EN:** Assigns a value to a_type_size. **CN:** 将一个值赋给 a_type_size。
+- **L558** `    b_type_size = DataTypeSize[data_types["b_type"]]` — **EN:** Assigns a value to b_type_size. **CN:** 将一个值赋给 b_type_size。
+- **L559** `    if a_type_size != b_type_size and CudaToolkitVersionSatisfies(cuda_version, 12, 1):` — **EN:** Starts a conditional branch guarded by `a_type_size != b_type_size and CudaToolkitVersionSatisfie...`. **CN:** 开始一个由 `a_type_size != b_type_size and CudaToolkitVersionSatisfie...` 控制的条件分支。
+- **L560** `        schedules = []` — **EN:** Assigns a value to schedules. **CN:** 将一个值赋给 schedules。
+- **L561** `        stream_k_schedules = []` — **EN:** Assigns a value to stream_k_schedules. **CN:** 将一个值赋给 stream_k_schedules。
+- **L562** `        epilogue_schedule = EpilogueScheduleType.TmaWarpSpecialized` — **EN:** Assigns a value to epilogue_schedule. **CN:** 将一个值赋给 epilogue_schedule。
+- **L563** `        if a_type_size > b_type_size:` — **EN:** Starts a conditional branch guarded by `a_type_size > b_type_size`. **CN:** 开始一个由 `a_type_size > b_type_size` 控制的条件分支。
+- **L564** `            epilogue_schedule = EpilogueScheduleType.EpilogueTransposed` — **EN:** Assigns a value to epilogue_schedule. **CN:** 将一个值赋给 epilogue_schedule。
+- **L565** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L566** `        if not is_blockwise(gemm_kind):` — **EN:** Starts a conditional branch guarded by `not is_blockwise(gemm_kind)`. **CN:** 开始一个由 `not is_blockwise(gemm_kind)` 控制的条件分支。
+- **L567** `            schedules.append([` — **EN:** Invokes `schedules.append` as a standalone call. **CN:** 以独立语句方式调用 `schedules.append`。
+- **L568** `                KernelScheduleType.TmaWarpSpecialized,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L569** `                epilogue_schedule` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L570** `            ])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L571** `            schedules.append([` — **EN:** Invokes `schedules.append` as a standalone call. **CN:** 以独立语句方式调用 `schedules.append`。
+- **L572** `                KernelScheduleType.TmaWarpSpecializedPingpong,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L573** `                epilogue_schedule` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L574** `            ])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L575** `        if cta_m >= 128:` — **EN:** Starts a conditional branch guarded by `cta_m >= 128`. **CN:** 开始一个由 `cta_m >= 128` 控制的条件分支。
+- **L576** `            if a_type_size > b_type_size:` — **EN:** Starts a conditional branch guarded by `a_type_size > b_type_size`. **CN:** 开始一个由 `a_type_size > b_type_size` 控制的条件分支。
+- **L577** `                epilogue_schedule = EpilogueScheduleType.EpilogueTransposed` — **EN:** Assigns a value to epilogue_schedule. **CN:** 将一个值赋给 epilogue_schedule。
+- **L578** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L579** `                epilogue_schedule = EpilogueScheduleType.TmaWarpSpecializedCooperative` — **EN:** Assigns a value to epilogue_schedule. **CN:** 将一个值赋给 epilogue_schedule。
+- **L580** `            if is_blockwise(gemm_kind):` — **EN:** Starts a conditional branch guarded by `is_blockwise(gemm_kind)`. **CN:** 开始一个由 `is_blockwise(gemm_kind)` 控制的条件分支。
+- **L581** `                schedules.append([` — **EN:** Invokes `schedules.append` as a standalone call. **CN:** 以独立语句方式调用 `schedules.append`。
+- **L582** `                    KernelScheduleType.BlockwiseTmaWarpSpecializedCooperative,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L583** `                    epilogue_schedule` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L584** `                ])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L585** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L586** `                schedules.append([` — **EN:** Invokes `schedules.append` as a standalone call. **CN:** 以独立语句方式调用 `schedules.append`。
+- **L587** `                    KernelScheduleType.TmaWarpSpecializedCooperative,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L588** `                    epilogue_schedule` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L589** `                ])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L590** `                stream_k_schedules.append([` — **EN:** Invokes `stream_k_schedules.append` as a standalone call. **CN:** 以独立语句方式调用 `stream_k_schedules.append`。
+- **L591** `                    KernelScheduleType.TmaWarpSpecializedCooperative,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L592** `                    epilogue_schedule` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L593** `                ])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L594** `        return schedules, stream_k_schedules` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L595** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L596** `    if not is_aligned and not is_blockwise(gemm_kind):` — **EN:** Starts a conditional branch guarded by `not is_aligned and (not is_blockwise(gemm_kind))`. **CN:** 开始一个由 `not is_aligned and (not is_blockwise(gemm_kind))` 控制的条件分支。
+- **L597** `        schedules = [[KernelScheduleType.CpAsyncWarpSpecialized,` — **EN:** Assigns a value to schedules. **CN:** 将一个值赋给 schedules。
+- **L598** `                    default_epilogue]]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L599** `        stream_k_schedules = []` — **EN:** Assigns a value to stream_k_schedules. **CN:** 将一个值赋给 stream_k_schedules。
+- **L600** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L601** `        if CudaToolkitVersionSatisfies(cuda_version, 12, 1) and can_do_cooperative:` — **EN:** Starts a conditional branch guarded by `CudaToolkitVersionSatisfies(cuda_version, 12, 1) and can_...`. **CN:** 开始一个由 `CudaToolkitVersionSatisfies(cuda_version, 12, 1) and can_...` 控制的条件分支。
+- **L602** `            schedules.append([` — **EN:** Invokes `schedules.append` as a standalone call. **CN:** 以独立语句方式调用 `schedules.append`。
+- **L603** `                KernelScheduleType.CpAsyncWarpSpecializedCooperative,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L604** `                default_epilogue` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L605** `            ])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L606** `            stream_k_schedules.append([` — **EN:** Invokes `stream_k_schedules.append` as a standalone call. **CN:** 以独立语句方式调用 `stream_k_schedules.append`。
+- **L607** `                KernelScheduleType.CpAsyncWarpSpecializedCooperative,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L608** `                default_epilogue` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L609** `            ])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L610** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L611** `        return schedules, stream_k_schedules` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L612** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L613** `    schedules = []` — **EN:** Assigns a value to schedules. **CN:** 将一个值赋给 schedules。
+- **L614** `    # Pruning: emit Void-C and Grouped kernels with persistent kernels only` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L615** `    if (level >= 1 or not is_void_c) and not grouped and not is_blockwise(gemm_kind):` — **EN:** Starts a conditional branch guarded by `(level >= 1 or not is_void_c) and (not grouped) and (not ...`. **CN:** 开始一个由 `(level >= 1 or not is_void_c) and (not grouped) and (not ...` 控制的条件分支。
+- **L616** `        # Pruning: don't stamp out fp8 kernels with auto schedule` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L617** `        if not is_fp8:` — **EN:** Starts a conditional branch guarded by `not is_fp8`. **CN:** 开始一个由 `not is_fp8` 控制的条件分支。
+- **L618** `            schedules.append([KernelScheduleType.ScheduleAuto, auto_epilogue])` — **EN:** Invokes `schedules.append` as a standalone call. **CN:** 以独立语句方式调用 `schedules.append`。
+- **L619** `        schedules.append([KernelScheduleType.TmaWarpSpecialized, default_epilogue])` — **EN:** Invokes `schedules.append` as a standalone call. **CN:** 以独立语句方式调用 `schedules.append`。
+- **L620** `    stream_k_schedules = []` — **EN:** Assigns a value to stream_k_schedules. **CN:** 将一个值赋给 stream_k_schedules。
+- **L621** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L622** `    if CudaToolkitVersionSatisfies(cuda_version, 12, 0):` — **EN:** Starts a conditional branch guarded by `CudaToolkitVersionSatisfies(cuda_version, 12, 0)`. **CN:** 开始一个由 `CudaToolkitVersionSatisfies(cuda_version, 12, 0)` 控制的条件分支。
+- **L623** `        if can_do_tma_epilogue:` — **EN:** Starts a conditional branch guarded by `can_do_tma_epilogue`. **CN:** 开始一个由 `can_do_tma_epilogue` 控制的条件分支。
+- **L624** `            assert not requires_transposed_epilogue` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L625** `            # Inconsistency: fp8 pingpong only gets stamped out with fast accum` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L626** `            if (not is_fp8 or level >= 1) and not is_blockwise(gemm_kind):` — **EN:** Starts a conditional branch guarded by `(not is_fp8 or level >= 1) and (not is_blockwise(gemm_kind))`. **CN:** 开始一个由 `(not is_fp8 or level >= 1) and (not is_blockwise(gemm_kind))` 控制的条件分支。
+- **L627** `                schedules.append([` — **EN:** Invokes `schedules.append` as a standalone call. **CN:** 以独立语句方式调用 `schedules.append`。
+- **L628** `                    to_grouped_schedule(KernelScheduleType.TmaWarpSpecializedPingpong, grouped),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L629** `                    to_grouped_schedule(EpilogueScheduleType.TmaWarpSpecialized, grouped)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L630** `                ])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L631** `            if can_do_fp8_fast_accum:` — **EN:** Starts a conditional branch guarded by `can_do_fp8_fast_accum`. **CN:** 开始一个由 `can_do_fp8_fast_accum` 控制的条件分支。
+- **L632** `                schedules.append([` — **EN:** Invokes `schedules.append` as a standalone call. **CN:** 以独立语句方式调用 `schedules.append`。
+- **L633** `                    to_grouped_schedule(KernelScheduleType.TmaWarpSpecializedPingpongFP8FastAccum, grouped),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L634** `                    to_grouped_schedule(EpilogueScheduleType.TmaWarpSpecialized, grouped)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L635** `                ])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L636** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L637** `    if CudaToolkitVersionSatisfies(cuda_version, 12, 1):` — **EN:** Starts a conditional branch guarded by `CudaToolkitVersionSatisfies(cuda_version, 12, 1)`. **CN:** 开始一个由 `CudaToolkitVersionSatisfies(cuda_version, 12, 1)` 控制的条件分支。
+- **L638** `        # Pruning: don't stamp out fp8 ping-pong kernel with non-tma epilogue` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L639** `        if not is_fp8 or level >= 1:` — **EN:** Starts a conditional branch guarded by `not is_fp8 or level >= 1`. **CN:** 开始一个由 `not is_fp8 or level >= 1` 控制的条件分支。
+- **L640** `            if not is_blockwise(gemm_kind):` — **EN:** Starts a conditional branch guarded by `not is_blockwise(gemm_kind)`. **CN:** 开始一个由 `not is_blockwise(gemm_kind)` 控制的条件分支。
+- **L641** `                schedules.append([to_grouped_schedule(KernelScheduleType.TmaWarpSpecializedPingpong, grouped), to_grouped_schedule(default_epilogue, grouped)])` — **EN:** Invokes `schedules.append` as a standalone call. **CN:** 以独立语句方式调用 `schedules.append`。
+- **L642** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L643** `                schedules.append([to_grouped_schedule(KernelScheduleType.BlockwiseTmaWarpSpecializedPingpong, grouped), to_grouped_schedule(default_epilogue, grouped)])` — **EN:** Invokes `schedules.append` as a standalone call. **CN:** 以独立语句方式调用 `schedules.append`。
+- **L644** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L645** `        if can_do_fp8_fast_accum:` — **EN:** Starts a conditional branch guarded by `can_do_fp8_fast_accum`. **CN:** 开始一个由 `can_do_fp8_fast_accum` 控制的条件分支。
+- **L646** `            if not grouped:` — **EN:** Starts a conditional branch guarded by `not grouped`. **CN:** 开始一个由 `not grouped` 控制的条件分支。
+- **L647** `                schedules.append([KernelScheduleType.TmaWarpSpecializedFP8FastAccum, default_epilogue])` — **EN:** Invokes `schedules.append` as a standalone call. **CN:** 以独立语句方式调用 `schedules.append`。
+- **L648** `            schedules.append([to_grouped_schedule(KernelScheduleType.TmaWarpSpecializedPingpongFP8FastAccum, grouped), to_grouped_schedule(default_epilogue, grouped)])` — **EN:** Invokes `schedules.append` as a standalone call. **CN:** 以独立语句方式调用 `schedules.append`。
+- **L649** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L650** `        if can_do_cooperative:` — **EN:** Starts a conditional branch guarded by `can_do_cooperative`. **CN:** 开始一个由 `can_do_cooperative` 控制的条件分支。
+- **L651** `            if is_blockwise(gemm_kind):` — **EN:** Starts a conditional branch guarded by `is_blockwise(gemm_kind)`. **CN:** 开始一个由 `is_blockwise(gemm_kind)` 控制的条件分支。
+- **L652** `                schedules.append([` — **EN:** Invokes `schedules.append` as a standalone call. **CN:** 以独立语句方式调用 `schedules.append`。
+- **L653** `                    to_grouped_schedule(KernelScheduleType.BlockwiseTmaWarpSpecializedCooperative, grouped),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L654** `                    to_grouped_schedule(default_epilogue, grouped)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L655** `                ])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L656** `                stream_k_schedules.append([` — **EN:** Invokes `stream_k_schedules.append` as a standalone call. **CN:** 以独立语句方式调用 `stream_k_schedules.append`。
+- **L657** `                    KernelScheduleType.BlockwiseTmaWarpSpecializedCooperative,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L658** `                    default_epilogue` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L659** `                ])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L660** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L661** `                schedules.append([` — **EN:** Invokes `schedules.append` as a standalone call. **CN:** 以独立语句方式调用 `schedules.append`。
+- **L662** `                    to_grouped_schedule(KernelScheduleType.TmaWarpSpecializedCooperative, grouped),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L663** `                    to_grouped_schedule(default_epilogue, grouped)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L664** `                ])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L665** `                stream_k_schedules.append([` — **EN:** Invokes `stream_k_schedules.append` as a standalone call. **CN:** 以独立语句方式调用 `stream_k_schedules.append`。
+- **L666** `                    KernelScheduleType.TmaWarpSpecializedCooperative,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L667** `                    default_epilogue` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L668** `                ])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L669** `            if can_do_fp8_fast_accum:` — **EN:** Starts a conditional branch guarded by `can_do_fp8_fast_accum`. **CN:** 开始一个由 `can_do_fp8_fast_accum` 控制的条件分支。
+- **L670** `                schedules.append([` — **EN:** Invokes `schedules.append` as a standalone call. **CN:** 以独立语句方式调用 `schedules.append`。
+- **L671** `                    to_grouped_schedule(KernelScheduleType.TmaWarpSpecializedCooperativeFP8FastAccum, grouped),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L672** `                    to_grouped_schedule(default_epilogue, grouped)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L673** `                ])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L674** `                stream_k_schedules.append([` — **EN:** Invokes `stream_k_schedules.append` as a standalone call. **CN:** 以独立语句方式调用 `stream_k_schedules.append`。
+- **L675** `                    KernelScheduleType.TmaWarpSpecializedCooperativeFP8FastAccum,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L676** `                    default_epilogue` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L677** `                ])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L678** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L679** `        # persistent kernels with TMA epilogues` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L680** `        if can_do_tma_epilogue:` — **EN:** Starts a conditional branch guarded by `can_do_tma_epilogue`. **CN:** 开始一个由 `can_do_tma_epilogue` 控制的条件分支。
+- **L681** `            assert not requires_transposed_epilogue` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L682** `            if can_do_cooperative:` — **EN:** Starts a conditional branch guarded by `can_do_cooperative`. **CN:** 开始一个由 `can_do_cooperative` 控制的条件分支。
+- **L683** `                if is_blockwise(gemm_kind):` — **EN:** Starts a conditional branch guarded by `is_blockwise(gemm_kind)`. **CN:** 开始一个由 `is_blockwise(gemm_kind)` 控制的条件分支。
+- **L684** `                    schedules.append([` — **EN:** Invokes `schedules.append` as a standalone call. **CN:** 以独立语句方式调用 `schedules.append`。
+- **L685** `                        to_grouped_schedule(KernelScheduleType.BlockwiseTmaWarpSpecializedCooperative, grouped),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L686** `                        to_grouped_schedule(EpilogueScheduleType.TmaWarpSpecializedCooperative, grouped)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L687** `                    ])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L688** `                    stream_k_schedules.append([` — **EN:** Invokes `stream_k_schedules.append` as a standalone call. **CN:** 以独立语句方式调用 `stream_k_schedules.append`。
+- **L689** `                        KernelScheduleType.BlockwiseTmaWarpSpecializedCooperative,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L690** `                        EpilogueScheduleType.TmaWarpSpecializedCooperative` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L691** `                    ])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L692** `                else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L693** `                    schedules.append([` — **EN:** Invokes `schedules.append` as a standalone call. **CN:** 以独立语句方式调用 `schedules.append`。
+- **L694** `                        to_grouped_schedule(KernelScheduleType.TmaWarpSpecializedCooperative, grouped),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L695** `                        to_grouped_schedule(EpilogueScheduleType.TmaWarpSpecializedCooperative, grouped)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L696** `                    ])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L697** `                    stream_k_schedules.append([` — **EN:** Invokes `stream_k_schedules.append` as a standalone call. **CN:** 以独立语句方式调用 `stream_k_schedules.append`。
+- **L698** `                        KernelScheduleType.TmaWarpSpecializedCooperative,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L699** `                        EpilogueScheduleType.TmaWarpSpecializedCooperative` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L700** `                    ])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L701** `                if can_do_fp8_fast_accum:` — **EN:** Starts a conditional branch guarded by `can_do_fp8_fast_accum`. **CN:** 开始一个由 `can_do_fp8_fast_accum` 控制的条件分支。
+- **L702** `                    schedules.append([` — **EN:** Invokes `schedules.append` as a standalone call. **CN:** 以独立语句方式调用 `schedules.append`。
+- **L703** `                        to_grouped_schedule(KernelScheduleType.TmaWarpSpecializedCooperativeFP8FastAccum, grouped),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L704** `                        to_grouped_schedule(EpilogueScheduleType.TmaWarpSpecializedCooperative, grouped)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L705** `                    ])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L706** `                    stream_k_schedules.append([` — **EN:** Invokes `stream_k_schedules.append` as a standalone call. **CN:** 以独立语句方式调用 `stream_k_schedules.append`。
+- **L707** `                        KernelScheduleType.TmaWarpSpecializedCooperativeFP8FastAccum,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L708** `                        EpilogueScheduleType.TmaWarpSpecializedCooperative` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L709** `                    ])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L710** `    # Grouped GEMM do not support Stream-K scheduler` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L711** `    if grouped:` — **EN:** Starts a conditional branch guarded by `grouped`. **CN:** 开始一个由 `grouped` 控制的条件分支。
+- **L712** `        return schedules, []` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L713** `    return schedules, stream_k_schedules` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L714** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L715** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L716** `#### Misc: helpers` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L717** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L718** `def generate_data_types_from_math_instruction(math_instruction, element_source = None, element_dest = None, element_epilogue = None):` — **EN:** Defines function `generate_data_types_from_math_instruction`. **CN:** 定义函数 `generate_data_types_from_math_instruction`。
+- **L719** `    element_a, element_b = math_instruction.element_a, math_instruction.element_b` — **EN:** Assigns a value to (element_a, element_b). **CN:** 将一个值赋给 (element_a, element_b)。
+- **L720** `    element_accumulator = math_instruction.element_accumulator` — **EN:** Assigns a value to element_accumulator. **CN:** 将一个值赋给 element_accumulator。
+- **L721** `    element_c = element_source or element_accumulator` — **EN:** Assigns a value to element_c. **CN:** 将一个值赋给 element_c。
+- **L722** `    element_d = element_dest or element_accumulator` — **EN:** Assigns a value to element_d. **CN:** 将一个值赋给 element_d。
+- **L723** `    element_epilogue = element_epilogue or element_accumulator` — **EN:** Assigns a value to element_epilogue. **CN:** 将一个值赋给 element_epilogue。
+- **L724** `    data_types = {` — **EN:** Assigns a value to data_types. **CN:** 将一个值赋给 data_types。
+- **L725** `        "a_type"   : element_a,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L726** `        "b_type"   : element_b,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L727** `        "c_type"   : element_c,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L728** `        "d_type"   : element_d,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L729** `        "acc_type" : element_accumulator,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L730** `        "epi_type" : element_epilogue` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L731** `    }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L732** `    return data_types` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L733** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L734** `def fix_alignments(data_types, layout, alignment_bits = 128):` — **EN:** Defines function `fix_alignments`. **CN:** 定义函数 `fix_alignments`。
+- **L735** `    operand_keys = ["a_type", "b_type", "c_type"]` — **EN:** Assigns a value to operand_keys. **CN:** 将一个值赋给 operand_keys。
+- **L736** `    operands_to_fix = ["c_type"]` — **EN:** Assigns a value to operands_to_fix. **CN:** 将一个值赋给 operands_to_fix。
+- **L737** `    new_layout = []` — **EN:** Assigns a value to new_layout. **CN:** 将一个值赋给 new_layout。
+- **L738** `    assert len(layout) == len(operand_keys)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L739** `    for i, k in enumerate(operand_keys):` — **EN:** Starts a loop assigning items from `enumerate(operand_keys)` to `(i, k)`. **CN:** 开始一个循环，将 `enumerate(operand_keys)` 的元素赋给 `(i, k)`。
+- **L740** `        assert k in data_types and data_types[k] in DataTypeSize` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L741** `        dtype = data_types[k]` — **EN:** Assigns a value to dtype. **CN:** 将一个值赋给 dtype。
+- **L742** `        dtype_size_bits = DataTypeSize[dtype]` — **EN:** Assigns a value to dtype_size_bits. **CN:** 将一个值赋给 dtype_size_bits。
+- **L743** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L744** `        layout_type = layout[i][0]` — **EN:** Assigns a value to layout_type. **CN:** 将一个值赋给 layout_type。
+- **L745** `        layout_alignment = layout[i][1]` — **EN:** Assigns a value to layout_alignment. **CN:** 将一个值赋给 layout_alignment。
+- **L746** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L747** `        # Don't modify alignment if dtype's been changed to void` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L748** `        if k in operands_to_fix and dtype_size_bits >= 1:` — **EN:** Starts a conditional branch guarded by `k in operands_to_fix and dtype_size_bits >= 1`. **CN:** 开始一个由 `k in operands_to_fix and dtype_size_bits >= 1` 控制的条件分支。
+- **L749** `            layout_alignment = alignment_bits // dtype_size_bits` — **EN:** Assigns a value to layout_alignment. **CN:** 将一个值赋给 layout_alignment。
+- **L750** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L751** `        new_layout.append([layout_type, layout_alignment])` — **EN:** Invokes `new_layout.append` as a standalone call. **CN:** 以独立语句方式调用 `new_layout.append`。
+- **L752** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L753** `    return new_layout` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_library.sm90_utils`. CN: 模块名为 `cutlass_library.sm90_utils`。
+- EN: Module docstring summary: Utilities for enumerating CUTLASS library SM90 kernels CN: 模块文档摘要为：Utilities for enumerating CUTLASS library SM90 kernels
+- EN: Top-level functions: CudaToolkitVersionSatisfies, get_wgmma_level_from_global_level, get_mma_level_from_global_level, get_cluster_level_from_global_level, get_pruning_level_from_global_level, generate_tf32_math_instruction_shapes_sm90, generate_fp16_bf16_math_instruction_shapes_sm90, generate_fp8_math_instruction_shapes_sm90, generate_int8_math_instruction_shapes_sm90, generate_mixed_dtype_math_instructions_shapes_sm90, generate_tf32_math_instructions_sm90, generate_fp16_bf16_math_instructions_sm90, ... (+13 more) CN: 顶层函数包括：CudaToolkitVersionSatisfies, get_wgmma_level_from_global_level, get_mma_level_from_global_level, get_cluster_level_from_global_level, get_pruning_level_from_global_level, generate_tf32_math_instruction_shapes_sm90, generate_fp16_bf16_math_instruction_shapes_sm90, generate_fp8_math_instruction_shapes_sm90, generate_int8_math_instruction_shapes_sm90, generate_mixed_dtype_math_instructions_shapes_sm90, generate_tf32_math_instructions_sm90, generate_fp16_bf16_math_instructions_sm90, ... (+13 more)
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_library.library:*, .sm90_shapes:SM90_MMA_MULTIPLIERS,SM90_CLUSTER_SIZES,SM90_WGMMA_SHAPES_TF32_DENSE,SM90_WGMMA_SHAPES_FP16_BF16_DENSE,SM90_WGMMA_SHAPES_FP8_DENSE,SM90_WGMMA_SHAPES_INT8_DENSE CN: 内部依赖：cutlass_library.library:*, .sm90_shapes:SM90_MMA_MULTIPLIERS,SM90_CLUSTER_SIZES,SM90_WGMMA_SHAPES_TF32_DENSE,SM90_WGMMA_SHAPES_FP16_BF16_DENSE,SM90_WGMMA_SHAPES_FP8_DENSE,SM90_WGMMA_SHAPES_INT8_DENSE
+- EN: External or standard-library dependencies: argparse, enum, itertools:product, math, logging, os.path, shutil, sys, copy, typing:Any,Optional,Sequence,Tuple,List, builtins, library:*, sm90_shapes:SM90_MMA_MULTIPLIERS,SM90_CLUSTER_SIZES,SM90_WGMMA_SHAPES_TF32_DENSE,SM90_WGMMA_SHAPES_FP16_BF16_DENSE,SM90_WGMMA_SHAPES_FP8_DENSE,SM90_WGMMA_SHAPES_INT8_DENSE CN: 外部或标准库依赖：argparse, enum, itertools:product, math, logging, os.path, shutil, sys, copy, typing:Any,Optional,Sequence,Tuple,List, builtins, library:*, sm90_shapes:SM90_MMA_MULTIPLIERS,SM90_CLUSTER_SIZES,SM90_WGMMA_SHAPES_TF32_DENSE,SM90_WGMMA_SHAPES_FP16_BF16_DENSE,SM90_WGMMA_SHAPES_FP8_DENSE,SM90_WGMMA_SHAPES_INT8_DENSE

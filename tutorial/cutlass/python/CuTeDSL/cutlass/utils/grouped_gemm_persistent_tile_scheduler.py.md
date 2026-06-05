@@ -1,0 +1,1144 @@
+# grouped_gemm_persistent_tile_scheduler.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/utils/grouped_gemm_persistent_tile_scheduler.py`
+
+## Purpose / 作用
+- EN: Defines 5 classes (GroupSearchResult, GroupedGemmGroupSearchState, GroupedWorkTileInfo, StaticPersistentGroupTileScheduler, ... (+1 more)) and 1 functions (create_initial_search_state) in `CuTeDSL.cutlass.utils.grouped_gemm_persistent_tile_scheduler`.
+- CN: 该模块 `CuTeDSL.cutlass.utils.grouped_gemm_persistent_tile_scheduler` 定义了 5 个类（GroupSearchResult, GroupedGemmGroupSearchState, GroupedWorkTileInfo, StaticPersistentGroupTileScheduler, ... (+1 more)） 和 1 个函数（create_initial_search_state）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `from typing import List, Optional, Tuple, Union` — **EN:** Imports List, Optional, Tuple, Union from `typing`. **CN:** 从 `typing` 导入 List, Optional, Tuple, Union。
+- **L13** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L14** `import cutlass.cute as cute` — **EN:** Imports cutlass.cute as cute for later use. **CN:** 导入 cutlass.cute as cute 供后续使用。
+- **L15** `from cutlass.cutlass_dsl import (` — **EN:** Imports Boolean, Int32, Integer, extract_mlir_values, new_from_mlir_values, const_expr, ... (+1 more) from `cutlass.cutlass_dsl`. **CN:** 从 `cutlass.cutlass_dsl` 导入 Boolean, Int32, Integer, extract_mlir_values, new_from_mlir_values, const_expr, ... (+1 more)。
+- **L16** `    Boolean,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L17** `    Int32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L18** `    Integer,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L19** `    extract_mlir_values,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L20** `    new_from_mlir_values,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L21** `    const_expr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L22** `    dsl_user_op,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L23** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L24** `from cutlass._mlir import ir` — **EN:** Imports ir from `cutlass._mlir`. **CN:** 从 `cutlass._mlir` 导入 ir。
+- **L25** `from typing_extensions import deprecated` — **EN:** Imports deprecated from `typing_extensions`. **CN:** 从 `typing_extensions` 导入 deprecated。
+- **L26** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L27** `from cutlass.utils import (` — **EN:** Imports PersistentTileSchedulerParams, StaticPersistentTileScheduler, WorkTileInfo from `cutlass.utils`. **CN:** 从 `cutlass.utils` 导入 PersistentTileSchedulerParams, StaticPersistentTileScheduler, WorkTileInfo。
+- **L28** `    PersistentTileSchedulerParams,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L29** `    StaticPersistentTileScheduler,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L30** `    WorkTileInfo,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L31** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L34** `class GroupSearchResult:` — **EN:** Defines class `GroupSearchResult`. **CN:** 定义类 `GroupSearchResult`。
+- **L35** `    """` — **EN:** Starts the docstring for the class `GroupSearchResult`. **CN:** 开始说明 class `GroupSearchResult` 的文档字符串。
+- **L36** `    The result of the group search for grouped gemm.` — **EN:** Continues the docstring for the class `GroupSearchResult`. **CN:** 继续说明 class `GroupSearchResult` 的文档字符串。
+- **L37** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L38** `    :param group_idx: The result group index` — **EN:** Continues the docstring for the class `GroupSearchResult`. **CN:** 继续说明 class `GroupSearchResult` 的文档字符串。
+- **L39** `    :type group_idx: Int32` — **EN:** Continues the docstring for the class `GroupSearchResult`. **CN:** 继续说明 class `GroupSearchResult` 的文档字符串。
+- **L40** `    :param cta_tile_idx_m: CTA tile index along M dimension after rasterization` — **EN:** Continues the docstring for the class `GroupSearchResult`. **CN:** 继续说明 class `GroupSearchResult` 的文档字符串。
+- **L41** `    :type cta_tile_idx_m: Int32` — **EN:** Continues the docstring for the class `GroupSearchResult`. **CN:** 继续说明 class `GroupSearchResult` 的文档字符串。
+- **L42** `    :param cta_tile_idx_n: CTA tile index along N dimension after rasterization` — **EN:** Continues the docstring for the class `GroupSearchResult`. **CN:** 继续说明 class `GroupSearchResult` 的文档字符串。
+- **L43** `    :type cta_tile_idx_n: Int32` — **EN:** Continues the docstring for the class `GroupSearchResult`. **CN:** 继续说明 class `GroupSearchResult` 的文档字符串。
+- **L44** `    :param problem_shape_m: The M dimension of the gemm problem` — **EN:** Continues the docstring for the class `GroupSearchResult`. **CN:** 继续说明 class `GroupSearchResult` 的文档字符串。
+- **L45** `    :type problem_shape_m: Int32` — **EN:** Continues the docstring for the class `GroupSearchResult`. **CN:** 继续说明 class `GroupSearchResult` 的文档字符串。
+- **L46** `    :param problem_shape_n: The N dimension of the gemm problem` — **EN:** Continues the docstring for the class `GroupSearchResult`. **CN:** 继续说明 class `GroupSearchResult` 的文档字符串。
+- **L47** `    :type problem_shape_n: Int32` — **EN:** Continues the docstring for the class `GroupSearchResult`. **CN:** 继续说明 class `GroupSearchResult` 的文档字符串。
+- **L48** `    :param problem_shape_k: The K dimension of the gemm problem` — **EN:** Continues the docstring for the class `GroupSearchResult`. **CN:** 继续说明 class `GroupSearchResult` 的文档字符串。
+- **L49** `    :type problem_shape_k: Int32` — **EN:** Continues the docstring for the class `GroupSearchResult`. **CN:** 继续说明 class `GroupSearchResult` 的文档字符串。
+- **L50** `    :param cta_tile_count_k: Number of tiles along K dimension` — **EN:** Continues the docstring for the class `GroupSearchResult`. **CN:** 继续说明 class `GroupSearchResult` 的文档字符串。
+- **L51** `    :type cta_tile_count_k: Int32` — **EN:** Continues the docstring for the class `GroupSearchResult`. **CN:** 继续说明 class `GroupSearchResult` 的文档字符串。
+- **L52** `    """` — **EN:** Ends the docstring for the class `GroupSearchResult`. **CN:** 结束说明 class `GroupSearchResult` 的文档字符串。
+- **L53** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L54** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L55** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L56** `        group_idx: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L57** `        cta_tile_idx_m: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L58** `        cta_tile_idx_n: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L59** `        problem_shape_m: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L60** `        problem_shape_n: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L61** `        problem_shape_k: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L62** `        cta_tile_count_k: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L63** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L64** `        self.group_idx = group_idx` — **EN:** Assigns a value to self.group_idx. **CN:** 将一个值赋给 self.group_idx。
+- **L65** `        self.cta_tile_idx_m = cta_tile_idx_m` — **EN:** Assigns a value to self.cta_tile_idx_m. **CN:** 将一个值赋给 self.cta_tile_idx_m。
+- **L66** `        self.cta_tile_idx_n = cta_tile_idx_n` — **EN:** Assigns a value to self.cta_tile_idx_n. **CN:** 将一个值赋给 self.cta_tile_idx_n。
+- **L67** `        self.problem_shape_m = problem_shape_m` — **EN:** Assigns a value to self.problem_shape_m. **CN:** 将一个值赋给 self.problem_shape_m。
+- **L68** `        self.problem_shape_n = problem_shape_n` — **EN:** Assigns a value to self.problem_shape_n. **CN:** 将一个值赋给 self.problem_shape_n。
+- **L69** `        self.problem_shape_k = problem_shape_k` — **EN:** Assigns a value to self.problem_shape_k. **CN:** 将一个值赋给 self.problem_shape_k。
+- **L70** `        self.cta_tile_count_k = cta_tile_count_k` — **EN:** Assigns a value to self.cta_tile_count_k. **CN:** 将一个值赋给 self.cta_tile_count_k。
+- **L71** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L72** `    def __extract_mlir_values__(self) -> List[ir.Value]:` — **EN:** Defines function `__extract_mlir_values__`. **CN:** 定义函数 `__extract_mlir_values__`。
+- **L73** `        values = extract_mlir_values(self.group_idx)` — **EN:** Assigns a value to values. **CN:** 将一个值赋给 values。
+- **L74** `        values.extend(extract_mlir_values(self.cta_tile_idx_m))` — **EN:** Invokes `values.extend` as a standalone call. **CN:** 以独立语句方式调用 `values.extend`。
+- **L75** `        values.extend(extract_mlir_values(self.cta_tile_idx_n))` — **EN:** Invokes `values.extend` as a standalone call. **CN:** 以独立语句方式调用 `values.extend`。
+- **L76** `        values.extend(extract_mlir_values(self.problem_shape_m))` — **EN:** Invokes `values.extend` as a standalone call. **CN:** 以独立语句方式调用 `values.extend`。
+- **L77** `        values.extend(extract_mlir_values(self.problem_shape_n))` — **EN:** Invokes `values.extend` as a standalone call. **CN:** 以独立语句方式调用 `values.extend`。
+- **L78** `        values.extend(extract_mlir_values(self.problem_shape_k))` — **EN:** Invokes `values.extend` as a standalone call. **CN:** 以独立语句方式调用 `values.extend`。
+- **L79** `        values.extend(extract_mlir_values(self.cta_tile_count_k))` — **EN:** Invokes `values.extend` as a standalone call. **CN:** 以独立语句方式调用 `values.extend`。
+- **L80** `        return values` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L81** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L82** `    def __new_from_mlir_values__(self, values: List[ir.Value]) -> "GroupSearchResult":` — **EN:** Defines function `__new_from_mlir_values__`. **CN:** 定义函数 `__new_from_mlir_values__`。
+- **L83** `        assert len(values) == 7` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L84** `        return GroupSearchResult(*tuple(values))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L85** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L86** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L87** `class GroupedGemmGroupSearchState:` — **EN:** Defines class `GroupedGemmGroupSearchState`. **CN:** 定义类 `GroupedGemmGroupSearchState`。
+- **L88** `    """` — **EN:** Starts the docstring for the class `GroupedGemmGroupSearchState`. **CN:** 开始说明 class `GroupedGemmGroupSearchState` 的文档字符串。
+- **L89** `    The state of group index search for grouped gemm.` — **EN:** Continues the docstring for the class `GroupedGemmGroupSearchState`. **CN:** 继续说明 class `GroupedGemmGroupSearchState` 的文档字符串。
+- **L90** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L91** `    The state will be initialized once and updated in every round of group index search.` — **EN:** Continues the docstring for the class `GroupedGemmGroupSearchState`. **CN:** 继续说明 class `GroupedGemmGroupSearchState` 的文档字符串。
+- **L92** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L93** `    :param start_group_idx: The group idx to start the search with` — **EN:** Continues the docstring for the class `GroupedGemmGroupSearchState`. **CN:** 继续说明 class `GroupedGemmGroupSearchState` 的文档字符串。
+- **L94** `    :type start_group_idx: Int32` — **EN:** Continues the docstring for the class `GroupedGemmGroupSearchState`. **CN:** 继续说明 class `GroupedGemmGroupSearchState` 的文档字符串。
+- **L95** `    :param tile_count_prev_group: Number of tiles before the matched group` — **EN:** Continues the docstring for the class `GroupedGemmGroupSearchState`. **CN:** 继续说明 class `GroupedGemmGroupSearchState` 的文档字符串。
+- **L96** `    :type tile_count_prev_group: Int32` — **EN:** Continues the docstring for the class `GroupedGemmGroupSearchState`. **CN:** 继续说明 class `GroupedGemmGroupSearchState` 的文档字符串。
+- **L97** `    :param tile_count_searched: Number of tiles we have searched. When the matched group is found,` — **EN:** Continues the docstring for the class `GroupedGemmGroupSearchState`. **CN:** 继续说明 class `GroupedGemmGroupSearchState` 的文档字符串。
+- **L98** `                               it records the number of tiles including the matched group` — **EN:** Continues the docstring for the class `GroupedGemmGroupSearchState`. **CN:** 继续说明 class `GroupedGemmGroupSearchState` 的文档字符串。
+- **L99** `    :type tile_count_searched: Int32` — **EN:** Continues the docstring for the class `GroupedGemmGroupSearchState`. **CN:** 继续说明 class `GroupedGemmGroupSearchState` 的文档字符串。
+- **L100** `    """` — **EN:** Ends the docstring for the class `GroupedGemmGroupSearchState`. **CN:** 结束说明 class `GroupedGemmGroupSearchState` 的文档字符串。
+- **L101** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L102** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L103** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L104** `        start_group_idx: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L105** `        tile_count_prev_group: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L106** `        tile_count_searched: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L107** `        found: Boolean,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L108** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L109** `        self.start_group_idx = start_group_idx` — **EN:** Assigns a value to self.start_group_idx. **CN:** 将一个值赋给 self.start_group_idx。
+- **L110** `        self.tile_count_prev_group = tile_count_prev_group` — **EN:** Assigns a value to self.tile_count_prev_group. **CN:** 将一个值赋给 self.tile_count_prev_group。
+- **L111** `        self.tile_count_searched = tile_count_searched` — **EN:** Assigns a value to self.tile_count_searched. **CN:** 将一个值赋给 self.tile_count_searched。
+- **L112** `        self.found = Boolean(found)` — **EN:** Assigns a value to self.found. **CN:** 将一个值赋给 self.found。
+- **L113** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L114** `    def __extract_mlir_values__(self) -> List[ir.Value]:` — **EN:** Defines function `__extract_mlir_values__`. **CN:** 定义函数 `__extract_mlir_values__`。
+- **L115** `        values = extract_mlir_values(self.start_group_idx)` — **EN:** Assigns a value to values. **CN:** 将一个值赋给 values。
+- **L116** `        values.extend(extract_mlir_values(self.tile_count_prev_group))` — **EN:** Invokes `values.extend` as a standalone call. **CN:** 以独立语句方式调用 `values.extend`。
+- **L117** `        values.extend(extract_mlir_values(self.tile_count_searched))` — **EN:** Invokes `values.extend` as a standalone call. **CN:** 以独立语句方式调用 `values.extend`。
+- **L118** `        values.extend(extract_mlir_values(self.found))` — **EN:** Invokes `values.extend` as a standalone call. **CN:** 以独立语句方式调用 `values.extend`。
+- **L119** `        return values` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L120** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L121** `    def __new_from_mlir_values__(` — **EN:** Defines function `__new_from_mlir_values__`. **CN:** 定义函数 `__new_from_mlir_values__`。
+- **L122** `        self, values: List[ir.Value]` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L123** `    ) -> "GroupedGemmGroupSearchState":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L124** `        assert len(values) == 4` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L125** `        start_group_idx = new_from_mlir_values(self.start_group_idx, [values[0]])` — **EN:** Assigns a value to start_group_idx. **CN:** 将一个值赋给 start_group_idx。
+- **L126** `        tile_count_prev_group = new_from_mlir_values(` — **EN:** Assigns a value to tile_count_prev_group. **CN:** 将一个值赋给 tile_count_prev_group。
+- **L127** `            self.tile_count_prev_group, [values[1]]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L128** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L129** `        tile_count_searched = new_from_mlir_values(` — **EN:** Assigns a value to tile_count_searched. **CN:** 将一个值赋给 tile_count_searched。
+- **L130** `            self.tile_count_searched, [values[2]]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L131** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L132** `        found = new_from_mlir_values(self.found, [values[3]])` — **EN:** Assigns a value to found. **CN:** 将一个值赋给 found。
+- **L133** `        return GroupedGemmGroupSearchState(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L134** `            start_group_idx, tile_count_prev_group, tile_count_searched, found` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L135** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L136** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L137** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L138** `def create_initial_search_state() -> GroupedGemmGroupSearchState:` — **EN:** Defines function `create_initial_search_state`. **CN:** 定义函数 `create_initial_search_state`。
+- **L139** `    """` — **EN:** Starts the docstring for the function `create_initial_search_state`. **CN:** 开始说明 function `create_initial_search_state` 的文档字符串。
+- **L140** `    Create an initial search state for grouped gemm.` — **EN:** Continues the docstring for the function `create_initial_search_state`. **CN:** 继续说明 function `create_initial_search_state` 的文档字符串。
+- **L141** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L142** `    :return: A new search state with initial values` — **EN:** Continues the docstring for the function `create_initial_search_state`. **CN:** 继续说明 function `create_initial_search_state` 的文档字符串。
+- **L143** `    :rtype: GroupedGemmGroupSearchState` — **EN:** Continues the docstring for the function `create_initial_search_state`. **CN:** 继续说明 function `create_initial_search_state` 的文档字符串。
+- **L144** `    """` — **EN:** Ends the docstring for the function `create_initial_search_state`. **CN:** 结束说明 function `create_initial_search_state` 的文档字符串。
+- **L145** `    return GroupedGemmGroupSearchState(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L146** `        start_group_idx=Int32(0),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L147** `        tile_count_prev_group=Int32(0),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L148** `        tile_count_searched=Int32(0),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L149** `        found=Boolean(False),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L150** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L151** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L152** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L153** `# Grouped Work Tile Information` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L154** `class GroupedWorkTileInfo(WorkTileInfo):` — **EN:** Defines class `GroupedWorkTileInfo` with bases WorkTileInfo. **CN:** 定义类 `GroupedWorkTileInfo`，其基类为 WorkTileInfo。
+- **L155** `    """A class to represent information about a work tile.` — **EN:** Starts the docstring for the class `GroupedWorkTileInfo`. **CN:** 开始说明 class `GroupedWorkTileInfo` 的文档字符串。
+- **L156** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L157** `    :ivar tile_idx: The index of the tile.` — **EN:** Continues the docstring for the class `GroupedWorkTileInfo`. **CN:** 继续说明 class `GroupedWorkTileInfo` 的文档字符串。
+- **L158** `    :type tile_idx: cute.Coord` — **EN:** Continues the docstring for the class `GroupedWorkTileInfo`. **CN:** 继续说明 class `GroupedWorkTileInfo` 的文档字符串。
+- **L159** `    :ivar is_valid_tile: Whether the tile is valid.` — **EN:** Continues the docstring for the class `GroupedWorkTileInfo`. **CN:** 继续说明 class `GroupedWorkTileInfo` 的文档字符串。
+- **L160** `    :type is_valid_tile: Boolean` — **EN:** Continues the docstring for the class `GroupedWorkTileInfo`. **CN:** 继续说明 class `GroupedWorkTileInfo` 的文档字符串。
+- **L161** `    :ivar group_search_result: Group work tile information.` — **EN:** Continues the docstring for the class `GroupedWorkTileInfo`. **CN:** 继续说明 class `GroupedWorkTileInfo` 的文档字符串。
+- **L162** `    :type group_search_result: GroupSearchResult` — **EN:** Continues the docstring for the class `GroupedWorkTileInfo`. **CN:** 继续说明 class `GroupedWorkTileInfo` 的文档字符串。
+- **L163** `    """` — **EN:** Ends the docstring for the class `GroupedWorkTileInfo`. **CN:** 结束说明 class `GroupedWorkTileInfo` 的文档字符串。
+- **L164** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L165** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L166** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L167** `        tile_idx: cute.Coord,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L168** `        is_valid_tile: Boolean,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L169** `        group_search_result: GroupSearchResult,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L170** `    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L171** `        super().__init__(tile_idx, is_valid_tile)` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L172** `        self.group_search_result = group_search_result` — **EN:** Assigns a value to self.group_search_result. **CN:** 将一个值赋给 self.group_search_result。
+- **L173** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L174** `    def __extract_mlir_values__(self) -> list[ir.Value]:` — **EN:** Defines function `__extract_mlir_values__`. **CN:** 定义函数 `__extract_mlir_values__`。
+- **L175** `        values = extract_mlir_values(self.tile_idx)` — **EN:** Assigns a value to values. **CN:** 将一个值赋给 values。
+- **L176** `        values.extend(extract_mlir_values(self.is_valid_tile))` — **EN:** Invokes `values.extend` as a standalone call. **CN:** 以独立语句方式调用 `values.extend`。
+- **L177** `        values.extend(extract_mlir_values(self.group_search_result))` — **EN:** Invokes `values.extend` as a standalone call. **CN:** 以独立语句方式调用 `values.extend`。
+- **L178** `        return values` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L179** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L180** `    def __new_from_mlir_values__(self, values: list[ir.Value]) -> "GroupedWorkTileInfo":` — **EN:** Defines function `__new_from_mlir_values__`. **CN:** 定义函数 `__new_from_mlir_values__`。
+- **L181** `        if len(values) != 11:` — **EN:** Starts a conditional branch guarded by `len(values) != 11`. **CN:** 开始一个由 `len(values) != 11` 控制的条件分支。
+- **L182** `            raise ValueError("Length of mlir values extracted is incorrect.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L183** `        new_tile_idx = new_from_mlir_values(self._tile_idx, values[:3])` — **EN:** Assigns a value to new_tile_idx. **CN:** 将一个值赋给 new_tile_idx。
+- **L184** `        new_is_valid_tile = new_from_mlir_values(self._is_valid_tile, [values[3]])` — **EN:** Assigns a value to new_is_valid_tile. **CN:** 将一个值赋给 new_is_valid_tile。
+- **L185** `        new_group_search_result = new_from_mlir_values(` — **EN:** Assigns a value to new_group_search_result. **CN:** 将一个值赋给 new_group_search_result。
+- **L186** `            self.group_search_result, values[4:11]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L187** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L188** `        return GroupedWorkTileInfo(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L189** `            new_tile_idx, new_is_valid_tile, new_group_search_result` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L190** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L191** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L192** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L193** `# Static Persistent Grouped GEMM` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L194** `class StaticPersistentGroupTileScheduler(StaticPersistentTileScheduler):` — **EN:** Defines class `StaticPersistentGroupTileScheduler` with bases StaticPersistentTileScheduler. **CN:** 定义类 `StaticPersistentGroupTileScheduler`，其基类为 StaticPersistentTileScheduler。
+- **L195** `    """A scheduler for static persistent group-based tile execution in CUTLASS/CuTe kernels.` — **EN:** Starts the docstring for the class `StaticPersistentGroupTileScheduler`. **CN:** 开始说明 class `StaticPersistentGroupTileScheduler` 的文档字符串。
+- **L196** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L197** `    :ivar params: Tile schedule related params, including cluster shape and problem_layout_ncluster_mnl` — **EN:** Continues the docstring for the class `StaticPersistentGroupTileScheduler`. **CN:** 继续说明 class `StaticPersistentGroupTileScheduler` 的文档字符串。
+- **L198** `    :type params: PersistentTileSchedulerParams` — **EN:** Continues the docstring for the class `StaticPersistentGroupTileScheduler`. **CN:** 继续说明 class `StaticPersistentGroupTileScheduler` 的文档字符串。
+- **L199** `    :ivar num_persistent_clusters: Number of persistent clusters that can be launched` — **EN:** Continues the docstring for the class `StaticPersistentGroupTileScheduler`. **CN:** 继续说明 class `StaticPersistentGroupTileScheduler` 的文档字符串。
+- **L200** `    :type num_persistent_clusters: Int32` — **EN:** Continues the docstring for the class `StaticPersistentGroupTileScheduler`. **CN:** 继续说明 class `StaticPersistentGroupTileScheduler` 的文档字符串。
+- **L201** `    :ivar _current_work_linear_idx: Current cluster index` — **EN:** Continues the docstring for the class `StaticPersistentGroupTileScheduler`. **CN:** 继续说明 class `StaticPersistentGroupTileScheduler` 的文档字符串。
+- **L202** `    :type _current_work_linear_idx: Int32` — **EN:** Continues the docstring for the class `StaticPersistentGroupTileScheduler`. **CN:** 继续说明 class `StaticPersistentGroupTileScheduler` 的文档字符串。
+- **L203** `    :ivar cta_id_in_cluster: ID of the CTA within its cluster` — **EN:** Continues the docstring for the class `StaticPersistentGroupTileScheduler`. **CN:** 继续说明 class `StaticPersistentGroupTileScheduler` 的文档字符串。
+- **L204** `    :type cta_id_in_cluster: cute.Coord` — **EN:** Continues the docstring for the class `StaticPersistentGroupTileScheduler`. **CN:** 继续说明 class `StaticPersistentGroupTileScheduler` 的文档字符串。
+- **L205** `    :ivar _num_tiles_executed: Counter for executed tiles` — **EN:** Continues the docstring for the class `StaticPersistentGroupTileScheduler`. **CN:** 继续说明 class `StaticPersistentGroupTileScheduler` 的文档字符串。
+- **L206** `    :type _num_tiles_executed: Int32` — **EN:** Continues the docstring for the class `StaticPersistentGroupTileScheduler`. **CN:** 继续说明 class `StaticPersistentGroupTileScheduler` 的文档字符串。
+- **L207** `    :ivar cluster_tile_shape_mnk: The shape of cluster tile as (m, n, k)` — **EN:** Continues the docstring for the class `StaticPersistentGroupTileScheduler`. **CN:** 继续说明 class `StaticPersistentGroupTileScheduler` 的文档字符串。
+- **L208** `    :type cluster_tile_shape_mnk: tuple[int, int, int]` — **EN:** Continues the docstring for the class `StaticPersistentGroupTileScheduler`. **CN:** 继续说明 class `StaticPersistentGroupTileScheduler` 的文档字符串。
+- **L209** `    :ivar search_state: The initial search state` — **EN:** Continues the docstring for the class `StaticPersistentGroupTileScheduler`. **CN:** 继续说明 class `StaticPersistentGroupTileScheduler` 的文档字符串。
+- **L210** `    :type search_state: GroupedGemmGroupSearchState` — **EN:** Continues the docstring for the class `StaticPersistentGroupTileScheduler`. **CN:** 继续说明 class `StaticPersistentGroupTileScheduler` 的文档字符串。
+- **L211** `    :ivar group_count: Number of groups in current grouped gemm problem` — **EN:** Continues the docstring for the class `StaticPersistentGroupTileScheduler`. **CN:** 继续说明 class `StaticPersistentGroupTileScheduler` 的文档字符串。
+- **L212** `    :type group_count: int` — **EN:** Continues the docstring for the class `StaticPersistentGroupTileScheduler`. **CN:** 继续说明 class `StaticPersistentGroupTileScheduler` 的文档字符串。
+- **L213** `    :ivar problem_shape_mnkl: Problem shape tensor for groups` — **EN:** Continues the docstring for the class `StaticPersistentGroupTileScheduler`. **CN:** 继续说明 class `StaticPersistentGroupTileScheduler` 的文档字符串。
+- **L214** `    :type problem_shape_mnkl: cute.Tensor` — **EN:** Continues the docstring for the class `StaticPersistentGroupTileScheduler`. **CN:** 继续说明 class `StaticPersistentGroupTileScheduler` 的文档字符串。
+- **L215** `    """` — **EN:** Ends the docstring for the class `StaticPersistentGroupTileScheduler`. **CN:** 结束说明 class `StaticPersistentGroupTileScheduler` 的文档字符串。
+- **L216** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L217** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L218** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L219** `        params: PersistentTileSchedulerParams,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L220** `        num_persistent_clusters: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L221** `        current_work_linear_idx: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L222** `        cta_id_in_cluster: cute.Coord,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L223** `        num_tiles_executed: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L224** `        cluster_tile_shape_mnk: tuple[int, int, int],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L225** `        search_state: GroupedGemmGroupSearchState,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L226** `        group_count: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L227** `        problem_shape_mnkl: cute.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L228** `        cached_problem_shape_0: cute.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L229** `        cached_problem_shape_1: cute.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L230** `    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L231** `        StaticPersistentTileScheduler.__init__(` — **EN:** Invokes `StaticPersistentTileScheduler.__init__` as a standalone call. **CN:** 以独立语句方式调用 `StaticPersistentTileScheduler.__init__`。
+- **L232** `            self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L233** `            params,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L234** `            num_persistent_clusters,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L235** `            current_work_linear_idx,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L236** `            cta_id_in_cluster,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L237** `            num_tiles_executed,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L238** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L239** `        self.group_count = group_count` — **EN:** Assigns a value to self.group_count. **CN:** 将一个值赋给 self.group_count。
+- **L240** `        self.lane_idx = cute.arch.lane_idx()` — **EN:** Assigns a value to self.lane_idx. **CN:** 将一个值赋给 self.lane_idx。
+- **L241** `        self.cluster_tile_shape_mnk = cluster_tile_shape_mnk` — **EN:** Assigns a value to self.cluster_tile_shape_mnk. **CN:** 将一个值赋给 self.cluster_tile_shape_mnk。
+- **L242** `        self.search_state = search_state` — **EN:** Assigns a value to self.search_state. **CN:** 将一个值赋给 self.search_state。
+- **L243** `        self.problem_shape_mnkl = problem_shape_mnkl` — **EN:** Assigns a value to self.problem_shape_mnkl. **CN:** 将一个值赋给 self.problem_shape_mnkl。
+- **L244** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L245** `        self.cached_problem_shape_0 = cached_problem_shape_0` — **EN:** Assigns a value to self.cached_problem_shape_0. **CN:** 将一个值赋给 self.cached_problem_shape_0。
+- **L246** `        self.cached_problem_shape_1 = cached_problem_shape_1` — **EN:** Assigns a value to self.cached_problem_shape_1. **CN:** 将一个值赋给 self.cached_problem_shape_1。
+- **L247** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L248** `    def __extract_mlir_values__(self) -> list[ir.Value]:` — **EN:** Defines function `__extract_mlir_values__`. **CN:** 定义函数 `__extract_mlir_values__`。
+- **L249** `        values = extract_mlir_values(self.num_persistent_clusters)` — **EN:** Assigns a value to values. **CN:** 将一个值赋给 values。
+- **L250** `        values.extend(extract_mlir_values(self._current_work_linear_idx))` — **EN:** Invokes `values.extend` as a standalone call. **CN:** 以独立语句方式调用 `values.extend`。
+- **L251** `        values.extend(extract_mlir_values(self.cta_id_in_cluster))` — **EN:** Invokes `values.extend` as a standalone call. **CN:** 以独立语句方式调用 `values.extend`。
+- **L252** `        values.extend(extract_mlir_values(self._num_tiles_executed))` — **EN:** Invokes `values.extend` as a standalone call. **CN:** 以独立语句方式调用 `values.extend`。
+- **L253** `        values.extend(extract_mlir_values(self.search_state))` — **EN:** Invokes `values.extend` as a standalone call. **CN:** 以独立语句方式调用 `values.extend`。
+- **L254** `        values.extend(extract_mlir_values(self.problem_shape_mnkl))` — **EN:** Invokes `values.extend` as a standalone call. **CN:** 以独立语句方式调用 `values.extend`。
+- **L255** `        values.extend(extract_mlir_values(self.cached_problem_shape_0))` — **EN:** Invokes `values.extend` as a standalone call. **CN:** 以独立语句方式调用 `values.extend`。
+- **L256** `        values.extend(extract_mlir_values(self.cached_problem_shape_1))` — **EN:** Invokes `values.extend` as a standalone call. **CN:** 以独立语句方式调用 `values.extend`。
+- **L257** `        values.extend(extract_mlir_values(self.params))` — **EN:** Invokes `values.extend` as a standalone call. **CN:** 以独立语句方式调用 `values.extend`。
+- **L258** `        return values` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L259** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L260** `    def __new_from_mlir_values__(` — **EN:** Defines function `__new_from_mlir_values__`. **CN:** 定义函数 `__new_from_mlir_values__`。
+- **L261** `        self, values: list[ir.Value]` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L262** `    ) -> "StaticPersistentGroupTileScheduler":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L263** `        if len(values) < 13:` — **EN:** Starts a conditional branch guarded by `len(values) < 13`. **CN:** 开始一个由 `len(values) < 13` 控制的条件分支。
+- **L264** `            raise ValueError("Length of mlir values extracted is incorrect.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L265** `        new_num_persistent_clusters = new_from_mlir_values(` — **EN:** Assigns a value to new_num_persistent_clusters. **CN:** 将一个值赋给 new_num_persistent_clusters。
+- **L266** `            self.num_persistent_clusters, [values[0]]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L267** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L268** `        new_current_work_linear_idx = new_from_mlir_values(` — **EN:** Assigns a value to new_current_work_linear_idx. **CN:** 将一个值赋给 new_current_work_linear_idx。
+- **L269** `            self._current_work_linear_idx, [values[1]]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L270** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L271** `        new_cta_id_in_cluster = new_from_mlir_values(` — **EN:** Assigns a value to new_cta_id_in_cluster. **CN:** 将一个值赋给 new_cta_id_in_cluster。
+- **L272** `            self.cta_id_in_cluster, values[2:5]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L273** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L274** `        new_num_tiles_executed = new_from_mlir_values(` — **EN:** Assigns a value to new_num_tiles_executed. **CN:** 将一个值赋给 new_num_tiles_executed。
+- **L275** `            self._num_tiles_executed, [values[5]]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L276** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L277** `        search_state = new_from_mlir_values(self.search_state, values[6:10])` — **EN:** Assigns a value to search_state. **CN:** 将一个值赋给 search_state。
+- **L278** `        problem_shape_mnkl = new_from_mlir_values(self.problem_shape_mnkl, [values[10]])` — **EN:** Assigns a value to problem_shape_mnkl. **CN:** 将一个值赋给 problem_shape_mnkl。
+- **L279** `        cached_problem_shape_0 = new_from_mlir_values(` — **EN:** Assigns a value to cached_problem_shape_0. **CN:** 将一个值赋给 cached_problem_shape_0。
+- **L280** `            self.cached_problem_shape_0, [values[11]]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L281** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L282** `        cached_problem_shape_1 = new_from_mlir_values(` — **EN:** Assigns a value to cached_problem_shape_1. **CN:** 将一个值赋给 cached_problem_shape_1。
+- **L283** `            self.cached_problem_shape_1, [values[12]]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L284** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L285** `        params = new_from_mlir_values(self.params, values[13:])` — **EN:** Assigns a value to params. **CN:** 将一个值赋给 params。
+- **L286** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L287** `        return StaticPersistentGroupTileScheduler(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L288** `            params,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L289** `            new_num_persistent_clusters,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L290** `            new_current_work_linear_idx,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L291** `            new_cta_id_in_cluster,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L292** `            new_num_tiles_executed,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L293** `            self.cluster_tile_shape_mnk,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L294** `            search_state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L295** `            self.group_count,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L296** `            problem_shape_mnkl,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L297** `            cached_problem_shape_0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L298** `            cached_problem_shape_1,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L299** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L300** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L301** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L302** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L303** `    def create(` — **EN:** Defines function `create`. **CN:** 定义函数 `create`。
+- **L304** `        params: PersistentTileSchedulerParams,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L305** `        block_idx: Tuple[Integer, Integer, Integer],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L306** `        grid_dim: Tuple[Integer, Integer, Integer],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L307** `        cluster_tile_shape_mnk: tuple[int, int, int],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L308** `        initial_search_state: GroupedGemmGroupSearchState,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L309** `        group_count: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L310** `        problem_shape_mnkl: cute.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L311** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L312** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L313** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L314** `    ) -> "StaticPersistentGroupTileScheduler":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L315** `        """Initialize the static persistent group-based tile scheduler.` — **EN:** Starts the docstring for the function `create`. **CN:** 开始说明 function `create` 的文档字符串。
+- **L316** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L317** `        :param params: Parameters for the persistent` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L318** `            tile scheduler.` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L319** `        :type params: PersistentTileSchedulerParams` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L320** `        :param block_idx: The 3d block index in the format (bidx, bidy, bidz).` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L321** `        :type block_idx: Tuple[Integer, Integer, Integer]` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L322** `        :param grid_dim: The 3d grid dimensions for kernel launch.` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L323** `        :type grid_dim: Tuple[Integer, Integer, Integer]` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L324** `        :param cluster_tile_shape_mnk: The shape of cluster tile as (m, n, k)` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L325** `        :type cluster_tile_shape_mnk: tuple[int, int, int]` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L326** `        :param initial_search_state: The initial search state` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L327** `        :type initial_search_state: GroupedGemmGroupSearchState` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L328** `        :param group_count: Number of groups in current grouped gemm problem` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L329** `        :type group_count: int` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L330** `        :param problem_shape_mnkl: Problem shape tensor for groups` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L331** `        :type problem_shape_mnkl: cute.Tensor` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L332** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L333** `        :return: A StaticPersistentGroupTileScheduler object.` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L334** `        :rtype: StaticPersistentGroupTileScheduler` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L335** `        """` — **EN:** Ends the docstring for the function `create`. **CN:** 结束说明 function `create` 的文档字符串。
+- **L336** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L337** `        # Calculate the number of persistent clusters by dividing the total grid size` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L338** `        # by the number of CTAs per cluster` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L339** `        num_persistent_clusters = cute.size(grid_dim, loc=loc, ip=ip) // cute.size(` — **EN:** Assigns a value to num_persistent_clusters. **CN:** 将一个值赋给 num_persistent_clusters。
+- **L340** `            params.cluster_shape_mn, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L341** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L342** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L343** `        bidx, bidy, bidz = block_idx` — **EN:** Assigns a value to (bidx, bidy, bidz). **CN:** 将一个值赋给 (bidx, bidy, bidz)。
+- **L344** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L345** `        # Initialize workload index equals to the cluster index in the grid` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L346** `        current_work_linear_idx = Int32(bidz)` — **EN:** Assigns a value to current_work_linear_idx. **CN:** 将一个值赋给 current_work_linear_idx。
+- **L347** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L348** `        # CTA id in the cluster` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L349** `        cta_id_in_cluster = (` — **EN:** Assigns a value to cta_id_in_cluster. **CN:** 将一个值赋给 cta_id_in_cluster。
+- **L350** `            Int32(bidx % params.cluster_shape_mn[0]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L351** `            Int32(bidy % params.cluster_shape_mn[1]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L352** `            Int32(0),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L353** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L354** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L355** `        cached_problem_shape_0 = cute.make_rmem_tensor(` — **EN:** Assigns a value to cached_problem_shape_0. **CN:** 将一个值赋给 cached_problem_shape_0。
+- **L356** `            cute.make_layout(4), problem_shape_mnkl.element_type` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L357** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L358** `        cached_problem_shape_1 = cute.make_rmem_tensor(` — **EN:** Assigns a value to cached_problem_shape_1. **CN:** 将一个值赋给 cached_problem_shape_1。
+- **L359** `            cute.make_layout(4), problem_shape_mnkl.element_type` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L360** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L361** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L362** `        # Initialize number of tiles executed to zero` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L363** `        num_tiles_executed = Int32(0)` — **EN:** Assigns a value to num_tiles_executed. **CN:** 将一个值赋给 num_tiles_executed。
+- **L364** `        return StaticPersistentGroupTileScheduler(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L365** `            params,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L366** `            num_persistent_clusters,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L367** `            current_work_linear_idx,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L368** `            cta_id_in_cluster,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L369** `            num_tiles_executed,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L370** `            cluster_tile_shape_mnk,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L371** `            initial_search_state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L372** `            group_count,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L373** `            problem_shape_mnkl,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L374** `            cached_problem_shape_0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L375** `            cached_problem_shape_1,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L376** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L377** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L378** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L379** `    def num_tiles_executed(self) -> Int32:` — **EN:** Defines function `num_tiles_executed`. **CN:** 定义函数 `num_tiles_executed`。
+- **L380** `        return self._num_tiles_executed` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L381** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L382** `    # This setter is the main way to prevent the Attribute error right now` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L383** `    @num_tiles_executed.setter` — **EN:** Applies decorator `num_tiles_executed.setter` to the following definition. **CN:** 将装饰器 `num_tiles_executed.setter` 应用于后面的定义。
+- **L384** `    def num_tiles_executed(self, value: Int32) -> None:` — **EN:** Defines function `num_tiles_executed`. **CN:** 定义函数 `num_tiles_executed`。
+- **L385** `        self._num_tiles_executed = value` — **EN:** Assigns a value to self._num_tiles_executed. **CN:** 将一个值赋给 self._num_tiles_executed。
+- **L386** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L387** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L388** `    @cute.jit` — **EN:** Applies decorator `cute.jit` to the following definition. **CN:** 将装饰器 `cute.jit` 应用于后面的定义。
+- **L389** `    def _prefix_sum(` — **EN:** Defines function `_prefix_sum`. **CN:** 定义函数 `_prefix_sum`。
+- **L390** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L391** `        value_per_thread: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L392** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L393** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L394** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L395** `    ) -> Int32:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L396** `        """` — **EN:** Starts the docstring for the function `_prefix_sum`. **CN:** 开始说明 function `_prefix_sum` 的文档字符串。
+- **L397** `        Perform prefix sum within a full warp.` — **EN:** Continues the docstring for the function `_prefix_sum`. **CN:** 继续说明 function `_prefix_sum` 的文档字符串。
+- **L398** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L399** `        :param value_per_thread: The value for this thread to contribute to the prefix sum` — **EN:** Continues the docstring for the function `_prefix_sum`. **CN:** 继续说明 function `_prefix_sum` 的文档字符串。
+- **L400** `        :type value_per_thread: Int32` — **EN:** Continues the docstring for the function `_prefix_sum`. **CN:** 继续说明 function `_prefix_sum` 的文档字符串。
+- **L401** `        :return: The prefix sum result for this thread` — **EN:** Continues the docstring for the function `_prefix_sum`. **CN:** 继续说明 function `_prefix_sum` 的文档字符串。
+- **L402** `        :rtype: Int32` — **EN:** Continues the docstring for the function `_prefix_sum`. **CN:** 继续说明 function `_prefix_sum` 的文档字符串。
+- **L403** `        """` — **EN:** Ends the docstring for the function `_prefix_sum`. **CN:** 结束说明 function `_prefix_sum` 的文档字符串。
+- **L404** `        clamp_value = 0` — **EN:** Assigns a value to clamp_value. **CN:** 将一个值赋给 clamp_value。
+- **L405** `        idx = 1` — **EN:** Assigns a value to idx. **CN:** 将一个值赋给 idx。
+- **L406** `        sum_per_thread = value_per_thread` — **EN:** Assigns a value to sum_per_thread. **CN:** 将一个值赋给 sum_per_thread。
+- **L407** `        while const_expr(idx < cute.arch.WARP_SIZE):` — **EN:** Starts a while-loop guarded by `const_expr(idx < cute.arch.WARP_SIZE)`. **CN:** 开始一个由 `const_expr(idx < cute.arch.WARP_SIZE)` 控制的 while 循环。
+- **L408** `            value = cute.arch.shuffle_sync_up(` — **EN:** Assigns a value to value. **CN:** 将一个值赋给 value。
+- **L409** `                sum_per_thread, idx, mask_and_clamp=clamp_value, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L410** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L411** `            if self.lane_idx >= idx:` — **EN:** Starts a conditional branch guarded by `self.lane_idx >= idx`. **CN:** 开始一个由 `self.lane_idx >= idx` 控制的条件分支。
+- **L412** `                sum_per_thread += value` — **EN:** Updates sum_per_thread in place. **CN:** 原地更新 sum_per_thread。
+- **L413** `            idx = idx << 1` — **EN:** Assigns a value to idx. **CN:** 将一个值赋给 idx。
+- **L414** `        return sum_per_thread` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L415** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L416** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L417** `    def _get_problem_for_group(` — **EN:** Defines function `_get_problem_for_group`. **CN:** 定义函数 `_get_problem_for_group`。
+- **L418** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L419** `        problem_shape_mnkl: cute.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L420** `        group_idx: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L421** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L422** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L423** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L424** `    ) -> cute.Tensor:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L425** `        """` — **EN:** Starts the docstring for the function `_get_problem_for_group`. **CN:** 开始说明 function `_get_problem_for_group` 的文档字符串。
+- **L426** `        Load gemm problem (m,n,k,l) for the specified group from global memory to register.` — **EN:** Continues the docstring for the function `_get_problem_for_group`. **CN:** 继续说明 function `_get_problem_for_group` 的文档字符串。
+- **L427** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L428** `        :param problem_shape_mnkl: Tensor in global memory with layout (group_count, 4):(4, 1)` — **EN:** Continues the docstring for the function `_get_problem_for_group`. **CN:** 继续说明 function `_get_problem_for_group` 的文档字符串。
+- **L429** `        :type problem_shape_mnkl: cute.Tensor` — **EN:** Continues the docstring for the function `_get_problem_for_group`. **CN:** 继续说明 function `_get_problem_for_group` 的文档字符串。
+- **L430** `        :param group_idx: The index of the group to load` — **EN:** Continues the docstring for the function `_get_problem_for_group`. **CN:** 继续说明 function `_get_problem_for_group` 的文档字符串。
+- **L431** `        :type group_idx: Int32` — **EN:** Continues the docstring for the function `_get_problem_for_group`. **CN:** 继续说明 function `_get_problem_for_group` 的文档字符串。
+- **L432** `        :return: The problem shape tensor for the specified group` — **EN:** Continues the docstring for the function `_get_problem_for_group`. **CN:** 继续说明 function `_get_problem_for_group` 的文档字符串。
+- **L433** `        :rtype: cute.Tensor` — **EN:** Continues the docstring for the function `_get_problem_for_group`. **CN:** 继续说明 function `_get_problem_for_group` 的文档字符串。
+- **L434** `        """` — **EN:** Ends the docstring for the function `_get_problem_for_group`. **CN:** 结束说明 function `_get_problem_for_group` 的文档字符串。
+- **L435** `        cur_problem_mnkl = cute.make_rmem_tensor(` — **EN:** Assigns a value to cur_problem_mnkl. **CN:** 将一个值赋给 cur_problem_mnkl。
+- **L436** `            cute.make_layout(4), problem_shape_mnkl.element_type, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L437** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L438** `        cute.autovec_copy(` — **EN:** Invokes `cute.autovec_copy` as a standalone call. **CN:** 以独立语句方式调用 `cute.autovec_copy`。
+- **L439** `            problem_shape_mnkl[(group_idx, None)], cur_problem_mnkl, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L440** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L441** `        return cur_problem_mnkl` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L442** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L443** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L444** `    @cute.jit` — **EN:** Applies decorator `cute.jit` to the following definition. **CN:** 将装饰器 `cute.jit` 应用于后面的定义。
+- **L445** `    def prefetch_problem_shapes(` — **EN:** Defines function `prefetch_problem_shapes`. **CN:** 定义函数 `prefetch_problem_shapes`。
+- **L446** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L447** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L448** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L449** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L450** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L451** `        if self.lane_idx < self.group_count:` — **EN:** Starts a conditional branch guarded by `self.lane_idx < self.group_count`. **CN:** 开始一个由 `self.lane_idx < self.group_count` 控制的条件分支。
+- **L452** `            cur_problem_mnkl = self._get_problem_for_group(` — **EN:** Assigns a value to cur_problem_mnkl. **CN:** 将一个值赋给 cur_problem_mnkl。
+- **L453** `                self.problem_shape_mnkl, self.lane_idx` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L454** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L455** `            self.cached_problem_shape_1 = cur_problem_mnkl` — **EN:** Assigns a value to self.cached_problem_shape_1. **CN:** 将一个值赋给 self.cached_problem_shape_1。
+- **L456** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L457** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L458** `    def _get_cluster_tile_count_mn(` — **EN:** Defines function `_get_cluster_tile_count_mn`. **CN:** 定义函数 `_get_cluster_tile_count_mn`。
+- **L459** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L460** `        problem_shape: cute.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L461** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L462** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L463** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L464** `    ) -> Int32:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L465** `        """` — **EN:** Starts the docstring for the function `_get_cluster_tile_count_mn`. **CN:** 开始说明 function `_get_cluster_tile_count_mn` 的文档字符串。
+- **L466** `        Compute total cluster count.` — **EN:** Continues the docstring for the function `_get_cluster_tile_count_mn`. **CN:** 继续说明 function `_get_cluster_tile_count_mn` 的文档字符串。
+- **L467** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L468** `        :param problem_shape: Tensor containing problem shape (m, n, k, l)` — **EN:** Continues the docstring for the function `_get_cluster_tile_count_mn`. **CN:** 继续说明 function `_get_cluster_tile_count_mn` 的文档字符串。
+- **L469** `        :type problem_shape: cute.Tensor` — **EN:** Continues the docstring for the function `_get_cluster_tile_count_mn`. **CN:** 继续说明 function `_get_cluster_tile_count_mn` 的文档字符串。
+- **L470** `        :return: The total cluster tile count for M and N dimensions` — **EN:** Continues the docstring for the function `_get_cluster_tile_count_mn`. **CN:** 继续说明 function `_get_cluster_tile_count_mn` 的文档字符串。
+- **L471** `        :rtype: Int32` — **EN:** Continues the docstring for the function `_get_cluster_tile_count_mn`. **CN:** 继续说明 function `_get_cluster_tile_count_mn` 的文档字符串。
+- **L472** `        """` — **EN:** Ends the docstring for the function `_get_cluster_tile_count_mn`. **CN:** 结束说明 function `_get_cluster_tile_count_mn` 的文档字符串。
+- **L473** `        cur_ntile_m = (` — **EN:** Assigns a value to cur_ntile_m. **CN:** 将一个值赋给 cur_ntile_m。
+- **L474** `            problem_shape[0] + self.cluster_tile_shape_mnk[0] - 1  # type: ignore[operator]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L475** `        ) // self.cluster_tile_shape_mnk[0]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L476** `        cur_ntile_n = (` — **EN:** Assigns a value to cur_ntile_n. **CN:** 将一个值赋给 cur_ntile_n。
+- **L477** `            problem_shape[1] + self.cluster_tile_shape_mnk[1] - 1  # type: ignore[operator]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L478** `        ) // self.cluster_tile_shape_mnk[1]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L479** `        cur_ntile_mn = cur_ntile_m * cur_ntile_n` — **EN:** Assigns a value to cur_ntile_mn. **CN:** 将一个值赋给 cur_ntile_mn。
+- **L480** `        return cur_ntile_mn  # type: ignore[return-value]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L481** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L482** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L483** `    def _compute_cta_tile_coord(` — **EN:** Defines function `_compute_cta_tile_coord`. **CN:** 定义函数 `_compute_cta_tile_coord`。
+- **L484** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L485** `        cluster_tile_idx: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L486** `        cta_tile_coord_in_cluster: tuple,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L487** `        cluster_tile_count_m: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L488** `        cluster_tile_count_n: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L489** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L490** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L491** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L492** `    ) -> tuple:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L493** `        """` — **EN:** Starts the docstring for the function `_compute_cta_tile_coord`. **CN:** 开始说明 function `_compute_cta_tile_coord` 的文档字符串。
+- **L494** `        Compute CTA tile indices along M and N dimensions based on the linear index within a group.` — **EN:** Continues the docstring for the function `_compute_cta_tile_coord`. **CN:** 继续说明 function `_compute_cta_tile_coord` 的文档字符串。
+- **L495** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L496** `        It uses the AlongM mode to decompose the linear index onto M and N dimensions.` — **EN:** Continues the docstring for the function `_compute_cta_tile_coord`. **CN:** 继续说明 function `_compute_cta_tile_coord` 的文档字符串。
+- **L497** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L498** `        :param cluster_tile_idx: The linear index within a group` — **EN:** Continues the docstring for the function `_compute_cta_tile_coord`. **CN:** 继续说明 function `_compute_cta_tile_coord` 的文档字符串。
+- **L499** `        :type cluster_tile_idx: Int32` — **EN:** Continues the docstring for the function `_compute_cta_tile_coord`. **CN:** 继续说明 function `_compute_cta_tile_coord` 的文档字符串。
+- **L500** `        :param cta_tile_coord_in_cluster: CTA indices along M and N dimensions within a cluster` — **EN:** Continues the docstring for the function `_compute_cta_tile_coord`. **CN:** 继续说明 function `_compute_cta_tile_coord` 的文档字符串。
+- **L501** `        :type cta_tile_coord_in_cluster: tuple of Int32` — **EN:** Continues the docstring for the function `_compute_cta_tile_coord`. **CN:** 继续说明 function `_compute_cta_tile_coord` 的文档字符串。
+- **L502** `        :param cluster_tile_count_m: The number of clusters along M dimension of the matched group` — **EN:** Continues the docstring for the function `_compute_cta_tile_coord`. **CN:** 继续说明 function `_compute_cta_tile_coord` 的文档字符串。
+- **L503** `        :type cluster_tile_count_m: Int32` — **EN:** Continues the docstring for the function `_compute_cta_tile_coord`. **CN:** 继续说明 function `_compute_cta_tile_coord` 的文档字符串。
+- **L504** `        :param cluster_tile_count_n: The number of clusters along N dimension of the matched group` — **EN:** Continues the docstring for the function `_compute_cta_tile_coord`. **CN:** 继续说明 function `_compute_cta_tile_coord` 的文档字符串。
+- **L505** `        :type cluster_tile_count_n: Int32` — **EN:** Continues the docstring for the function `_compute_cta_tile_coord`. **CN:** 继续说明 function `_compute_cta_tile_coord` 的文档字符串。
+- **L506** `        :return: A tuple containing CTA tile indices along M and N dimensions` — **EN:** Continues the docstring for the function `_compute_cta_tile_coord`. **CN:** 继续说明 function `_compute_cta_tile_coord` 的文档字符串。
+- **L507** `        :rtype: tuple of (Int32, Int32)` — **EN:** Continues the docstring for the function `_compute_cta_tile_coord`. **CN:** 继续说明 function `_compute_cta_tile_coord` 的文档字符串。
+- **L508** `        """` — **EN:** Ends the docstring for the function `_compute_cta_tile_coord`. **CN:** 结束说明 function `_compute_cta_tile_coord` 的文档字符串。
+- **L509** `        cluster_layout_mn = cute.make_layout(` — **EN:** Assigns a value to cluster_layout_mn. **CN:** 将一个值赋给 cluster_layout_mn。
+- **L510** `            (cluster_tile_count_m, cluster_tile_count_n), loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L511** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L512** `        (mi, ni) = cluster_layout_mn.get_hier_coord(cluster_tile_idx)` — **EN:** Assigns a value to (mi, ni). **CN:** 将一个值赋给 (mi, ni)。
+- **L513** `        cta_tile_idx_m = (` — **EN:** Assigns a value to cta_tile_idx_m. **CN:** 将一个值赋给 cta_tile_idx_m。
+- **L514** `            mi * self.params.cluster_shape_mn[0] + cta_tile_coord_in_cluster[0]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L515** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L516** `        cta_tile_idx_n = (` — **EN:** Assigns a value to cta_tile_idx_n. **CN:** 将一个值赋给 cta_tile_idx_n。
+- **L517** `            ni * self.params.cluster_shape_mn[1] + cta_tile_coord_in_cluster[1]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L518** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L519** `        return (cta_tile_idx_m, cta_tile_idx_n)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L520** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L521** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L522** `    @cute.jit` — **EN:** Applies decorator `cute.jit` to the following definition. **CN:** 将装饰器 `cute.jit` 应用于后面的定义。
+- **L523** `    def _group_search(` — **EN:** Defines function `_group_search`. **CN:** 定义函数 `_group_search`。
+- **L524** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L525** `        linear_idx: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L526** `        problem_shape_mnkl: cute.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L527** `        init_group_idx: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L528** `        init_tile_count_searched: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L529** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L530** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L531** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L532** `    ) -> GroupedGemmGroupSearchState:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L533** `        """` — **EN:** Starts the docstring for the function `_group_search`. **CN:** 开始说明 function `_group_search` 的文档字符串。
+- **L534** `        Search which group the linear index belongs to.` — **EN:** Continues the docstring for the function `_group_search`. **CN:** 继续说明 function `_group_search` 的文档字符串。
+- **L535** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L536** `        :param linear_idx: The linear index to be decomposed` — **EN:** Continues the docstring for the function `_group_search`. **CN:** 继续说明 function `_group_search` 的文档字符串。
+- **L537** `        :type linear_idx: Int32` — **EN:** Continues the docstring for the function `_group_search`. **CN:** 继续说明 function `_group_search` 的文档字符串。
+- **L538** `        :param problem_shape_mnkl: Tensor containing gemm problem size (M, N, K, L) for all groups` — **EN:** Continues the docstring for the function `_group_search`. **CN:** 继续说明 function `_group_search` 的文档字符串。
+- **L539** `        :type problem_shape_mnkl: cute.Tensor` — **EN:** Continues the docstring for the function `_group_search`. **CN:** 继续说明 function `_group_search` 的文档字符串。
+- **L540** `        :param init_group_idx: The group idx to start the search with` — **EN:** Continues the docstring for the function `_group_search`. **CN:** 继续说明 function `_group_search` 的文档字符串。
+- **L541** `        :type init_group_idx: Int32` — **EN:** Continues the docstring for the function `_group_search`. **CN:** 继续说明 function `_group_search` 的文档字符串。
+- **L542** `        :param init_tile_count_searched: The number of tiles we have searched` — **EN:** Continues the docstring for the function `_group_search`. **CN:** 继续说明 function `_group_search` 的文档字符串。
+- **L543** `        :type init_tile_count_searched: Int32` — **EN:** Continues the docstring for the function `_group_search`. **CN:** 继续说明 function `_group_search` 的文档字符串。
+- **L544** `        :return: The updated search state` — **EN:** Continues the docstring for the function `_group_search`. **CN:** 继续说明 function `_group_search` 的文档字符串。
+- **L545** `        :rtype: GroupedGemmGroupSearchState` — **EN:** Continues the docstring for the function `_group_search`. **CN:** 继续说明 function `_group_search` 的文档字符串。
+- **L546** `        """` — **EN:** Ends the docstring for the function `_group_search`. **CN:** 结束说明 function `_group_search` 的文档字符串。
+- **L547** `        c_0 = Int32(0).ir_value()` — **EN:** Assigns a value to c_0. **CN:** 将一个值赋给 c_0。
+- **L548** `        last_lane_idx = cute.arch.WARP_SIZE - 1` — **EN:** Assigns a value to last_lane_idx. **CN:** 将一个值赋给 last_lane_idx。
+- **L549** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L550** `        tile_count_searched = init_tile_count_searched` — **EN:** Assigns a value to tile_count_searched. **CN:** 将一个值赋给 tile_count_searched。
+- **L551** `        start_group_idx = init_group_idx` — **EN:** Assigns a value to start_group_idx. **CN:** 将一个值赋给 start_group_idx。
+- **L552** `        not_found = linear_idx >= tile_count_searched` — **EN:** Assigns a value to not_found. **CN:** 将一个值赋给 not_found。
+- **L553** `        start_not_found = not_found` — **EN:** Assigns a value to start_not_found. **CN:** 将一个值赋给 start_not_found。
+- **L554** `        tile_count_prev_group = self.search_state.tile_count_prev_group` — **EN:** Assigns a value to tile_count_prev_group. **CN:** 将一个值赋给 tile_count_prev_group。
+- **L555** `        tidx, _, _ = cute.arch.thread_idx()` — **EN:** Assigns a value to (tidx, _, _). **CN:** 将一个值赋给 (tidx, _, _)。
+- **L556** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L557** `        while not_found and start_group_idx < self.group_count:` — **EN:** Starts a while-loop guarded by `not_found and start_group_idx < self.group_count`. **CN:** 开始一个由 `not_found and start_group_idx < self.group_count` 控制的 while 循环。
+- **L558** `            # get group to search for current lane` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L559** `            cur_group_idx = start_group_idx + self.lane_idx` — **EN:** Assigns a value to cur_group_idx. **CN:** 将一个值赋给 cur_group_idx。
+- **L560** `            # check if the group to be checked is out of range` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L561** `            inside_group_bound = cur_group_idx < self.group_count` — **EN:** Assigns a value to inside_group_bound. **CN:** 将一个值赋给 inside_group_bound。
+- **L562** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L563** `            # Rotate cache` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L564** `            self.cached_problem_shape_0 = self.cached_problem_shape_1` — **EN:** Assigns a value to self.cached_problem_shape_0. **CN:** 将一个值赋给 self.cached_problem_shape_0。
+- **L565** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L566** `            # Prefetch problem shape for next while iteration` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L567** `            next_prefetch_group_idx = (` — **EN:** Assigns a value to next_prefetch_group_idx. **CN:** 将一个值赋给 next_prefetch_group_idx。
+- **L568** `                start_group_idx + cute.arch.WARP_SIZE + self.lane_idx` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L569** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L570** `            if next_prefetch_group_idx < self.group_count:` — **EN:** Starts a conditional branch guarded by `next_prefetch_group_idx < self.group_count`. **CN:** 开始一个由 `next_prefetch_group_idx < self.group_count` 控制的条件分支。
+- **L571** `                self.cached_problem_shape_1 = self._get_problem_for_group(` — **EN:** Assigns a value to self.cached_problem_shape_1. **CN:** 将一个值赋给 self.cached_problem_shape_1。
+- **L572** `                    problem_shape_mnkl, next_prefetch_group_idx` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L573** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L574** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L575** `            cur_ntile_mn = c_0` — **EN:** Assigns a value to cur_ntile_mn. **CN:** 将一个值赋给 cur_ntile_mn。
+- **L576** `            if inside_group_bound:` — **EN:** Starts a conditional branch guarded by `inside_group_bound`. **CN:** 开始一个由 `inside_group_bound` 控制的条件分支。
+- **L577** `                # get problem size of current group` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L578** `                cur_problem_mnkl = self._get_problem_for_group(` — **EN:** Assigns a value to cur_problem_mnkl. **CN:** 将一个值赋给 cur_problem_mnkl。
+- **L579** `                    problem_shape_mnkl, cur_group_idx, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L580** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L581** `                cur_ntile_mn = self._get_cluster_tile_count_mn(` — **EN:** Assigns a value to cur_ntile_mn. **CN:** 将一个值赋给 cur_ntile_mn。
+- **L582** `                    cur_problem_mnkl, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L583** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L584** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L585** `            # compute tile count from beginning to current group(included)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L586** `            total_cluster_tile_count_ps_per_thread = self._prefix_sum(` — **EN:** Assigns a value to total_cluster_tile_count_ps_per_thread. **CN:** 将一个值赋给 total_cluster_tile_count_ps_per_thread。
+- **L587** `                cur_ntile_mn, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L588** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L589** `            cluster_tile_count_end_per_thread = (` — **EN:** Assigns a value to cluster_tile_count_end_per_thread. **CN:** 将一个值赋给 cluster_tile_count_end_per_thread。
+- **L590** `                total_cluster_tile_count_ps_per_thread + tile_count_searched` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L591** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L592** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L593** `            group_not_in_window = linear_idx >= cluster_tile_count_end_per_thread` — **EN:** Assigns a value to group_not_in_window. **CN:** 将一个值赋给 group_not_in_window。
+- **L594** `            hitted_group_idx_in_search_window = cute.arch.popc(` — **EN:** Assigns a value to hitted_group_idx_in_search_window. **CN:** 将一个值赋给 hitted_group_idx_in_search_window。
+- **L595** `                cute.arch.vote_ballot_sync(group_not_in_window, loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L596** `                loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L597** `                ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L598** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L599** `            not_found = hitted_group_idx_in_search_window == cute.arch.WARP_SIZE` — **EN:** Assigns a value to not_found. **CN:** 将一个值赋给 not_found。
+- **L600** `            start_group_idx = hitted_group_idx_in_search_window + start_group_idx` — **EN:** Assigns a value to start_group_idx. **CN:** 将一个值赋给 start_group_idx。
+- **L601** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L602** `            hit_the_1st_problem_in_search_window = (` — **EN:** Assigns a value to hit_the_1st_problem_in_search_window. **CN:** 将一个值赋给 hit_the_1st_problem_in_search_window。
+- **L603** `                hitted_group_idx_in_search_window == c_0` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L604** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L605** `            tile_count_prev_group = tile_count_searched` — **EN:** Assigns a value to tile_count_prev_group. **CN:** 将一个值赋给 tile_count_prev_group。
+- **L606** `            if hit_the_1st_problem_in_search_window == False:` — **EN:** Starts a conditional branch guarded by `hit_the_1st_problem_in_search_window == False`. **CN:** 开始一个由 `hit_the_1st_problem_in_search_window == False` 控制的条件分支。
+- **L607** `                tile_count_prev_group = cute.arch.shuffle_sync(` — **EN:** Assigns a value to tile_count_prev_group. **CN:** 将一个值赋给 tile_count_prev_group。
+- **L608** `                    cluster_tile_count_end_per_thread,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L609** `                    hitted_group_idx_in_search_window - 1,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L610** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L611** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L612** `            # If no matched group, then get new_cluster_tile_count_end from last lane` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L613** `            # Otherwise, get new_cluster_tile_count_end from the hitted group` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L614** `            lane_idx_for_cluster_tile_count_end = hitted_group_idx_in_search_window` — **EN:** Assigns a value to lane_idx_for_cluster_tile_count_end. **CN:** 将一个值赋给 lane_idx_for_cluster_tile_count_end。
+- **L615** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L616** `            if not_found:` — **EN:** Starts a conditional branch guarded by `not_found`. **CN:** 开始一个由 `not_found` 控制的条件分支。
+- **L617** `                lane_idx_for_cluster_tile_count_end = last_lane_idx` — **EN:** Assigns a value to lane_idx_for_cluster_tile_count_end. **CN:** 将一个值赋给 lane_idx_for_cluster_tile_count_end。
+- **L618** `            tile_count_searched = cute.arch.shuffle_sync(` — **EN:** Assigns a value to tile_count_searched. **CN:** 将一个值赋给 tile_count_searched。
+- **L619** `                cluster_tile_count_end_per_thread,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L620** `                lane_idx_for_cluster_tile_count_end,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L621** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L622** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L623** `            # Prefetch problem shape for next wave` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L624** `            if not not_found:` — **EN:** Starts a conditional branch guarded by `not not_found`. **CN:** 开始一个由 `not not_found` 控制的条件分支。
+- **L625** `                if start_group_idx + self.lane_idx < self.group_count:` — **EN:** Starts a conditional branch guarded by `start_group_idx + self.lane_idx < self.group_count`. **CN:** 开始一个由 `start_group_idx + self.lane_idx < self.group_count` 控制的条件分支。
+- **L626** `                    self.cached_problem_shape_1 = self._get_problem_for_group(` — **EN:** Assigns a value to self.cached_problem_shape_1. **CN:** 将一个值赋给 self.cached_problem_shape_1。
+- **L627** `                        problem_shape_mnkl, start_group_idx + self.lane_idx` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L628** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L629** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L630** `        # The tile is invalid if not_found doesn't change before and after the while loop.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L631** `        end_not_found = not_found` — **EN:** Assigns a value to end_not_found. **CN:** 将一个值赋给 end_not_found。
+- **L632** `        is_valid = start_not_found != end_not_found` — **EN:** Assigns a value to is_valid. **CN:** 将一个值赋给 is_valid。
+- **L633** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L634** `        return GroupedGemmGroupSearchState(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L635** `            start_group_idx,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L636** `            tile_count_prev_group,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L637** `            tile_count_searched,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L638** `            is_valid,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L639** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L640** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L641** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L642** `    @cute.jit` — **EN:** Applies decorator `cute.jit` to the following definition. **CN:** 将装饰器 `cute.jit` 应用于后面的定义。
+- **L643** `    def _group_search_and_load_problem_shape(` — **EN:** Defines function `_group_search_and_load_problem_shape`. **CN:** 定义函数 `_group_search_and_load_problem_shape`。
+- **L644** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L645** `        linear_idx: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L646** `        problem_shape_mnkl: cute.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L647** `        start_group_idx: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L648** `        tile_count_searched: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L649** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L650** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L651** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L652** `    ) -> Tuple[Boolean, Union[Int32, int], cute.Tensor]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L653** `        """` — **EN:** Starts the docstring for the function `_group_search_and_load_problem_shape`. **CN:** 开始说明 function `_group_search_and_load_problem_shape` 的文档字符串。
+- **L654** `        Perform group search and load problem shape for the matched group.` — **EN:** Continues the docstring for the function `_group_search_and_load_problem_shape`. **CN:** 继续说明 function `_group_search_and_load_problem_shape` 的文档字符串。
+- **L655** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L656** `        :param linear_idx: The linear index to be decomposed` — **EN:** Continues the docstring for the function `_group_search_and_load_problem_shape`. **CN:** 继续说明 function `_group_search_and_load_problem_shape` 的文档字符串。
+- **L657** `        :type linear_idx: Int32` — **EN:** Continues the docstring for the function `_group_search_and_load_problem_shape`. **CN:** 继续说明 function `_group_search_and_load_problem_shape` 的文档字符串。
+- **L658** `        :param problem_shape_mnkl: Tensor containing gemm problem size (M, N, K, L) for all groups` — **EN:** Continues the docstring for the function `_group_search_and_load_problem_shape`. **CN:** 继续说明 function `_group_search_and_load_problem_shape` 的文档字符串。
+- **L659** `        :type problem_shape_mnkl: cute.Tensor` — **EN:** Continues the docstring for the function `_group_search_and_load_problem_shape`. **CN:** 继续说明 function `_group_search_and_load_problem_shape` 的文档字符串。
+- **L660** `        :param start_group_idx: The group idx to start the search with` — **EN:** Continues the docstring for the function `_group_search_and_load_problem_shape`. **CN:** 继续说明 function `_group_search_and_load_problem_shape` 的文档字符串。
+- **L661** `        :type start_group_idx: Int32` — **EN:** Continues the docstring for the function `_group_search_and_load_problem_shape`. **CN:** 继续说明 function `_group_search_and_load_problem_shape` 的文档字符串。
+- **L662** `        :param tile_count_searched: The number of tiles we have searched` — **EN:** Continues the docstring for the function `_group_search_and_load_problem_shape`. **CN:** 继续说明 function `_group_search_and_load_problem_shape` 的文档字符串。
+- **L663** `        :type tile_count_searched: Int32` — **EN:** Continues the docstring for the function `_group_search_and_load_problem_shape`. **CN:** 继续说明 function `_group_search_and_load_problem_shape` 的文档字符串。
+- **L664** `        :return: A tuple containing the final group index and the problem shape tensor` — **EN:** Continues the docstring for the function `_group_search_and_load_problem_shape`. **CN:** 继续说明 function `_group_search_and_load_problem_shape` 的文档字符串。
+- **L665** `        :rtype: Tuple[Int32, cute.Tensor]` — **EN:** Continues the docstring for the function `_group_search_and_load_problem_shape`. **CN:** 继续说明 function `_group_search_and_load_problem_shape` 的文档字符串。
+- **L666** `        """` — **EN:** Ends the docstring for the function `_group_search_and_load_problem_shape`. **CN:** 结束说明 function `_group_search_and_load_problem_shape` 的文档字符串。
+- **L667** `        self.search_state = self._group_search(` — **EN:** Assigns a value to self.search_state. **CN:** 将一个值赋给 self.search_state。
+- **L668** `            linear_idx,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L669** `            problem_shape_mnkl,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L670** `            start_group_idx,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L671** `            tile_count_searched,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L672** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L673** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L674** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L675** `        tidx, _, _ = cute.arch.thread_idx()` — **EN:** Assigns a value to (tidx, _, _). **CN:** 将一个值赋给 (tidx, _, _)。
+- **L676** `        # get final group search state` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L677** `        found = self.search_state.found` — **EN:** Assigns a value to found. **CN:** 将一个值赋给 found。
+- **L678** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L679** `        final_group_idx: Union[Int32, int] = -1` — **EN:** Assigns a typed value to final_group_idx. **CN:** 为 final_group_idx 赋予带类型标注的值。
+- **L680** `        problem_mnkl = cute.make_rmem_tensor(` — **EN:** Assigns a value to problem_mnkl. **CN:** 将一个值赋给 problem_mnkl。
+- **L681** `            cute.make_layout(4), problem_shape_mnkl.element_type, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L682** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L683** `        if found:` — **EN:** Starts a conditional branch guarded by `found`. **CN:** 开始一个由 `found` 控制的条件分支。
+- **L684** `            final_group_idx = self.search_state.start_group_idx` — **EN:** Assigns a value to final_group_idx. **CN:** 将一个值赋给 final_group_idx。
+- **L685** `            problem_mnkl = self._get_problem_for_group(` — **EN:** Assigns a value to problem_mnkl. **CN:** 将一个值赋给 problem_mnkl。
+- **L686** `                problem_shape_mnkl, final_group_idx, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L687** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L688** `        return found, final_group_idx, problem_mnkl` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L689** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L690** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L691** `    def delinearize_z(` — **EN:** Defines function `delinearize_z`. **CN:** 定义函数 `delinearize_z`。
+- **L692** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L693** `        cta_tile_coord: tuple,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L694** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L695** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L696** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L697** `    ) -> "GroupedWorkTileInfo":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L698** `        """` — **EN:** Starts the docstring for the function `delinearize_z`. **CN:** 开始说明 function `delinearize_z` 的文档字符串。
+- **L699** `        Delinearize the linear z index and return GroupSearchResult.` — **EN:** Continues the docstring for the function `delinearize_z`. **CN:** 继续说明 function `delinearize_z` 的文档字符串。
+- **L700** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L701** `        This function should be used by warps that need to know the CTA tile index on M and N dimensions.` — **EN:** Continues the docstring for the function `delinearize_z`. **CN:** 继续说明 function `delinearize_z` 的文档字符串。
+- **L702** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L703** `        :param cta_tile_coord: The raw CTA coordinate from tile scheduler` — **EN:** Continues the docstring for the function `delinearize_z`. **CN:** 继续说明 function `delinearize_z` 的文档字符串。
+- **L704** `        :type cta_tile_coord: tuple of Int32` — **EN:** Continues the docstring for the function `delinearize_z`. **CN:** 继续说明 function `delinearize_z` 的文档字符串。
+- **L705** `        :param problem_shape_mnkl: Tensor containing gemm problem size (M, N, K, L) for each group` — **EN:** Continues the docstring for the function `delinearize_z`. **CN:** 继续说明 function `delinearize_z` 的文档字符串。
+- **L706** `        :type problem_shape_mnkl: cute.Tensor` — **EN:** Continues the docstring for the function `delinearize_z`. **CN:** 继续说明 function `delinearize_z` 的文档字符串。
+- **L707** `        :return: The search result containing group index and tile coordinates` — **EN:** Continues the docstring for the function `delinearize_z`. **CN:** 继续说明 function `delinearize_z` 的文档字符串。
+- **L708** `        :rtype: GroupSearchResult` — **EN:** Continues the docstring for the function `delinearize_z`. **CN:** 继续说明 function `delinearize_z` 的文档字符串。
+- **L709** `        """` — **EN:** Ends the docstring for the function `delinearize_z`. **CN:** 结束说明 function `delinearize_z` 的文档字符串。
+- **L710** `        # delinear the z coord` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L711** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L712** `        linear_idx = self._current_work_linear_idx` — **EN:** Assigns a value to linear_idx. **CN:** 将一个值赋给 linear_idx。
+- **L713** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L714** `        found, group_idx, problem_mnkl = self._group_search_and_load_problem_shape(` — **EN:** Assigns a value to (found, group_idx, problem_mnkl). **CN:** 将一个值赋给 (found, group_idx, problem_mnkl)。
+- **L715** `            linear_idx,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L716** `            self.problem_shape_mnkl,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L717** `            self.search_state.start_group_idx,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L718** `            self.search_state.tile_count_prev_group,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L719** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L720** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L721** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L722** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L723** `        # The work_tile is valid if its linear index could be mapped to a group in the problem shapes` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L724** `        is_valid = found` — **EN:** Assigns a value to is_valid. **CN:** 将一个值赋给 is_valid。
+- **L725** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L726** `        # linear index local to current group` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L727** `        cluster_tile_idx_in_current_group = (` — **EN:** Assigns a value to cluster_tile_idx_in_current_group. **CN:** 将一个值赋给 cluster_tile_idx_in_current_group。
+- **L728** `            linear_idx - self.search_state.tile_count_prev_group` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L729** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L730** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L731** `        cluster_count_m, cluster_count_n, cluster_count_k = cute.ceil_div(` — **EN:** Assigns a value to (cluster_count_m, cluster_count_n, cluster_count_k). **CN:** 将一个值赋给 (cluster_count_m, cluster_count_n, cluster_count_k)。
+- **L732** `            (problem_mnkl[0], problem_mnkl[1], problem_mnkl[2]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L733** `            (` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L734** `                self.cluster_tile_shape_mnk[0],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L735** `                self.cluster_tile_shape_mnk[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L736** `                self.cluster_tile_shape_mnk[2],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L737** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L738** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L739** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L740** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L741** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L742** `        # decompose to get indices on M and N` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L743** `        cta_tile_idx_m, cta_tile_idx_n = self._compute_cta_tile_coord(` — **EN:** Assigns a value to (cta_tile_idx_m, cta_tile_idx_n). **CN:** 将一个值赋给 (cta_tile_idx_m, cta_tile_idx_n)。
+- **L744** `            cluster_tile_idx_in_current_group,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L745** `            cta_tile_coord,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L746** `            cluster_count_m,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L747** `            cluster_count_n,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L748** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L749** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L750** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L751** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L752** `        group_search_result = GroupSearchResult(` — **EN:** Assigns a value to group_search_result. **CN:** 将一个值赋给 group_search_result。
+- **L753** `            group_idx,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L754** `            cta_tile_idx_m,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L755** `            cta_tile_idx_n,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L756** `            problem_mnkl[0],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L757** `            problem_mnkl[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L758** `            problem_mnkl[2],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L759** `            cluster_count_k,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L760** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L761** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L762** `        return GroupedWorkTileInfo(cta_tile_coord, is_valid, group_search_result)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L763** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L764** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L765** `    def get_current_work(` — **EN:** Defines function `get_current_work`. **CN:** 定义函数 `get_current_work`。
+- **L766** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L767** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L768** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L769** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L770** `    ) -> WorkTileInfo:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L771** `        work_tile = self._get_current_work_for_linear_idx(` — **EN:** Assigns a value to work_tile. **CN:** 将一个值赋给 work_tile。
+- **L772** `            self._current_work_linear_idx, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L773** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L774** `        grouped_work_tile = self.delinearize_z(work_tile.tile_idx, loc=loc, ip=ip)` — **EN:** Assigns a value to grouped_work_tile. **CN:** 将一个值赋给 grouped_work_tile。
+- **L775** `        return grouped_work_tile` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L776** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L777** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L778** `@deprecated(` — **EN:** Applies decorator `deprecated('API is deprecated, use cutlass.utils.StaticPe...` to the following definition. **CN:** 将装饰器 `deprecated('API is deprecated, use cutlass.utils.StaticPe...` 应用于后面的定义。
+- **L779** `    "API is deprecated, use cutlass.utils.StaticPersistentGroupTileScheduler instead"` — **EN:** Applies decorator `deprecated('API is deprecated, use cutlass.utils.StaticPe...` to the following definition. **CN:** 将装饰器 `deprecated('API is deprecated, use cutlass.utils.StaticPe...` 应用于后面的定义。
+- **L780** `)` — **EN:** Applies decorator `deprecated('API is deprecated, use cutlass.utils.StaticPe...` to the following definition. **CN:** 将装饰器 `deprecated('API is deprecated, use cutlass.utils.StaticPe...` 应用于后面的定义。
+- **L781** `class GroupedGemmTileSchedulerHelper:` — **EN:** Defines class `GroupedGemmTileSchedulerHelper`. **CN:** 定义类 `GroupedGemmTileSchedulerHelper`。
+- **L782** `    """` — **EN:** Starts the docstring for the class `GroupedGemmTileSchedulerHelper`. **CN:** 开始说明 class `GroupedGemmTileSchedulerHelper` 的文档字符串。
+- **L783** `    A helper to translate the raw block index (x, y, z) from tile scheduler to real CTA tile index for grouped gemm.` — **EN:** Continues the docstring for the class `GroupedGemmTileSchedulerHelper`. **CN:** 继续说明 class `GroupedGemmTileSchedulerHelper` 的文档字符串。
+- **L784** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L785** `    :param group_count: Number of groups in current grouped gemm problem` — **EN:** Continues the docstring for the class `GroupedGemmTileSchedulerHelper`. **CN:** 继续说明 class `GroupedGemmTileSchedulerHelper` 的文档字符串。
+- **L786** `    :type group_count: int` — **EN:** Continues the docstring for the class `GroupedGemmTileSchedulerHelper`. **CN:** 继续说明 class `GroupedGemmTileSchedulerHelper` 的文档字符串。
+- **L787** `    :param tile_sched_params: Parameter used to create the tile scheduler this helper works with` — **EN:** Continues the docstring for the class `GroupedGemmTileSchedulerHelper`. **CN:** 继续说明 class `GroupedGemmTileSchedulerHelper` 的文档字符串。
+- **L788** `    :type tile_sched_params: PersistentTileSchedulerParams` — **EN:** Continues the docstring for the class `GroupedGemmTileSchedulerHelper`. **CN:** 继续说明 class `GroupedGemmTileSchedulerHelper` 的文档字符串。
+- **L789** `    :param cluster_tile_shape_mnk: The shape of cluster tile as (m, n, k)` — **EN:** Continues the docstring for the class `GroupedGemmTileSchedulerHelper`. **CN:** 继续说明 class `GroupedGemmTileSchedulerHelper` 的文档字符串。
+- **L790** `    :type cluster_tile_shape_mnk: tuple[int, int, int]` — **EN:** Continues the docstring for the class `GroupedGemmTileSchedulerHelper`. **CN:** 继续说明 class `GroupedGemmTileSchedulerHelper` 的文档字符串。
+- **L791** `    :param search_state: The initial search state` — **EN:** Continues the docstring for the class `GroupedGemmTileSchedulerHelper`. **CN:** 继续说明 class `GroupedGemmTileSchedulerHelper` 的文档字符串。
+- **L792** `    :type search_state: GroupedGemmGroupSearchState` — **EN:** Continues the docstring for the class `GroupedGemmTileSchedulerHelper`. **CN:** 继续说明 class `GroupedGemmTileSchedulerHelper` 的文档字符串。
+- **L793** `    """` — **EN:** Ends the docstring for the class `GroupedGemmTileSchedulerHelper`. **CN:** 结束说明 class `GroupedGemmTileSchedulerHelper` 的文档字符串。
+- **L794** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L795** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L796** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L797** `        group_count: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L798** `        tile_sched_params: PersistentTileSchedulerParams,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L799** `        cluster_tile_shape_mnk: tuple[int, int, int],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L800** `        search_state: GroupedGemmGroupSearchState,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L801** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L802** `        self.tile_sched_params = tile_sched_params` — **EN:** Assigns a value to self.tile_sched_params. **CN:** 将一个值赋给 self.tile_sched_params。
+- **L803** `        self.group_count = group_count` — **EN:** Assigns a value to self.group_count. **CN:** 将一个值赋给 self.group_count。
+- **L804** `        self.lane_idx = cute.arch.lane_idx()` — **EN:** Assigns a value to self.lane_idx. **CN:** 将一个值赋给 self.lane_idx。
+- **L805** `        self.cluster_tile_shape_mnk = cluster_tile_shape_mnk` — **EN:** Assigns a value to self.cluster_tile_shape_mnk. **CN:** 将一个值赋给 self.cluster_tile_shape_mnk。
+- **L806** `        self.search_state = search_state` — **EN:** Assigns a value to self.search_state. **CN:** 将一个值赋给 self.search_state。
+- **L807** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L808** `    def __extract_mlir_values__(self) -> List[ir.Value]:` — **EN:** Defines function `__extract_mlir_values__`. **CN:** 定义函数 `__extract_mlir_values__`。
+- **L809** `        values = extract_mlir_values(self.tile_sched_params)` — **EN:** Assigns a value to values. **CN:** 将一个值赋给 values。
+- **L810** `        values.extend(extract_mlir_values(self.search_state))` — **EN:** Invokes `values.extend` as a standalone call. **CN:** 以独立语句方式调用 `values.extend`。
+- **L811** `        return values` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L812** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L813** `    def __new_from_mlir_values__(` — **EN:** Defines function `__new_from_mlir_values__`. **CN:** 定义函数 `__new_from_mlir_values__`。
+- **L814** `        self, values: List[ir.Value]` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L815** `    ) -> "GroupedGemmTileSchedulerHelper":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L816** `        # Reconstruct tile_sched_params and determine how many values it consumed.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L817** `        # NOTE: tile_sched_params may contain FastDivmod divisors (when swizzle_size == 1),` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L818** `        # which adds extra MLIR values.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L819** `        params_values = extract_mlir_values(self.tile_sched_params)` — **EN:** Assigns a value to params_values. **CN:** 将一个值赋给 params_values。
+- **L820** `        n_params_values = len(params_values)` — **EN:** Assigns a value to n_params_values. **CN:** 将一个值赋给 n_params_values。
+- **L821** `        tile_sched_params = new_from_mlir_values(` — **EN:** Assigns a value to tile_sched_params. **CN:** 将一个值赋给 tile_sched_params。
+- **L822** `            self.tile_sched_params, values[:n_params_values]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L823** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L824** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L825** `        # Reconstruct search_state from remaining values` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L826** `        search_state = new_from_mlir_values(self.search_state, values[n_params_values:])` — **EN:** Assigns a value to search_state. **CN:** 将一个值赋给 search_state。
+- **L827** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L828** `        return GroupedGemmTileSchedulerHelper(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L829** `            self.group_count,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L830** `            tile_sched_params,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L831** `            self.cluster_tile_shape_mnk,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L832** `            search_state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L833** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L834** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L835** `    def delinearize_z(` — **EN:** Defines function `delinearize_z`. **CN:** 定义函数 `delinearize_z`。
+- **L836** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L837** `        cta_tile_coord: tuple,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L838** `        problem_shape_mnkl: cute.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L839** `    ) -> GroupSearchResult:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L840** `        """` — **EN:** Starts the docstring for the function `delinearize_z`. **CN:** 开始说明 function `delinearize_z` 的文档字符串。
+- **L841** `        Delinearize the linear z index and return GroupSearchResult.` — **EN:** Continues the docstring for the function `delinearize_z`. **CN:** 继续说明 function `delinearize_z` 的文档字符串。
+- **L842** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L843** `        This function should be used by warps that need to know the CTA tile index on M and N dimensions.` — **EN:** Continues the docstring for the function `delinearize_z`. **CN:** 继续说明 function `delinearize_z` 的文档字符串。
+- **L844** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L845** `        :param cta_tile_coord: The raw CTA coordinate from tile scheduler` — **EN:** Continues the docstring for the function `delinearize_z`. **CN:** 继续说明 function `delinearize_z` 的文档字符串。
+- **L846** `        :type cta_tile_coord: tuple of Int32` — **EN:** Continues the docstring for the function `delinearize_z`. **CN:** 继续说明 function `delinearize_z` 的文档字符串。
+- **L847** `        :param problem_shape_mnkl: Tensor containing gemm problem size (M, N, K, L) for each group` — **EN:** Continues the docstring for the function `delinearize_z`. **CN:** 继续说明 function `delinearize_z` 的文档字符串。
+- **L848** `        :type problem_shape_mnkl: cute.Tensor` — **EN:** Continues the docstring for the function `delinearize_z`. **CN:** 继续说明 function `delinearize_z` 的文档字符串。
+- **L849** `        :return: The search result containing group index and tile coordinates` — **EN:** Continues the docstring for the function `delinearize_z`. **CN:** 继续说明 function `delinearize_z` 的文档字符串。
+- **L850** `        :rtype: GroupSearchResult` — **EN:** Continues the docstring for the function `delinearize_z`. **CN:** 继续说明 function `delinearize_z` 的文档字符串。
+- **L851** `        """` — **EN:** Ends the docstring for the function `delinearize_z`. **CN:** 结束说明 function `delinearize_z` 的文档字符串。
+- **L852** `        # delinear the z coord` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L853** `        linear_idx = cta_tile_coord[2]` — **EN:** Assigns a value to linear_idx. **CN:** 将一个值赋给 linear_idx。
+- **L854** `        group_idx, problem_mnkl = self._group_search_and_load_problem_shape(` — **EN:** Assigns a value to (group_idx, problem_mnkl). **CN:** 将一个值赋给 (group_idx, problem_mnkl)。
+- **L855** `            linear_idx,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L856** `            problem_shape_mnkl,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L857** `            self.search_state.start_group_idx,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L858** `            self.search_state.tile_count_prev_group,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L859** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L860** `        # linear index local to current group` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L861** `        cluster_tile_idx_in_current_group = (` — **EN:** Assigns a value to cluster_tile_idx_in_current_group. **CN:** 将一个值赋给 cluster_tile_idx_in_current_group。
+- **L862** `            linear_idx - self.search_state.tile_count_prev_group` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L863** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L864** `        cluster_count_m, cluster_count_n, cluster_count_k = cute.ceil_div(` — **EN:** Assigns a value to (cluster_count_m, cluster_count_n, cluster_count_k). **CN:** 将一个值赋给 (cluster_count_m, cluster_count_n, cluster_count_k)。
+- **L865** `            (problem_mnkl[0], problem_mnkl[1], problem_mnkl[2]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L866** `            (` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L867** `                self.cluster_tile_shape_mnk[0],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L868** `                self.cluster_tile_shape_mnk[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L869** `                self.cluster_tile_shape_mnk[2],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L870** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L871** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L872** `        # decompose to get indices on M and N` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L873** `        cta_tile_idx_m, cta_tile_idx_n = self._compute_cta_tile_coord(` — **EN:** Assigns a value to (cta_tile_idx_m, cta_tile_idx_n). **CN:** 将一个值赋给 (cta_tile_idx_m, cta_tile_idx_n)。
+- **L874** `            cluster_tile_idx_in_current_group,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L875** `            cta_tile_coord,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L876** `            cluster_count_m,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L877** `            cluster_count_n,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L878** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L879** `        return GroupSearchResult(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L880** `            group_idx,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L881** `            cta_tile_idx_m,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L882** `            cta_tile_idx_n,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L883** `            problem_mnkl[0],  # type: ignore[arg-type]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L884** `            problem_mnkl[1],  # type: ignore[arg-type]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L885** `            problem_mnkl[2],  # type: ignore[arg-type]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L886** `            cluster_count_k,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L887** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L888** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L889** `    def search_cluster_tile_count_k(` — **EN:** Defines function `search_cluster_tile_count_k`. **CN:** 定义函数 `search_cluster_tile_count_k`。
+- **L890** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L891** `        cta_tile_coord: tuple,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L892** `        problem_shape_mnkl: cute.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L893** `    ) -> Tuple[Int32, Int32]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L894** `        """` — **EN:** Starts the docstring for the function `search_cluster_tile_count_k`. **CN:** 开始说明 function `search_cluster_tile_count_k` 的文档字符串。
+- **L895** `        Search the matched group for given linear index and compute the number of tiles along K dimension for the matched group.` — **EN:** Continues the docstring for the function `search_cluster_tile_count_k`. **CN:** 继续说明 function `search_cluster_tile_count_k` 的文档字符串。
+- **L896** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L897** `        This function should be used by warps that are only interested in the number of tiles along K dimension.` — **EN:** Continues the docstring for the function `search_cluster_tile_count_k`. **CN:** 继续说明 function `search_cluster_tile_count_k` 的文档字符串。
+- **L898** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L899** `        :param cta_tile_coord: The raw CTA coordinate from tile scheduler` — **EN:** Continues the docstring for the function `search_cluster_tile_count_k`. **CN:** 继续说明 function `search_cluster_tile_count_k` 的文档字符串。
+- **L900** `        :type cta_tile_coord: tuple of Int32` — **EN:** Continues the docstring for the function `search_cluster_tile_count_k`. **CN:** 继续说明 function `search_cluster_tile_count_k` 的文档字符串。
+- **L901** `        :param problem_shape_mnkl: Tensor containing gemm problem size (M, N, K, L) for all groups` — **EN:** Continues the docstring for the function `search_cluster_tile_count_k`. **CN:** 继续说明 function `search_cluster_tile_count_k` 的文档字符串。
+- **L902** `        :type problem_shape_mnkl: cute.Tensor` — **EN:** Continues the docstring for the function `search_cluster_tile_count_k`. **CN:** 继续说明 function `search_cluster_tile_count_k` 的文档字符串。
+- **L903** `        :return: A tuple containing cluster count along K dimension and the group index` — **EN:** Continues the docstring for the function `search_cluster_tile_count_k`. **CN:** 继续说明 function `search_cluster_tile_count_k` 的文档字符串。
+- **L904** `        :rtype: Tuple[Int32, Int32]` — **EN:** Continues the docstring for the function `search_cluster_tile_count_k`. **CN:** 继续说明 function `search_cluster_tile_count_k` 的文档字符串。
+- **L905** `        """` — **EN:** Ends the docstring for the function `search_cluster_tile_count_k`. **CN:** 结束说明 function `search_cluster_tile_count_k` 的文档字符串。
+- **L906** `        group_idx, problem_mnk = self._group_search_and_load_problem_shape(` — **EN:** Assigns a value to (group_idx, problem_mnk). **CN:** 将一个值赋给 (group_idx, problem_mnk)。
+- **L907** `            cta_tile_coord[2],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L908** `            problem_shape_mnkl,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L909** `            self.search_state.start_group_idx,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L910** `            self.search_state.tile_count_prev_group,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L911** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L912** `        cluster_count_k = (` — **EN:** Assigns a value to cluster_count_k. **CN:** 将一个值赋给 cluster_count_k。
+- **L913** `            problem_mnk[2] + self.cluster_tile_shape_mnk[2] - 1  # type: ignore[operator]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L914** `        ) // self.cluster_tile_shape_mnk[2]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L915** `        return cluster_count_k, group_idx  # type: ignore[return-value]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L916** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L917** `    @cute.jit` — **EN:** Applies decorator `cute.jit` to the following definition. **CN:** 将装饰器 `cute.jit` 应用于后面的定义。
+- **L918** `    def _prefix_sum(self, value_per_thread: Int32) -> Int32:` — **EN:** Defines function `_prefix_sum`. **CN:** 定义函数 `_prefix_sum`。
+- **L919** `        """` — **EN:** Starts the docstring for the function `_prefix_sum`. **CN:** 开始说明 function `_prefix_sum` 的文档字符串。
+- **L920** `        Perform prefix sum within a full warp.` — **EN:** Continues the docstring for the function `_prefix_sum`. **CN:** 继续说明 function `_prefix_sum` 的文档字符串。
+- **L921** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L922** `        :param value_per_thread: The value for this thread to contribute to the prefix sum` — **EN:** Continues the docstring for the function `_prefix_sum`. **CN:** 继续说明 function `_prefix_sum` 的文档字符串。
+- **L923** `        :type value_per_thread: Int32` — **EN:** Continues the docstring for the function `_prefix_sum`. **CN:** 继续说明 function `_prefix_sum` 的文档字符串。
+- **L924** `        :return: The prefix sum result for this thread` — **EN:** Continues the docstring for the function `_prefix_sum`. **CN:** 继续说明 function `_prefix_sum` 的文档字符串。
+- **L925** `        :rtype: Int32` — **EN:** Continues the docstring for the function `_prefix_sum`. **CN:** 继续说明 function `_prefix_sum` 的文档字符串。
+- **L926** `        """` — **EN:** Ends the docstring for the function `_prefix_sum`. **CN:** 结束说明 function `_prefix_sum` 的文档字符串。
+- **L927** `        clamp_value = 0` — **EN:** Assigns a value to clamp_value. **CN:** 将一个值赋给 clamp_value。
+- **L928** `        idx = 1` — **EN:** Assigns a value to idx. **CN:** 将一个值赋给 idx。
+- **L929** `        sum_per_thread = value_per_thread` — **EN:** Assigns a value to sum_per_thread. **CN:** 将一个值赋给 sum_per_thread。
+- **L930** `        while const_expr(idx < cute.arch.WARP_SIZE):` — **EN:** Starts a while-loop guarded by `const_expr(idx < cute.arch.WARP_SIZE)`. **CN:** 开始一个由 `const_expr(idx < cute.arch.WARP_SIZE)` 控制的 while 循环。
+- **L931** `            value = cute.arch.shuffle_sync_up(` — **EN:** Assigns a value to value. **CN:** 将一个值赋给 value。
+- **L932** `                sum_per_thread, idx, mask_and_clamp=clamp_value` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L933** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L934** `            if self.lane_idx >= idx:` — **EN:** Starts a conditional branch guarded by `self.lane_idx >= idx`. **CN:** 开始一个由 `self.lane_idx >= idx` 控制的条件分支。
+- **L935** `                sum_per_thread += value` — **EN:** Updates sum_per_thread in place. **CN:** 原地更新 sum_per_thread。
+- **L936** `            idx = idx << 1` — **EN:** Assigns a value to idx. **CN:** 将一个值赋给 idx。
+- **L937** `        return sum_per_thread` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L938** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L939** `    def _get_problem_for_group(` — **EN:** Defines function `_get_problem_for_group`. **CN:** 定义函数 `_get_problem_for_group`。
+- **L940** `        self, problem_shape_mnkl: cute.Tensor, group_idx: Int32` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L941** `    ) -> cute.Tensor:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L942** `        """` — **EN:** Starts the docstring for the function `_get_problem_for_group`. **CN:** 开始说明 function `_get_problem_for_group` 的文档字符串。
+- **L943** `        Load gemm problem (m,n,k,l) for the specified group from global memory to register.` — **EN:** Continues the docstring for the function `_get_problem_for_group`. **CN:** 继续说明 function `_get_problem_for_group` 的文档字符串。
+- **L944** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L945** `        :param problem_shape_mnkl: Tensor in global memory with layout (group_count, 4):(4, 1)` — **EN:** Continues the docstring for the function `_get_problem_for_group`. **CN:** 继续说明 function `_get_problem_for_group` 的文档字符串。
+- **L946** `        :type problem_shape_mnkl: cute.Tensor` — **EN:** Continues the docstring for the function `_get_problem_for_group`. **CN:** 继续说明 function `_get_problem_for_group` 的文档字符串。
+- **L947** `        :param group_idx: The index of the group to load` — **EN:** Continues the docstring for the function `_get_problem_for_group`. **CN:** 继续说明 function `_get_problem_for_group` 的文档字符串。
+- **L948** `        :type group_idx: Int32` — **EN:** Continues the docstring for the function `_get_problem_for_group`. **CN:** 继续说明 function `_get_problem_for_group` 的文档字符串。
+- **L949** `        :return: The problem shape tensor for the specified group` — **EN:** Continues the docstring for the function `_get_problem_for_group`. **CN:** 继续说明 function `_get_problem_for_group` 的文档字符串。
+- **L950** `        :rtype: cute.Tensor` — **EN:** Continues the docstring for the function `_get_problem_for_group`. **CN:** 继续说明 function `_get_problem_for_group` 的文档字符串。
+- **L951** `        """` — **EN:** Ends the docstring for the function `_get_problem_for_group`. **CN:** 结束说明 function `_get_problem_for_group` 的文档字符串。
+- **L952** `        cur_problem_mnkl = cute.make_rmem_tensor(` — **EN:** Assigns a value to cur_problem_mnkl. **CN:** 将一个值赋给 cur_problem_mnkl。
+- **L953** `            cute.make_layout(4), problem_shape_mnkl.element_type` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L954** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L955** `        cute.autovec_copy(problem_shape_mnkl[(group_idx, None)], cur_problem_mnkl)` — **EN:** Invokes `cute.autovec_copy` as a standalone call. **CN:** 以独立语句方式调用 `cute.autovec_copy`。
+- **L956** `        return cur_problem_mnkl` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L957** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L958** `    def _get_cluster_tile_count_mn(self, problem_shape: cute.Tensor) -> Int32:` — **EN:** Defines function `_get_cluster_tile_count_mn`. **CN:** 定义函数 `_get_cluster_tile_count_mn`。
+- **L959** `        """` — **EN:** Starts the docstring for the function `_get_cluster_tile_count_mn`. **CN:** 开始说明 function `_get_cluster_tile_count_mn` 的文档字符串。
+- **L960** `        Compute total cluster count.` — **EN:** Continues the docstring for the function `_get_cluster_tile_count_mn`. **CN:** 继续说明 function `_get_cluster_tile_count_mn` 的文档字符串。
+- **L961** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L962** `        :param problem_shape: Tensor containing problem shape (m, n, k, l)` — **EN:** Continues the docstring for the function `_get_cluster_tile_count_mn`. **CN:** 继续说明 function `_get_cluster_tile_count_mn` 的文档字符串。
+- **L963** `        :type problem_shape: cute.Tensor` — **EN:** Continues the docstring for the function `_get_cluster_tile_count_mn`. **CN:** 继续说明 function `_get_cluster_tile_count_mn` 的文档字符串。
+- **L964** `        :return: The total cluster tile count for M and N dimensions` — **EN:** Continues the docstring for the function `_get_cluster_tile_count_mn`. **CN:** 继续说明 function `_get_cluster_tile_count_mn` 的文档字符串。
+- **L965** `        :rtype: Int32` — **EN:** Continues the docstring for the function `_get_cluster_tile_count_mn`. **CN:** 继续说明 function `_get_cluster_tile_count_mn` 的文档字符串。
+- **L966** `        """` — **EN:** Ends the docstring for the function `_get_cluster_tile_count_mn`. **CN:** 结束说明 function `_get_cluster_tile_count_mn` 的文档字符串。
+- **L967** `        cur_ntile_m = (` — **EN:** Assigns a value to cur_ntile_m. **CN:** 将一个值赋给 cur_ntile_m。
+- **L968** `            problem_shape[0] + self.cluster_tile_shape_mnk[0] - 1  # type: ignore[operator]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L969** `        ) // self.cluster_tile_shape_mnk[0]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L970** `        cur_ntile_n = (` — **EN:** Assigns a value to cur_ntile_n. **CN:** 将一个值赋给 cur_ntile_n。
+- **L971** `            problem_shape[1] + self.cluster_tile_shape_mnk[1] - 1  # type: ignore[operator]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L972** `        ) // self.cluster_tile_shape_mnk[1]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L973** `        cur_ntile_mn = cur_ntile_m * cur_ntile_n` — **EN:** Assigns a value to cur_ntile_mn. **CN:** 将一个值赋给 cur_ntile_mn。
+- **L974** `        return cur_ntile_mn  # type: ignore[return-value]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L975** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L976** `    def _compute_cta_tile_coord(` — **EN:** Defines function `_compute_cta_tile_coord`. **CN:** 定义函数 `_compute_cta_tile_coord`。
+- **L977** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L978** `        cluster_tile_idx: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L979** `        cta_tile_coord_in_cluster: tuple,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L980** `        cluster_tile_count_m: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L981** `        cluster_tile_count_n: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L982** `    ) -> tuple:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L983** `        """` — **EN:** Starts the docstring for the function `_compute_cta_tile_coord`. **CN:** 开始说明 function `_compute_cta_tile_coord` 的文档字符串。
+- **L984** `        Compute CTA tile indices along M and N dimensions based on the linear index within a group.` — **EN:** Continues the docstring for the function `_compute_cta_tile_coord`. **CN:** 继续说明 function `_compute_cta_tile_coord` 的文档字符串。
+- **L985** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L986** `        It uses the AlongM mode to decompose the linear index onto M and N dimensions.` — **EN:** Continues the docstring for the function `_compute_cta_tile_coord`. **CN:** 继续说明 function `_compute_cta_tile_coord` 的文档字符串。
+- **L987** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L988** `        :param cluster_tile_idx: The linear index within a group` — **EN:** Continues the docstring for the function `_compute_cta_tile_coord`. **CN:** 继续说明 function `_compute_cta_tile_coord` 的文档字符串。
+- **L989** `        :type cluster_tile_idx: Int32` — **EN:** Continues the docstring for the function `_compute_cta_tile_coord`. **CN:** 继续说明 function `_compute_cta_tile_coord` 的文档字符串。
+- **L990** `        :param cta_tile_coord_in_cluster: CTA indices along M and N dimensions within a cluster` — **EN:** Continues the docstring for the function `_compute_cta_tile_coord`. **CN:** 继续说明 function `_compute_cta_tile_coord` 的文档字符串。
+- **L991** `        :type cta_tile_coord_in_cluster: tuple of Int32` — **EN:** Continues the docstring for the function `_compute_cta_tile_coord`. **CN:** 继续说明 function `_compute_cta_tile_coord` 的文档字符串。
+- **L992** `        :param cluster_tile_count_m: The number of clusters along M dimension of the matched group` — **EN:** Continues the docstring for the function `_compute_cta_tile_coord`. **CN:** 继续说明 function `_compute_cta_tile_coord` 的文档字符串。
+- **L993** `        :type cluster_tile_count_m: Int32` — **EN:** Continues the docstring for the function `_compute_cta_tile_coord`. **CN:** 继续说明 function `_compute_cta_tile_coord` 的文档字符串。
+- **L994** `        :param cluster_tile_count_n: The number of clusters along N dimension of the matched group` — **EN:** Continues the docstring for the function `_compute_cta_tile_coord`. **CN:** 继续说明 function `_compute_cta_tile_coord` 的文档字符串。
+- **L995** `        :type cluster_tile_count_n: Int32` — **EN:** Continues the docstring for the function `_compute_cta_tile_coord`. **CN:** 继续说明 function `_compute_cta_tile_coord` 的文档字符串。
+- **L996** `        :return: A tuple containing CTA tile indices along M and N dimensions` — **EN:** Continues the docstring for the function `_compute_cta_tile_coord`. **CN:** 继续说明 function `_compute_cta_tile_coord` 的文档字符串。
+- **L997** `        :rtype: tuple of (Int32, Int32)` — **EN:** Continues the docstring for the function `_compute_cta_tile_coord`. **CN:** 继续说明 function `_compute_cta_tile_coord` 的文档字符串。
+- **L998** `        """` — **EN:** Ends the docstring for the function `_compute_cta_tile_coord`. **CN:** 结束说明 function `_compute_cta_tile_coord` 的文档字符串。
+- **L999** `        cluster_layout_mn = cute.make_layout(` — **EN:** Assigns a value to cluster_layout_mn. **CN:** 将一个值赋给 cluster_layout_mn。
+- **L1000** `            (cluster_tile_count_m, cluster_tile_count_n)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1001** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1002** `        (mi, ni) = cluster_layout_mn.get_hier_coord(cluster_tile_idx)` — **EN:** Assigns a value to (mi, ni). **CN:** 将一个值赋给 (mi, ni)。
+- **L1003** `        cta_tile_idx_m = (` — **EN:** Assigns a value to cta_tile_idx_m. **CN:** 将一个值赋给 cta_tile_idx_m。
+- **L1004** `            mi * self.tile_sched_params.cluster_shape_mn[0]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1005** `            + cta_tile_coord_in_cluster[0]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1006** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1007** `        cta_tile_idx_n = (` — **EN:** Assigns a value to cta_tile_idx_n. **CN:** 将一个值赋给 cta_tile_idx_n。
+- **L1008** `            ni * self.tile_sched_params.cluster_shape_mn[1]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1009** `            + cta_tile_coord_in_cluster[1]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1010** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1011** `        return (cta_tile_idx_m, cta_tile_idx_n)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1012** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1013** `    @cute.jit` — **EN:** Applies decorator `cute.jit` to the following definition. **CN:** 将装饰器 `cute.jit` 应用于后面的定义。
+- **L1014** `    def _group_search(` — **EN:** Defines function `_group_search`. **CN:** 定义函数 `_group_search`。
+- **L1015** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1016** `        linear_idx: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1017** `        problem_shape_mnkl: cute.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1018** `        init_group_idx: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1019** `        init_tile_count_searched: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1020** `    ) -> GroupedGemmGroupSearchState:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1021** `        """` — **EN:** Starts the docstring for the function `_group_search`. **CN:** 开始说明 function `_group_search` 的文档字符串。
+- **L1022** `        Search which group the linear index belongs to.` — **EN:** Continues the docstring for the function `_group_search`. **CN:** 继续说明 function `_group_search` 的文档字符串。
+- **L1023** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1024** `        :param linear_idx: The linear index to be decomposed` — **EN:** Continues the docstring for the function `_group_search`. **CN:** 继续说明 function `_group_search` 的文档字符串。
+- **L1025** `        :type linear_idx: Int32` — **EN:** Continues the docstring for the function `_group_search`. **CN:** 继续说明 function `_group_search` 的文档字符串。
+- **L1026** `        :param problem_shape_mnkl: Tensor containing gemm problem size (M, N, K, L) for all groups` — **EN:** Continues the docstring for the function `_group_search`. **CN:** 继续说明 function `_group_search` 的文档字符串。
+- **L1027** `        :type problem_shape_mnkl: cute.Tensor` — **EN:** Continues the docstring for the function `_group_search`. **CN:** 继续说明 function `_group_search` 的文档字符串。
+- **L1028** `        :param init_group_idx: The group idx to start the search with` — **EN:** Continues the docstring for the function `_group_search`. **CN:** 继续说明 function `_group_search` 的文档字符串。
+- **L1029** `        :type init_group_idx: Int32` — **EN:** Continues the docstring for the function `_group_search`. **CN:** 继续说明 function `_group_search` 的文档字符串。
+- **L1030** `        :param init_tile_count_searched: The number of tiles we have searched` — **EN:** Continues the docstring for the function `_group_search`. **CN:** 继续说明 function `_group_search` 的文档字符串。
+- **L1031** `        :type init_tile_count_searched: Int32` — **EN:** Continues the docstring for the function `_group_search`. **CN:** 继续说明 function `_group_search` 的文档字符串。
+- **L1032** `        :return: The updated search state` — **EN:** Continues the docstring for the function `_group_search`. **CN:** 继续说明 function `_group_search` 的文档字符串。
+- **L1033** `        :rtype: GroupedGemmGroupSearchState` — **EN:** Continues the docstring for the function `_group_search`. **CN:** 继续说明 function `_group_search` 的文档字符串。
+- **L1034** `        """` — **EN:** Ends the docstring for the function `_group_search`. **CN:** 结束说明 function `_group_search` 的文档字符串。
+- **L1035** `        c_0 = Int32(0).ir_value()` — **EN:** Assigns a value to c_0. **CN:** 将一个值赋给 c_0。
+- **L1036** `        last_lane_idx = cute.arch.WARP_SIZE - 1` — **EN:** Assigns a value to last_lane_idx. **CN:** 将一个值赋给 last_lane_idx。
+- **L1037** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1038** `        tile_count_searched = init_tile_count_searched` — **EN:** Assigns a value to tile_count_searched. **CN:** 将一个值赋给 tile_count_searched。
+- **L1039** `        start_group_idx = init_group_idx` — **EN:** Assigns a value to start_group_idx. **CN:** 将一个值赋给 start_group_idx。
+- **L1040** `        not_found = linear_idx >= tile_count_searched` — **EN:** Assigns a value to not_found. **CN:** 将一个值赋给 not_found。
+- **L1041** `        tile_count_prev_group = self.search_state.tile_count_prev_group` — **EN:** Assigns a value to tile_count_prev_group. **CN:** 将一个值赋给 tile_count_prev_group。
+- **L1042** `        while not_found:` — **EN:** Starts a while-loop guarded by `not_found`. **CN:** 开始一个由 `not_found` 控制的 while 循环。
+- **L1043** `            # get group to search for current lane` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1044** `            cur_group_idx = start_group_idx + self.lane_idx` — **EN:** Assigns a value to cur_group_idx. **CN:** 将一个值赋给 cur_group_idx。
+- **L1045** `            # check if the group to be checked is out of range` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1046** `            inside_group_bound = cur_group_idx < self.group_count` — **EN:** Assigns a value to inside_group_bound. **CN:** 将一个值赋给 inside_group_bound。
+- **L1047** `            cur_ntile_mn = c_0` — **EN:** Assigns a value to cur_ntile_mn. **CN:** 将一个值赋给 cur_ntile_mn。
+- **L1048** `            if inside_group_bound:` — **EN:** Starts a conditional branch guarded by `inside_group_bound`. **CN:** 开始一个由 `inside_group_bound` 控制的条件分支。
+- **L1049** `                # get problem size of current group` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1050** `                cur_problem_mnkl = self._get_problem_for_group(` — **EN:** Assigns a value to cur_problem_mnkl. **CN:** 将一个值赋给 cur_problem_mnkl。
+- **L1051** `                    problem_shape_mnkl, cur_group_idx` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1052** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1053** `                cur_ntile_mn = self._get_cluster_tile_count_mn(cur_problem_mnkl)` — **EN:** Assigns a value to cur_ntile_mn. **CN:** 将一个值赋给 cur_ntile_mn。
+- **L1054** `            # compute tile count from beginning to current group(included)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1055** `            total_cluster_tile_count_ps_per_thread = self._prefix_sum(cur_ntile_mn)` — **EN:** Assigns a value to total_cluster_tile_count_ps_per_thread. **CN:** 将一个值赋给 total_cluster_tile_count_ps_per_thread。
+- **L1056** `            cluster_tile_count_end_per_thread = (` — **EN:** Assigns a value to cluster_tile_count_end_per_thread. **CN:** 将一个值赋给 cluster_tile_count_end_per_thread。
+- **L1057** `                total_cluster_tile_count_ps_per_thread + tile_count_searched` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1058** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1059** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1060** `            group_not_in_window = linear_idx >= cluster_tile_count_end_per_thread` — **EN:** Assigns a value to group_not_in_window. **CN:** 将一个值赋给 group_not_in_window。
+- **L1061** `            hitted_group_idx_in_search_window = cute.arch.popc(` — **EN:** Assigns a value to hitted_group_idx_in_search_window. **CN:** 将一个值赋给 hitted_group_idx_in_search_window。
+- **L1062** `                cute.arch.vote_ballot_sync(group_not_in_window)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1063** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1064** `            not_found = hitted_group_idx_in_search_window == cute.arch.WARP_SIZE` — **EN:** Assigns a value to not_found. **CN:** 将一个值赋给 not_found。
+- **L1065** `            start_group_idx = hitted_group_idx_in_search_window + start_group_idx` — **EN:** Assigns a value to start_group_idx. **CN:** 将一个值赋给 start_group_idx。
+- **L1066** `            hit_the_1st_problem_in_search_window = (` — **EN:** Assigns a value to hit_the_1st_problem_in_search_window. **CN:** 将一个值赋给 hit_the_1st_problem_in_search_window。
+- **L1067** `                hitted_group_idx_in_search_window == c_0` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1068** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1069** `            tile_count_prev_group = tile_count_searched` — **EN:** Assigns a value to tile_count_prev_group. **CN:** 将一个值赋给 tile_count_prev_group。
+- **L1070** `            if hit_the_1st_problem_in_search_window == False:` — **EN:** Starts a conditional branch guarded by `hit_the_1st_problem_in_search_window == False`. **CN:** 开始一个由 `hit_the_1st_problem_in_search_window == False` 控制的条件分支。
+- **L1071** `                tile_count_prev_group = cute.arch.shuffle_sync(` — **EN:** Assigns a value to tile_count_prev_group. **CN:** 将一个值赋给 tile_count_prev_group。
+- **L1072** `                    cluster_tile_count_end_per_thread,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1073** `                    hitted_group_idx_in_search_window - 1,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1074** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1075** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1076** `            # If no matched group, then get new_cluster_tile_count_end from last lane` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1077** `            # Otherwise, get new_cluster_tile_count_end from the hitted group` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1078** `            lane_idx_for_cluster_tile_count_end = hitted_group_idx_in_search_window` — **EN:** Assigns a value to lane_idx_for_cluster_tile_count_end. **CN:** 将一个值赋给 lane_idx_for_cluster_tile_count_end。
+- **L1079** `            if not_found:` — **EN:** Starts a conditional branch guarded by `not_found`. **CN:** 开始一个由 `not_found` 控制的条件分支。
+- **L1080** `                lane_idx_for_cluster_tile_count_end = last_lane_idx` — **EN:** Assigns a value to lane_idx_for_cluster_tile_count_end. **CN:** 将一个值赋给 lane_idx_for_cluster_tile_count_end。
+- **L1081** `            tile_count_searched = cute.arch.shuffle_sync(` — **EN:** Assigns a value to tile_count_searched. **CN:** 将一个值赋给 tile_count_searched。
+- **L1082** `                cluster_tile_count_end_per_thread,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1083** `                lane_idx_for_cluster_tile_count_end,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1084** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1085** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1086** `        return GroupedGemmGroupSearchState(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1087** `            start_group_idx,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1088** `            tile_count_prev_group,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1089** `            tile_count_searched,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1090** `            Boolean(1),  # found will always be 1 for old api` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1091** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1092** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1093** `    def _group_search_and_load_problem_shape(` — **EN:** Defines function `_group_search_and_load_problem_shape`. **CN:** 定义函数 `_group_search_and_load_problem_shape`。
+- **L1094** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1095** `        linear_idx: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1096** `        problem_shape_mnkl: cute.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1097** `        start_group_idx: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1098** `        tile_count_searched: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1099** `    ) -> Tuple[Int32, cute.Tensor]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1100** `        """` — **EN:** Starts the docstring for the function `_group_search_and_load_problem_shape`. **CN:** 开始说明 function `_group_search_and_load_problem_shape` 的文档字符串。
+- **L1101** `        Perform group search and load problem shape for the matched group.` — **EN:** Continues the docstring for the function `_group_search_and_load_problem_shape`. **CN:** 继续说明 function `_group_search_and_load_problem_shape` 的文档字符串。
+- **L1102** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1103** `        :param linear_idx: The linear index to be decomposed` — **EN:** Continues the docstring for the function `_group_search_and_load_problem_shape`. **CN:** 继续说明 function `_group_search_and_load_problem_shape` 的文档字符串。
+- **L1104** `        :type linear_idx: Int32` — **EN:** Continues the docstring for the function `_group_search_and_load_problem_shape`. **CN:** 继续说明 function `_group_search_and_load_problem_shape` 的文档字符串。
+- **L1105** `        :param problem_shape_mnkl: Tensor containing gemm problem size (M, N, K, L) for all groups` — **EN:** Continues the docstring for the function `_group_search_and_load_problem_shape`. **CN:** 继续说明 function `_group_search_and_load_problem_shape` 的文档字符串。
+- **L1106** `        :type problem_shape_mnkl: cute.Tensor` — **EN:** Continues the docstring for the function `_group_search_and_load_problem_shape`. **CN:** 继续说明 function `_group_search_and_load_problem_shape` 的文档字符串。
+- **L1107** `        :param start_group_idx: The group idx to start the search with` — **EN:** Continues the docstring for the function `_group_search_and_load_problem_shape`. **CN:** 继续说明 function `_group_search_and_load_problem_shape` 的文档字符串。
+- **L1108** `        :type start_group_idx: Int32` — **EN:** Continues the docstring for the function `_group_search_and_load_problem_shape`. **CN:** 继续说明 function `_group_search_and_load_problem_shape` 的文档字符串。
+- **L1109** `        :param tile_count_searched: The number of tiles we have searched` — **EN:** Continues the docstring for the function `_group_search_and_load_problem_shape`. **CN:** 继续说明 function `_group_search_and_load_problem_shape` 的文档字符串。
+- **L1110** `        :type tile_count_searched: Int32` — **EN:** Continues the docstring for the function `_group_search_and_load_problem_shape`. **CN:** 继续说明 function `_group_search_and_load_problem_shape` 的文档字符串。
+- **L1111** `        :return: A tuple containing the final group index and the problem shape tensor` — **EN:** Continues the docstring for the function `_group_search_and_load_problem_shape`. **CN:** 继续说明 function `_group_search_and_load_problem_shape` 的文档字符串。
+- **L1112** `        :rtype: Tuple[Int32, cute.Tensor]` — **EN:** Continues the docstring for the function `_group_search_and_load_problem_shape`. **CN:** 继续说明 function `_group_search_and_load_problem_shape` 的文档字符串。
+- **L1113** `        """` — **EN:** Ends the docstring for the function `_group_search_and_load_problem_shape`. **CN:** 结束说明 function `_group_search_and_load_problem_shape` 的文档字符串。
+- **L1114** `        self.search_state = self._group_search(` — **EN:** Assigns a value to self.search_state. **CN:** 将一个值赋给 self.search_state。
+- **L1115** `            linear_idx,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1116** `            problem_shape_mnkl,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1117** `            start_group_idx,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1118** `            tile_count_searched,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1119** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1120** `        # get final group search state` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1121** `        final_group_idx = self.search_state.start_group_idx` — **EN:** Assigns a value to final_group_idx. **CN:** 将一个值赋给 final_group_idx。
+- **L1122** `        # let's revisit if it's better to broadcast problem_shape_mnk in group_search` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1123** `        problem_mnkl = self._get_problem_for_group(problem_shape_mnkl, final_group_idx)` — **EN:** Assigns a value to problem_mnkl. **CN:** 将一个值赋给 problem_mnkl。
+- **L1124** `        return final_group_idx, problem_mnkl` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.utils.grouped_gemm_persistent_tile_scheduler`. CN: 模块名为 `CuTeDSL.cutlass.utils.grouped_gemm_persistent_tile_scheduler`。
+- EN: Top-level classes: GroupSearchResult, GroupedGemmGroupSearchState, GroupedWorkTileInfo, StaticPersistentGroupTileScheduler, GroupedGemmTileSchedulerHelper CN: 顶层类包括：GroupSearchResult, GroupedGemmGroupSearchState, GroupedWorkTileInfo, StaticPersistentGroupTileScheduler, GroupedGemmTileSchedulerHelper
+- EN: Top-level functions: create_initial_search_state CN: 顶层函数包括：create_initial_search_state
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass.cute, cutlass.cutlass_dsl:Boolean,Int32,Integer,extract_mlir_values,new_from_mlir_values,const_expr,dsl_user_op, cutlass._mlir:ir, cutlass.utils:PersistentTileSchedulerParams,StaticPersistentTileScheduler,WorkTileInfo CN: 内部依赖：cutlass.cute, cutlass.cutlass_dsl:Boolean,Int32,Integer,extract_mlir_values,new_from_mlir_values,const_expr,dsl_user_op, cutlass._mlir:ir, cutlass.utils:PersistentTileSchedulerParams,StaticPersistentTileScheduler,WorkTileInfo
+- EN: External or standard-library dependencies: typing:List,Optional,Tuple,Union, typing_extensions:deprecated CN: 外部或标准库依赖：typing:List,Optional,Tuple,Union, typing_extensions:deprecated

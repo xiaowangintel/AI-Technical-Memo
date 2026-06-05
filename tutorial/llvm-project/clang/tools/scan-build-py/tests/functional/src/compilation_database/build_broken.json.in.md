@@ -1,0 +1,178 @@
+# build_broken.json.in — Code Analysis / 代码分析
+
+## Source / 来源
+
+- **File / 文件**: `clang/tools/scan-build-py/tests/functional/src/compilation_database/build_broken.json.in`
+- **Repository / 仓库**: `llvm-project`
+- **Purpose / 目的**:
+  - **EN**: [ { "directory": "${path}", "command": "g++ -c -o main.o main.c -Wall -DDEBUG -Dvariable=value",
+  - **CN**: 实现用于拦截构建并驱动 Clang 静态分析的 Python 工具。
+
+## Line-by-Line Analysis / 逐行分析
+
+### Lines 1-10
+
+````text
+[
+{
+  "directory": "${path}",
+  "command": "g++ -c -o main.o main.c -Wall -DDEBUG -Dvariable=value",
+  "file": "${path}/main.c"
+}
+,
+{
+  "directory": "${path}",
+  "command": "cc -c -o broken-one.o broken-one.c -Wall -DDEBUG \"-Dvariable=value with space\"",
+````
+- **L1 EN**: Provides textual content or support data: `[`.
+  **L1 CN**: 提供文本内容或支持数据：`[`。
+- **L2 EN**: Provides textual content or support data: `{`.
+  **L2 CN**: 提供文本内容或支持数据：`{`。
+- **L3 EN**: Provides textual content or support data: `"directory": "${path}",`.
+  **L3 CN**: 提供文本内容或支持数据：`"directory": "${path}",`。
+- **L4 EN**: Provides textual content or support data: `"command": "g++ -c -o main.o main.c -Wall -DDEBUG -Dvariable=value",`.
+  **L4 CN**: 提供文本内容或支持数据：`"command": "g++ -c -o main.o main.c -Wall -DDEBUG -Dvariable=value",`。
+- **L5 EN**: Provides textual content or support data: `"file": "${path}/main.c"`.
+  **L5 CN**: 提供文本内容或支持数据：`"file": "${path}/main.c"`。
+- **L6 EN**: Provides textual content or support data: `}`.
+  **L6 CN**: 提供文本内容或支持数据：`}`。
+- **L7 EN**: Provides textual content or support data: `,`.
+  **L7 CN**: 提供文本内容或支持数据：`,`。
+- **L8 EN**: Provides textual content or support data: `{`.
+  **L8 CN**: 提供文本内容或支持数据：`{`。
+- **L9 EN**: Provides textual content or support data: `"directory": "${path}",`.
+  **L9 CN**: 提供文本内容或支持数据：`"directory": "${path}",`。
+- **L10 EN**: Provides textual content or support data: `"command": "cc -c -o broken-one.o broken-one.c -Wall -DDEBUG \"-Dvariable=value with space\"",`.
+  **L10 CN**: 提供文本内容或支持数据：`"command": "cc -c -o broken-one.o broken-one.c -Wall -DDEBUG \"-Dvariable=value with space\"",`。
+
+### Lines 11-20
+
+````text
+  "file": "${path}/broken-one.c"
+}
+,
+{
+  "directory": "${path}",
+  "command": "g++ -c -o broken-two.o broken-two.c -Wall -DDEBUG -Dvariable=value",
+  "file": "${path}/broken-two.c"
+}
+,
+{
+````
+- **L11 EN**: Provides textual content or support data: `"file": "${path}/broken-one.c"`.
+  **L11 CN**: 提供文本内容或支持数据：`"file": "${path}/broken-one.c"`。
+- **L12 EN**: Provides textual content or support data: `}`.
+  **L12 CN**: 提供文本内容或支持数据：`}`。
+- **L13 EN**: Provides textual content or support data: `,`.
+  **L13 CN**: 提供文本内容或支持数据：`,`。
+- **L14 EN**: Provides textual content or support data: `{`.
+  **L14 CN**: 提供文本内容或支持数据：`{`。
+- **L15 EN**: Provides textual content or support data: `"directory": "${path}",`.
+  **L15 CN**: 提供文本内容或支持数据：`"directory": "${path}",`。
+- **L16 EN**: Provides textual content or support data: `"command": "g++ -c -o broken-two.o broken-two.c -Wall -DDEBUG -Dvariable=value",`.
+  **L16 CN**: 提供文本内容或支持数据：`"command": "g++ -c -o broken-two.o broken-two.c -Wall -DDEBUG -Dvariable=value",`。
+- **L17 EN**: Provides textual content or support data: `"file": "${path}/broken-two.c"`.
+  **L17 CN**: 提供文本内容或支持数据：`"file": "${path}/broken-two.c"`。
+- **L18 EN**: Provides textual content or support data: `}`.
+  **L18 CN**: 提供文本内容或支持数据：`}`。
+- **L19 EN**: Provides textual content or support data: `,`.
+  **L19 CN**: 提供文本内容或支持数据：`,`。
+- **L20 EN**: Provides textual content or support data: `{`.
+  **L20 CN**: 提供文本内容或支持数据：`{`。
+
+### Lines 21-30
+
+````text
+  "directory": "${path}",
+  "command": "cc -c -o clean-one.o clean-one.c -Wall -DDEBUG \"-Dvariable=value with space\" -Iinclude",
+  "file": "${path}/clean-one.c"
+}
+,
+{
+  "directory": "${path}",
+  "command": "g++ -c -o clean-two.o clean-two.c -Wall -DDEBUG -Dvariable=value -I ./include",
+  "file": "${path}/clean-two.c"
+}
+````
+- **L21 EN**: Provides textual content or support data: `"directory": "${path}",`.
+  **L21 CN**: 提供文本内容或支持数据：`"directory": "${path}",`。
+- **L22 EN**: Provides textual content or support data: `"command": "cc -c -o clean-one.o clean-one.c -Wall -DDEBUG \"-Dvariable=value with space\" -Iincl...`.
+  **L22 CN**: 提供文本内容或支持数据：`"command": "cc -c -o clean-one.o clean-one.c -Wall -DDEBUG \"-Dvariable=value with space\" -Iincl...`。
+- **L23 EN**: Provides textual content or support data: `"file": "${path}/clean-one.c"`.
+  **L23 CN**: 提供文本内容或支持数据：`"file": "${path}/clean-one.c"`。
+- **L24 EN**: Provides textual content or support data: `}`.
+  **L24 CN**: 提供文本内容或支持数据：`}`。
+- **L25 EN**: Provides textual content or support data: `,`.
+  **L25 CN**: 提供文本内容或支持数据：`,`。
+- **L26 EN**: Provides textual content or support data: `{`.
+  **L26 CN**: 提供文本内容或支持数据：`{`。
+- **L27 EN**: Provides textual content or support data: `"directory": "${path}",`.
+  **L27 CN**: 提供文本内容或支持数据：`"directory": "${path}",`。
+- **L28 EN**: Provides textual content or support data: `"command": "g++ -c -o clean-two.o clean-two.c -Wall -DDEBUG -Dvariable=value -I ./include",`.
+  **L28 CN**: 提供文本内容或支持数据：`"command": "g++ -c -o clean-two.o clean-two.c -Wall -DDEBUG -Dvariable=value -I ./include",`。
+- **L29 EN**: Provides textual content or support data: `"file": "${path}/clean-two.c"`.
+  **L29 CN**: 提供文本内容或支持数据：`"file": "${path}/clean-two.c"`。
+- **L30 EN**: Provides textual content or support data: `}`.
+  **L30 CN**: 提供文本内容或支持数据：`}`。
+
+### Lines 31-40
+
+````text
+,
+{
+  "directory": "${path}",
+  "command": "cc -c -o emit-one.o emit-one.c -Wall -DDEBUG \"-Dvariable=value with space\"",
+  "file": "${path}/emit-one.c"
+}
+,
+{
+  "directory": "${path}",
+  "command": "g++ -c -o emit-two.o emit-two.c -Wall -DDEBUG -Dvariable=value",
+````
+- **L31 EN**: Provides textual content or support data: `,`.
+  **L31 CN**: 提供文本内容或支持数据：`,`。
+- **L32 EN**: Provides textual content or support data: `{`.
+  **L32 CN**: 提供文本内容或支持数据：`{`。
+- **L33 EN**: Provides textual content or support data: `"directory": "${path}",`.
+  **L33 CN**: 提供文本内容或支持数据：`"directory": "${path}",`。
+- **L34 EN**: Provides textual content or support data: `"command": "cc -c -o emit-one.o emit-one.c -Wall -DDEBUG \"-Dvariable=value with space\"",`.
+  **L34 CN**: 提供文本内容或支持数据：`"command": "cc -c -o emit-one.o emit-one.c -Wall -DDEBUG \"-Dvariable=value with space\"",`。
+- **L35 EN**: Provides textual content or support data: `"file": "${path}/emit-one.c"`.
+  **L35 CN**: 提供文本内容或支持数据：`"file": "${path}/emit-one.c"`。
+- **L36 EN**: Provides textual content or support data: `}`.
+  **L36 CN**: 提供文本内容或支持数据：`}`。
+- **L37 EN**: Provides textual content or support data: `,`.
+  **L37 CN**: 提供文本内容或支持数据：`,`。
+- **L38 EN**: Provides textual content or support data: `{`.
+  **L38 CN**: 提供文本内容或支持数据：`{`。
+- **L39 EN**: Provides textual content or support data: `"directory": "${path}",`.
+  **L39 CN**: 提供文本内容或支持数据：`"directory": "${path}",`。
+- **L40 EN**: Provides textual content or support data: `"command": "g++ -c -o emit-two.o emit-two.c -Wall -DDEBUG -Dvariable=value",`.
+  **L40 CN**: 提供文本内容或支持数据：`"command": "g++ -c -o emit-two.o emit-two.c -Wall -DDEBUG -Dvariable=value",`。
+
+### Lines 41-43
+
+````text
+  "file": "${path}/emit-two.c"
+}
+]
+````
+- **L41 EN**: Provides textual content or support data: `"file": "${path}/emit-two.c"`.
+  **L41 CN**: 提供文本内容或支持数据：`"file": "${path}/emit-two.c"`。
+- **L42 EN**: Provides textual content or support data: `}`.
+  **L42 CN**: 提供文本内容或支持数据：`}`。
+- **L43 EN**: Provides textual content or support data: `]`.
+  **L43 CN**: 提供文本内容或支持数据：`]`。
+
+## Key Concepts / 关键概念
+
+- **Clang tooling entry points / Clang 工具入口**:
+  - **EN**: Shows how a command-line tool, helper script, or support asset plugs into Clang workflows.
+  - **CN**: 展示命令行工具、辅助脚本或支持资源如何接入 Clang 工作流。
+- **Static-analysis orchestration / 静态分析编排**:
+  - **EN**: Intercepts builds and routes compilation actions through Clang static-analysis flows.
+  - **CN**: 拦截构建并将编译动作路由到 Clang 静态分析流程中。
+
+## Dependencies / 依赖关系
+
+- **Local context / 本地上下文**: This file depends mainly on nearby tool-specific logic or assets. / 该文件主要依赖附近的工具专用逻辑或资源。

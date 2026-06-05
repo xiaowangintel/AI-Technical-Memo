@@ -1,0 +1,215 @@
+# fmha_kernel_bwd_convert.hpp — Code Analysis / 代码分析
+
+**Source / 源文件**: `examples/77_blackwell_fmha/kernel/fmha_kernel_bwd_convert.hpp`  
+**Purpose / 用途**: Implements the backward conversion kernel that scales accumulator-format gradients and writes them back as final `dQ`, `dK`, and `dV` tensors. / 实现反向转换 kernel：把累加器格式的梯度按比例缩放后写回最终 `dQ/dK/dV` 张量。
+
+---
+
+## Line-by-Line Analysis / 逐行分析
+
+```cpp
+/***************************************************************************************************
+ * Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ * list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ **************************************************************************************************/
+```
+
+**EN**: This comment block frames the file: it usually states the target architecture, problem family, usage pattern, or design motivation before the code starts. That context matters because later template choices are easier to understand once the intended hardware path and workload are known. Belongs to a fused-attention pipeline, so problem shape, sequence handling, and softmax state are central. Maps convolution work through cutlass convolution/gemm abstractions.  
+**CN**: 这一段注释用于给文件定调：通常先说明目标架构、问题类型、使用方式或设计动机，再进入具体代码。先理解这些背景，再看后面的模板选择与硬件路径会更清晰。属于融合注意力流水线，因此问题形状、序列处理和 softmax 状态是核心。 通过 CUTLASS 卷积/GEMM 抽象映射卷积计算。
+
+---
+
+```cpp
+#pragma once
+
+#include "cutlass/cutlass.h"
+#include "cute/layout.hpp"
+
+namespace cutlass::fmha::kernel {
+
+using namespace cute;
+
+template<class ProblemShape, class Element, class ElementAcc>
+struct FmhaKernelBwdConvert {
+
+  struct Arguments {
+    ProblemShape problem_shape;
+
+    const ElementAcc* ptr_src_dQ;
+    tuple<int, _1, tuple<tuple<int, int>, int>> stride_src_dQ;
+    const ElementAcc* ptr_src_dK;
+    tuple<int, _1, tuple<tuple<_0, int>, int>> stride_src_dK;
+    const ElementAcc* ptr_src_dV;
+    tuple<int, _1, tuple<tuple<_0, int>, int>> stride_src_dV;
+    
+    Element* ptr_dest_dQ;
+    tuple<int, _1, tuple<tuple<int, int>, int>> stride_dest_dQ;
+    Element* ptr_dest_dK;
+    tuple<int, _1, tuple<tuple<_0, int>, int>> stride_dest_dK;
+    Element* ptr_dest_dV;
+    tuple<int, _1, tuple<tuple<_0, int>, int>> stride_dest_dV;
+
+    ElementAcc scale = 1.0;
+  };
+
+  using Params = Arguments;
+
+  using ClusterShape = Shape<_1, _1, _1>;
+  static constexpr int SharedStorageSize = 0;
+
+  static const int MinBlocksPerMultiprocessor = 1;
+  static const int MaxThreadsPerBlock = 128;
+  using ArchTag = cutlass::arch::Sm100;
+```
+
+**EN**: This storage block describes the shared-memory (and sometimes TMEM-related) state layout used by the kernel. Such declarations are performance-critical because they determine how pipeline stages, accumulator fragments, and epilogue scratch space coexist inside the CTA or cluster. Targets blackwell sm100 execution paths. Makes cluster geometry an explicit compile-time tuning knob.  
+**CN**: 这一存储块描述了内核所使用的共享内存（有时还包括 TMEM 相关）状态布局。它们是性能关键点，因为流水线阶段、累加器片段和 epilogue 临时空间如何在 CTA 或 cluster 内共存，都是由这里决定的。面向 Blackwell SM100 执行路径。 把 cluster 几何作为显式的编译期调优参数。
+
+---
+
+```cpp
+  static const int kBlockSeq = 8;
+
+  static size_t get_workspace_size(Arguments const& args) { return 0; }
+  static cutlass::Status initialize_workspace(Arguments const&, void*, cudaStream_t) {
+    return cutlass::Status::kSuccess;
+  }
+
+  static const int kNumThreadsD = 16;
+  static const int kNumThreadsSeq = MaxThreadsPerBlock / kNumThreadsD;
+  static const int kElementsPerLoad = 4;
+
+  static const int kIterationsSeq = kBlockSeq / kNumThreadsSeq;
+
+  static bool can_implement(Arguments const& args) {
+    return get<2>(args.problem_shape) % kElementsPerLoad == 0 && get<3>(args.problem_shape) % kElementsPerLoad == 0;
+  }
+
+  static dim3 get_grid_shape(Params const& params) {
+    dim3 grid(size<4,0>(params.problem_shape), size<4,1>(params.problem_shape), ceil_div(std::max(size<0>(params.problem_shape), size<1>(params.problem_shape)), kBlockSeq));
+    return grid;
+  }
+
+  static dim3 get_block_shape() {
+    dim3 block(kNumThreadsD, kNumThreadsSeq, 1);
+    return block;
+  }
+
+  static Params to_underlying_arguments(Arguments const& args, void* workspace) {
+    return args;
+  }
+
+  template<class StrideSrc, class StrideDest, class Count>
+  CUTLASS_DEVICE void copy(Params const& params, const ElementAcc* ptr_src, StrideSrc const& stride_src, Element* ptr_dest, StrideDest const& stride_dest, Count const& count, int d_dim) {
+    auto ptr_src_bh = ptr_src + get<2,0,0>(stride_src) * blockIdx.x + get<2,1>(stride_src) * blockIdx.y;
+    auto ptr_dest_bh = ptr_dest + get<2,0,0>(stride_dest) * blockIdx.x + get<2,1>(stride_dest) * blockIdx.y;
+```
+
+**EN**: This storage block describes the shared-memory (and sometimes TMEM-related) state layout used by the kernel. Such declarations are performance-critical because they determine how pipeline stages, accumulator fragments, and epilogue scratch space coexist inside the CTA or cluster. Belongs to a fused-attention pipeline, so problem shape, sequence handling, and softmax state are central. Maps convolution work through cutlass convolution/gemm abstractions.  
+**CN**: 这一存储块描述了内核所使用的共享内存（有时还包括 TMEM 相关）状态布局。它们是性能关键点，因为流水线阶段、累加器片段和 epilogue 临时空间如何在 CTA 或 cluster 内共存，都是由这里决定的。属于融合注意力流水线，因此问题形状、序列处理和 softmax 状态是核心。 通过 CUTLASS 卷积/GEMM 抽象映射卷积计算。
+
+---
+
+```cpp
+    int seqlen = count;
+    if constexpr (is_variable_length_v<decltype(count)>) {
+      int offset = count.cumulative_length[blockIdx.y];
+      ptr_dest_bh += offset * get<0>(stride_dest);
+      seqlen = count.cumulative_length[blockIdx.y + 1] - offset;
+    }
+
+    for (int idx_s_t = threadIdx.y; idx_s_t < kBlockSeq; idx_s_t += kNumThreadsSeq) {
+      int idx_s = idx_s_t + kBlockSeq * blockIdx.z;
+      if (idx_s >= seqlen) continue;
+      auto ptr_src_bhs = ptr_src_bh + idx_s * get<0>(stride_src);
+      auto ptr_dest_bhs = ptr_dest_bh + idx_s * get<0>(stride_dest);
+
+      for (int idx_d = threadIdx.x * kElementsPerLoad; idx_d < d_dim; idx_d += kElementsPerLoad * kNumThreadsD) {
+        ElementAcc value_src[kElementsPerLoad];
+        Element value_dest[kElementsPerLoad];
+        
+        using VecSrc = uint_bit_t<sizeof_bits_v<ElementAcc> * kElementsPerLoad>;
+        using VecDest = uint_bit_t<sizeof_bits_v<Element> * kElementsPerLoad>;
+        *reinterpret_cast<VecSrc*>(value_src) = *reinterpret_cast<const VecSrc*>(&ptr_src_bhs[idx_d]);
+
+        for (int v = 0; v < kElementsPerLoad; v++) {
+          value_dest[v] = static_cast<Element>(params.scale * value_src[v]);
+        }
+
+        *reinterpret_cast<VecDest*>(&ptr_dest_bhs[idx_d]) = *reinterpret_cast<const VecDest*>(value_dest);
+      }
+    }
+  }
+```
+
+**EN**: This storage block describes the shared-memory (and sometimes TMEM-related) state layout used by the kernel. Such declarations are performance-critical because they determine how pipeline stages, accumulator fragments, and epilogue scratch space coexist inside the CTA or cluster. Belongs to a fused-attention pipeline, so problem shape, sequence handling, and softmax state are central. Maps convolution work through cutlass convolution/gemm abstractions.  
+**CN**: 这一存储块描述了内核所使用的共享内存（有时还包括 TMEM 相关）状态布局。它们是性能关键点，因为流水线阶段、累加器片段和 epilogue 临时空间如何在 CTA 或 cluster 内共存，都是由这里决定的。属于融合注意力流水线，因此问题形状、序列处理和 softmax 状态是核心。 通过 CUTLASS 卷积/GEMM 抽象映射卷积计算。
+
+---
+
+```cpp
+  CUTLASS_DEVICE void operator()(const Params &params, char* smem) {
+    if (params.ptr_src_dQ != nullptr) {
+      copy(params, params.ptr_src_dQ, params.stride_src_dQ, params.ptr_dest_dQ, params.stride_dest_dQ, get<0>(params.problem_shape), get<2>(params.problem_shape));
+    }
+    if (params.ptr_src_dK != nullptr) {
+      copy(params, params.ptr_src_dK, params.stride_src_dK, params.ptr_dest_dK, params.stride_dest_dK, get<1>(params.problem_shape), get<2>(params.problem_shape));
+    }
+    if (params.ptr_src_dV != nullptr) {
+      copy(params, params.ptr_src_dV, params.stride_src_dV, params.ptr_dest_dV, params.stride_dest_dV, get<1>(params.problem_shape), get<3>(params.problem_shape));
+    }
+  }
+};
+```
+
+**EN**: This storage block describes the shared-memory (and sometimes TMEM-related) state layout used by the kernel. Such declarations are performance-critical because they determine how pipeline stages, accumulator fragments, and epilogue scratch space coexist inside the CTA or cluster. Belongs to a fused-attention pipeline, so problem shape, sequence handling, and softmax state are central. Maps convolution work through cutlass convolution/gemm abstractions.  
+**CN**: 这一存储块描述了内核所使用的共享内存（有时还包括 TMEM 相关）状态布局。它们是性能关键点，因为流水线阶段、累加器片段和 epilogue 临时空间如何在 CTA 或 cluster 内共存，都是由这里决定的。属于融合注意力流水线，因此问题形状、序列处理和 softmax 状态是核心。 通过 CUTLASS 卷积/GEMM 抽象映射卷积计算。
+
+---
+
+```cpp
+}  // namespace cutlass::fmha::kernel
+```
+
+**EN**: This storage block describes the shared-memory (and sometimes TMEM-related) state layout used by the kernel. Such declarations are performance-critical because they determine how pipeline stages, accumulator fragments, and epilogue scratch space coexist inside the CTA or cluster. Belongs to a fused-attention pipeline, so problem shape, sequence handling, and softmax state are central. Maps convolution work through cutlass convolution/gemm abstractions.  
+**CN**: 这一存储块描述了内核所使用的共享内存（有时还包括 TMEM 相关）状态布局。它们是性能关键点，因为流水线阶段、累加器片段和 epilogue 临时空间如何在 CTA 或 cluster 内共存，都是由这里决定的。属于融合注意力流水线，因此问题形状、序列处理和 softmax 状态是核心。 通过 CUTLASS 卷积/GEMM 抽象映射卷积计算。
+
+---
+
+## Key Concepts / 关键概念
+
+- Architecture-tagged specialization (`Sm100`/`Sm103`/`Sm120`) / 基于架构标签的特化（`Sm100`/`Sm103`/`Sm120`）
+- Cluster-shape tuning and possible multi-SM cooperation / Cluster 形状调优与可能的多 SM 协作
+- Warp-specialized FMHA layering across collective, kernel, and device wrappers / 跨 collective、kernel 与 device wrapper 的 warp-specialized FMHA 分层
+- Convolution expressed through CUTLASS-style template composition / 通过 CUTLASS 风格模板组合表达卷积
+
+## Dependencies / 依赖项
+
+- `cutlass/cutlass.h` — core CUTLASS types, architecture tags, and utilities / CUTLASS 核心类型、架构标签与工具
+- `cute/layout.hpp` — CuTe tensor/layout support / CuTe 张量/布局支持

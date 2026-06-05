@@ -1,0 +1,3694 @@
+# exmy_base.h — Code Analysis / 代码分析
+
+## Source / 源文件
+- `include/cutlass/exmy_base.h`
+
+## Purpose / 作用
+- EN: This header is introduced by the summary "Generic floating-point type for ExMy format" and defines related CUTLASS facilities in `include/cutlass/exmy_base.h`.
+- CN: 该头文件以注释摘要“Generic floating-point type for ExMy format”引入，并在 `include/cutlass/exmy_base.h` 中定义相关的 CUTLASS 接口。
+
+## Line-by-Line Analysis / 逐行分析
+- **L1**: <code>/***************************************************************************************************</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L2**: <code> * Copyright (c) 2023 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L3**: <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L4**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L5**: <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L6**: <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L7**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L8**: <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L9**: <code> * list of conditions and the following disclaimer.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L10**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L11**: <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L12**: <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L13**: <code> * and/or other materials provided with the distribution.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L14**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L15**: <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L16**: <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L17**: <code> * this software without specific prior written permission.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L18**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L19**: <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L20**: <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L21**: <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L22**: <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L23**: <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L24**: <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L25**: <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L26**: <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L27**: <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L28**: <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L29**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L30**: <code> **************************************************************************************************/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L31**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L32**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L33**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L34**: <code>/*!</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L35**: <code>  \file</code>
+  - EN: Doxygen file tag indicating that the comment documents the whole file.
+  - CN: Doxygen 文件标签，说明该注释用于描述整个文件。
+- **L36**: <code>  \brief Generic floating-point type for ExMy format</code>
+  - EN: Doxygen brief line summarizing the purpose of the file or declaration.
+  - CN: Doxygen 简述行，用于概括文件或声明的目的。
+- **L37**: <code>*/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L38**: <code>#pragma once</code>
+  - EN: Ensures the header is included only once per translation unit.
+  - CN: 确保该头文件在每个编译单元中只被包含一次。
+- **L39**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L40**: <code>#include &quot;cutlass/cutlass.h&quot;</code>
+  - EN: Includes "cutlass/cutlass.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/cutlass.h"，以便本文件使用该依赖中的声明。
+- **L41**: <code>#include &quot;cutlass/numeric_size.h&quot;</code>
+  - EN: Includes "cutlass/numeric_size.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/numeric_size.h"，以便本文件使用该依赖中的声明。
+- **L42**: <code>#include &quot;cutlass/platform/platform.h&quot;</code>
+  - EN: Includes "cutlass/platform/platform.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/platform/platform.h"，以便本文件使用该依赖中的声明。
+- **L43**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L44**: <code>// #define CUTLASS_DEBUG_TRACE_LEVEL 2</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L45**: <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L46**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L47**: <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to scope the following declarations.
+  - CN: 打开命名空间 `cutlass`，为后续声明提供作用域。
+- **L48**: <code> // Helper functions</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L49**: <code>namespace detail {</code>
+  - EN: Opens namespace `detail` to scope the following declarations.
+  - CN: 打开命名空间 `detail`，为后续声明提供作用域。
+- **L50**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L51**: <code>template &lt;class Src, class Dst&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L52**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L53**: <code>Dst copy_bits(Src src)</code>
+  - EN: Provides part of the signature or implementation for `copy_bits`.
+  - CN: 提供 `copy_bits` 的签名或实现的一部分。
+- **L54**: <code>{</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L55**: <code>  Dst dst;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L56**: <code>  static_assert(sizeof(Src) &lt;= sizeof(Dst), &quot;Dst type should be at least the same size as Src type&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L57**: <code>  static_assert(cutlass::platform::is_trivially_copyable&lt;Dst&gt;::value, &quot;Dst type should be trivially copyable&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L58**: <code>  static_assert(cutlass::platform::is_trivially_copyable&lt;</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L59**: <code>    /*cutlass::platform::remove_cvref_t&lt; */ Dst /* &gt; */ &gt;::value, &quot;Dst type should be trivially copyable&quot;);</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L60**: <code>  memcpy(&amp;dst, &amp;src, sizeof(src));</code>
+  - EN: Declares the callable or operator `memcpy`.
+  - CN: 声明可调用对象或运算符 `memcpy`。
+- **L61**: <code>  return dst;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L62**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L63**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L64**: <code>enum class NanInfEncoding</code>
+  - EN: Declares or defines the class `NanInfEncoding`.
+  - CN: 声明或定义 class `NanInfEncoding`。
+- **L65**: <code>{</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L66**: <code>  // IEEE-754 style NaN. Exponent bits are</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L67**: <code>  // all ones, and at least one bit of mantissa is one</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L68**: <code>  IEEE_754,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L69**: <code>  // Canonical NaN. There is only one value representing NaN and</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L70**: <code>  // no Inf is defined.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L71**: <code>  CANONICAL_ONLY,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L72**: <code>  // No NaN or Inf encoded.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L73**: <code>  NONE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L74**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L75**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L76**: <code>enum class FpEncoding</code>
+  - EN: Declares or defines the class `FpEncoding`.
+  - CN: 声明或定义 class `FpEncoding`。
+- **L77**: <code>{</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L78**: <code>  E11M52, // double</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L79**: <code>  E8M23,  // float</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L80**: <code>  E5M2,   // FP8</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L81**: <code>  E4M3,   // FP8</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L82**: <code>  UE4M3,  // FP8</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L83**: <code>  UE8M0,  // FP8</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L84**: <code>  E3M2,   // FP6</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L85**: <code>  E2M3,   // FP6</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L86**: <code>  E2M1,   // FP4</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L87**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L88**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L89**: <code>//////</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L90**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L91**: <code>#if (CUTLASS_CXX17_OR_LATER)</code>
+  - EN: Starts a conditional-compilation block controlled by `(CUTLASS_CXX17_OR_LATER)`.
+  - CN: 开始一个由 `(CUTLASS_CXX17_OR_LATER)` 控制的条件编译块。
+- **L92**: <code>template&lt;uint32_t NumExpBits, uint32_t NumMantissaBits&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L93**: <code>constexpr int exponent_bias_cxx17() {</code>
+  - EN: Starts the definition body for `exponent_bias_cxx17`.
+  - CN: 开始 `exponent_bias_cxx17` 的定义体。
+- **L94**: <code>  if CUTLASS_CONSTEXPR_IF_CXX17 (NumExpBits == 0) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L95**: <code>    static_assert(NumMantissaBits &lt;= static_cast&lt;uint32_t&gt;(cutlass::platform::numeric_limits&lt;int32_t&gt;::max()));</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L96**: <code>    return -1 * static_cast&lt;int&gt;(NumMantissaBits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L97**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L98**: <code>  else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L99**: <code>    return static_cast&lt;int&gt;((1 &lt;&lt; (NumExpBits - 1))) - 1;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L100**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L101**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L102**: <code>  CUTLASS_GCC_UNREACHABLE;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L103**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L104**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L105**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L106**: <code>namespace impl {</code>
+  - EN: Opens namespace `impl` to scope the following declarations.
+  - CN: 打开命名空间 `impl`，为后续声明提供作用域。
+- **L107**: <code>template&lt;uint32_t NumExpBitsMinusOne&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L108**: <code>constexpr int shift_num_bits_expression_cxx11() {</code>
+  - EN: Starts the definition body for `shift_num_bits_expression_cxx11`.
+  - CN: 开始 `shift_num_bits_expression_cxx11` 的定义体。
+- **L109**: <code>#if (CUTLASS_CXX17_OR_LATER)</code>
+  - EN: Starts a conditional-compilation block controlled by `(CUTLASS_CXX17_OR_LATER)`.
+  - CN: 开始一个由 `(CUTLASS_CXX17_OR_LATER)` 控制的条件编译块。
+- **L110**: <code>  static_assert(NumExpBitsMinusOne &lt;= 31u);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L111**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L112**: <code>  return NumExpBitsMinusOne &gt; 31u ? 31u : NumExpBitsMinusOne;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L113**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L114**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L115**: <code>template&lt;uint32_t NumExpBitsMinusOne&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L116**: <code>constexpr int inner_shift_expression_cxx11() {</code>
+  - EN: Starts the definition body for `inner_shift_expression_cxx11`.
+  - CN: 开始 `inner_shift_expression_cxx11` 的定义体。
+- **L117**: <code>  return static_cast&lt;int&gt;((1u &lt;&lt; shift_num_bits_expression_cxx11&lt;NumExpBitsMinusOne&gt;()) - 1u);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L118**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L119**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L120**: <code>} // namespace impl</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L121**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L122**: <code>// C++11 equivalent of exponent_bias_cxx17()</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L123**: <code>template&lt;uint32_t NumExpBits, uint32_t NumMantissaBits&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L124**: <code>constexpr int exponent_bias_cxx11() {</code>
+  - EN: Starts the definition body for `exponent_bias_cxx11`.
+  - CN: 开始 `exponent_bias_cxx11` 的定义体。
+- **L125**: <code>#if (CUTLASS_CXX17_OR_LATER)</code>
+  - EN: Starts a conditional-compilation block controlled by `(CUTLASS_CXX17_OR_LATER)`.
+  - CN: 开始一个由 `(CUTLASS_CXX17_OR_LATER)` 控制的条件编译块。
+- **L126**: <code>  return exponent_bias_cxx17&lt;NumExpBits, NumMantissaBits&gt;();</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L127**: <code>#else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L128**: <code>  return (NumExpBits == 0) ?</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L129**: <code>    -1 * static_cast&lt;int&gt;(NumMantissaBits) : impl::inner_shift_expression_cxx11&lt;NumExpBits - 1u&gt;();</code>
+  - EN: Declares the callable or operator `int`.
+  - CN: 声明可调用对象或运算符 `int`。
+- **L130**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L131**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L132**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L133**: <code>// C++11 equivalent of maximum_exponent_cxx17()</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L134**: <code>template&lt;uint32_t NumExpBits, uint32_t NumMantissaBits, NanInfEncoding NaNEncoding&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L135**: <code>constexpr int maximum_exponent_cxx11() {</code>
+  - EN: Starts the definition body for `maximum_exponent_cxx11`.
+  - CN: 开始 `maximum_exponent_cxx11` 的定义体。
+- **L136**: <code>  return</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L137**: <code>    ((NumExpBits == 0) ?</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L138**: <code>      (0 - exponent_bias_cxx11&lt;NumExpBits, NumMantissaBits&gt;()) :</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L139**: <code>      ((NaNEncoding == NanInfEncoding::IEEE_754) ?</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L140**: <code>        ((static_cast&lt;int&gt;((1 &lt;&lt; NumExpBits)) - 2) - exponent_bias_cxx11&lt;NumExpBits, NumMantissaBits&gt;()) :</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L141**: <code>        ((NaNEncoding == NanInfEncoding::CANONICAL_ONLY) ?</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L142**: <code>          ((NumMantissaBits &gt; 0) ?</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L143**: <code>            static_cast&lt;int&gt;((1 &lt;&lt; NumExpBits)) - 1 - exponent_bias_cxx11&lt;NumExpBits, NumMantissaBits&gt;() :</code>
+  - EN: Provides part of the signature or implementation for `int`.
+  - CN: 提供 `int` 的签名或实现的一部分。
+- **L144**: <code>            static_cast&lt;int&gt;((1 &lt;&lt; NumExpBits)) - 2 - exponent_bias_cxx11&lt;NumExpBits, NumMantissaBits&gt;()</code>
+  - EN: Provides part of the signature or implementation for `int`.
+  - CN: 提供 `int` 的签名或实现的一部分。
+- **L145**: <code>          ) :</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L146**: <code>          (static_cast&lt;int&gt;((1 &lt;&lt; NumExpBits)) - 1 - exponent_bias_cxx11&lt;NumExpBits, NumMantissaBits&gt;())</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L147**: <code>        )</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L148**: <code>      )</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L149**: <code>    );</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L150**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L151**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L152**: <code>#if (CUTLASS_CXX17_OR_LATER)</code>
+  - EN: Starts a conditional-compilation block controlled by `(CUTLASS_CXX17_OR_LATER)`.
+  - CN: 开始一个由 `(CUTLASS_CXX17_OR_LATER)` 控制的条件编译块。
+- **L153**: <code>template&lt;uint32_t NumExpBits, uint32_t NumMantissaBits, NanInfEncoding NaNEncoding&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L154**: <code>constexpr int maximum_exponent_cxx17() {</code>
+  - EN: Starts the definition body for `maximum_exponent_cxx17`.
+  - CN: 开始 `maximum_exponent_cxx17` 的定义体。
+- **L155**: <code>  constexpr int exp_bias = exponent_bias_cxx17&lt;NumExpBits, NumMantissaBits&gt;();</code>
+  - EN: Declares the callable or operator `NumMantissaBits`.
+  - CN: 声明可调用对象或运算符 `NumMantissaBits`。
+- **L156**: <code>  if CUTLASS_CONSTEXPR_IF_CXX17 (NumExpBits == 0) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L157**: <code>    // If no exponent bits, return fixed hidden bias</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L158**: <code>    return 0 - exp_bias;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L159**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L160**: <code>  else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L161**: <code>    if CUTLASS_CONSTEXPR_IF_CXX17 (NaNEncoding == NanInfEncoding::IEEE_754) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L162**: <code>      // We have IEEE style NaN and infinity</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L163**: <code>      // All values when exp_bits = 1...1s are used.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L164**: <code>      int max_exp_bits = static_cast&lt;int&gt;((1 &lt;&lt; NumExpBits)) - 2;</code>
+  - EN: Declares the callable or operator `int`.
+  - CN: 声明可调用对象或运算符 `int`。
+- **L165**: <code>      return max_exp_bits - exp_bias;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L166**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L167**: <code>    else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L168**: <code>      // There are no cases where we have Inf without IEEE_754_Nan</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L169**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L170**: <code>      // If we have a canonical NaN. Only exp=1..1 and mantissa=1..1</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L171**: <code>      // value has a special meaning. If we also have at least one mantissa</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L172**: <code>      // bit, then maximum exponent is 1...1 - exponent_bias</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L173**: <code>      if CUTLASS_CONSTEXPR_IF_CXX17 (NaNEncoding == NanInfEncoding::CANONICAL_ONLY) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L174**: <code>        if CUTLASS_CONSTEXPR_IF_CXX17 (NumMantissaBits &gt; 0) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L175**: <code>          int max_exp_bits = static_cast&lt;int&gt;((1 &lt;&lt; NumExpBits)) - 1;</code>
+  - EN: Declares the callable or operator `int`.
+  - CN: 声明可调用对象或运算符 `int`。
+- **L176**: <code>          return max_exp_bits - exp_bias;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L177**: <code>        }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L178**: <code>        else { // no mantissa bits</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L179**: <code>          int max_exp_bits = static_cast&lt;int&gt;((1 &lt;&lt; NumExpBits)) - 2;</code>
+  - EN: Declares the callable or operator `int`.
+  - CN: 声明可调用对象或运算符 `int`。
+- **L180**: <code>          return max_exp_bits - exp_bias;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L181**: <code>        }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L182**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L183**: <code>      // No NaNs or infs</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L184**: <code>      int max_exp_bits = static_cast&lt;int&gt;((1 &lt;&lt; NumExpBits)) - 1;</code>
+  - EN: Declares the callable or operator `int`.
+  - CN: 声明可调用对象或运算符 `int`。
+- **L185**: <code>      return max_exp_bits - exp_bias;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L186**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L187**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L188**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L189**: <code>  CUTLASS_GCC_UNREACHABLE;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L190**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L191**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L192**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L193**: <code>template&lt;uint32_t NumExpBits, uint32_t NumMantissaBits&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L194**: <code>constexpr int minimum_exponent_cxx11() {</code>
+  - EN: Starts the definition body for `minimum_exponent_cxx11`.
+  - CN: 开始 `minimum_exponent_cxx11` 的定义体。
+- **L195**: <code>  return</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L196**: <code>    ((NumExpBits == 0) ?</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L197**: <code>      0 - exponent_bias_cxx11&lt;NumExpBits, NumMantissaBits&gt;() :</code>
+  - EN: Provides part of the signature or implementation for `NumMantissaBits`.
+  - CN: 提供 `NumMantissaBits` 的签名或实现的一部分。
+- **L198**: <code>      ((NumMantissaBits &gt; 0) ?</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L199**: <code>        1 - exponent_bias_cxx11&lt;NumExpBits, NumMantissaBits&gt;() :</code>
+  - EN: Provides part of the signature or implementation for `NumMantissaBits`.
+  - CN: 提供 `NumMantissaBits` 的签名或实现的一部分。
+- **L200**: <code>        0 - exponent_bias_cxx11&lt;NumExpBits, NumMantissaBits&gt;())</code>
+  - EN: Provides part of the signature or implementation for `NumMantissaBits`.
+  - CN: 提供 `NumMantissaBits` 的签名或实现的一部分。
+- **L201**: <code>    );</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L202**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L203**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L204**: <code>#if (CUTLASS_CXX17_OR_LATER)</code>
+  - EN: Starts a conditional-compilation block controlled by `(CUTLASS_CXX17_OR_LATER)`.
+  - CN: 开始一个由 `(CUTLASS_CXX17_OR_LATER)` 控制的条件编译块。
+- **L205**: <code>template&lt;uint32_t NumExpBits, uint32_t NumMantissaBits&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L206**: <code>constexpr int minimum_exponent_cxx17() {</code>
+  - EN: Starts the definition body for `minimum_exponent_cxx17`.
+  - CN: 开始 `minimum_exponent_cxx17` 的定义体。
+- **L207**: <code>  constexpr int exp_bias = exponent_bias_cxx17&lt;NumExpBits, NumMantissaBits&gt;();</code>
+  - EN: Declares the callable or operator `NumMantissaBits`.
+  - CN: 声明可调用对象或运算符 `NumMantissaBits`。
+- **L208**: <code>  constexpr bool has_denorm = (NumMantissaBits &gt; 0);</code>
+  - EN: Declares the callable or operator `has_denorm`.
+  - CN: 声明可调用对象或运算符 `has_denorm`。
+- **L209**: <code>  if CUTLASS_CONSTEXPR_IF_CXX17 (NumExpBits == 0) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L210**: <code>    // If no exponent bits, return fixed hidden bias</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L211**: <code>    // Note that minimum and maximum exponents are the same.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L212**: <code>    return 0 - exp_bias;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L213**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L214**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L215**: <code>  if CUTLASS_CONSTEXPR_IF_CXX17 (has_denorm) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L216**: <code>    // Exp = 0...0s is reserved for denorm values.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L217**: <code>    return 1 - exp_bias;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L218**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L219**: <code>  return 0 - exp_bias;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L220**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L221**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L222**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L223**: <code>template&lt;class Storage, uint32_t NumExpBits, uint32_t NumMantissaBits, NanInfEncoding NaNEncoding&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L224**: <code>constexpr Storage max_pos_denormal_value_cxx11() {</code>
+  - EN: Starts the definition body for `max_pos_denormal_value_cxx11`.
+  - CN: 开始 `max_pos_denormal_value_cxx11` 的定义体。
+- **L225**: <code>  static_assert(NumExpBits &gt; 0 || NumMantissaBits &gt; 0, &quot;Both NumExpBits and NumMantissaBits can&#x27;t be zero&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L226**: <code>  return</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L227**: <code>    (!(NumMantissaBits &gt; 0) ? Storage(0) : Storage((1ull &lt;&lt; NumMantissaBits) - 1));</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L228**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L229**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L230**: <code>#if (CUTLASS_CXX17_OR_LATER)</code>
+  - EN: Starts a conditional-compilation block controlled by `(CUTLASS_CXX17_OR_LATER)`.
+  - CN: 开始一个由 `(CUTLASS_CXX17_OR_LATER)` 控制的条件编译块。
+- **L231**: <code>template&lt;class Storage, uint32_t NumExpBits, uint32_t NumMantissaBits, NanInfEncoding NaNEncoding&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L232**: <code>constexpr Storage max_pos_denormal_value_cxx17() {</code>
+  - EN: Starts the definition body for `max_pos_denormal_value_cxx17`.
+  - CN: 开始 `max_pos_denormal_value_cxx17` 的定义体。
+- **L233**: <code>  static_assert(NumExpBits &gt; 0 || NumMantissaBits &gt; 0, &quot;Both NumExpBits and NumMantissaBits can&#x27;t be zero&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L234**: <code>  constexpr bool has_denorm = (NumMantissaBits &gt; 0);</code>
+  - EN: Declares the callable or operator `has_denorm`.
+  - CN: 声明可调用对象或运算符 `has_denorm`。
+- **L235**: <code>  if CUTLASS_CONSTEXPR_IF_CXX17 (!has_denorm) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L236**: <code>    // If we don&#x27;t have denormal values, return all 0s</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L237**: <code>    return Storage(0);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L238**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L239**: <code>  else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L240**: <code>    // Case: (NumExpBits &gt; 0 &amp;&amp; NumMantissaBits &gt; 0) or (NumExpBits == 0 &amp;&amp; NumMantissaBits &gt; 0)</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L241**: <code>    return Storage((1ull &lt;&lt; NumMantissaBits) - 1);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L242**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L243**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L244**: <code>  CUTLASS_GCC_UNREACHABLE;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L245**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L246**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L247**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L248**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L249**: <code>template&lt;class Storage, uint32_t NumExpBits, uint32_t NumMantissaBits, NanInfEncoding NaNEncoding&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L250**: <code>constexpr Storage min_pos_denormal_value_cxx11() {</code>
+  - EN: Starts the definition body for `min_pos_denormal_value_cxx11`.
+  - CN: 开始 `min_pos_denormal_value_cxx11` 的定义体。
+- **L251**: <code>  return (!(NumMantissaBits &gt; 0) ? Storage(0) : Storage(1));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L252**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L253**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L254**: <code>#if (CUTLASS_CXX17_OR_LATER)</code>
+  - EN: Starts a conditional-compilation block controlled by `(CUTLASS_CXX17_OR_LATER)`.
+  - CN: 开始一个由 `(CUTLASS_CXX17_OR_LATER)` 控制的条件编译块。
+- **L255**: <code>template&lt;class Storage, uint32_t NumExpBits, uint32_t NumMantissaBits, NanInfEncoding NaNEncoding&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L256**: <code>constexpr Storage min_pos_denormal_value_cxx17() {</code>
+  - EN: Starts the definition body for `min_pos_denormal_value_cxx17`.
+  - CN: 开始 `min_pos_denormal_value_cxx17` 的定义体。
+- **L257**: <code>  constexpr bool has_denorm = (NumMantissaBits &gt; 0);</code>
+  - EN: Declares the callable or operator `has_denorm`.
+  - CN: 声明可调用对象或运算符 `has_denorm`。
+- **L258**: <code>  if CUTLASS_CONSTEXPR_IF_CXX17 (!has_denorm) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L259**: <code>    // If we don&#x27;t have denormal values, return all 0s</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L260**: <code>    return Storage(0);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L261**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L262**: <code>  // Case: (NumExpBits &gt; 0 &amp;&amp; NumMantissaBits &gt; 0) or (NumExpBits == 0 &amp;&amp; NumMantissaBits &gt; 0)</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L263**: <code>  return Storage(1);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L264**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L265**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L266**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L267**: <code>template&lt;class Storage, uint32_t NumExpBits, uint32_t NumMantissaBits, NanInfEncoding NaNEncoding&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L268**: <code>constexpr Storage max_pos_normal_value_cxx11() {</code>
+  - EN: Starts the definition body for `max_pos_normal_value_cxx11`.
+  - CN: 开始 `max_pos_normal_value_cxx11` 的定义体。
+- **L269**: <code>  return</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L270**: <code>    ((NumExpBits == 0) ?</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L271**: <code>      Storage(0) :</code>
+  - EN: Provides part of the signature or implementation for `Storage`.
+  - CN: 提供 `Storage` 的签名或实现的一部分。
+- **L272**: <code>      ((NumMantissaBits == 0) ?</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L273**: <code>        0 :</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L274**: <code>        (((NaNEncoding == NanInfEncoding::IEEE_754 || NaNEncoding == NanInfEncoding::NONE) ?</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L275**: <code>          ((1ull &lt;&lt; NumMantissaBits) - 1) :</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L276**: <code>          ((1ull &lt;&lt; NumMantissaBits) - 2)))</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L277**: <code>      ) | (static_cast&lt;Storage&gt;(</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L278**: <code>            maximum_exponent_cxx11&lt;NumExpBits, NumMantissaBits, NaNEncoding&gt;() +</code>
+  - EN: Provides part of the signature or implementation for `NaNEncoding`.
+  - CN: 提供 `NaNEncoding` 的签名或实现的一部分。
+- **L279**: <code>            exponent_bias_cxx11&lt;NumExpBits, NumMantissaBits&gt;()</code>
+  - EN: Provides part of the signature or implementation for `NumMantissaBits`.
+  - CN: 提供 `NumMantissaBits` 的签名或实现的一部分。
+- **L280**: <code>          ) &lt;&lt; NumMantissaBits)</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L281**: <code>    );</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L282**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L283**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L284**: <code>#if (CUTLASS_CXX17_OR_LATER)</code>
+  - EN: Starts a conditional-compilation block controlled by `(CUTLASS_CXX17_OR_LATER)`.
+  - CN: 开始一个由 `(CUTLASS_CXX17_OR_LATER)` 控制的条件编译块。
+- **L285**: <code>template&lt;class Storage, uint32_t NumExpBits, uint32_t NumMantissaBits, NanInfEncoding NaNEncoding&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L286**: <code>constexpr Storage max_pos_normal_value_cxx17() {</code>
+  - EN: Starts the definition body for `max_pos_normal_value_cxx17`.
+  - CN: 开始 `max_pos_normal_value_cxx17` 的定义体。
+- **L287**: <code>  if CUTLASS_CONSTEXPR_IF_CXX17 (NumExpBits == 0) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L288**: <code>    // if there are no exponent bits, we don&#x27;t have normal values.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L289**: <code>    return Storage(0);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L290**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L291**: <code>  constexpr int exp_bias = exponent_bias_cxx17&lt;NumExpBits, NumMantissaBits&gt;();</code>
+  - EN: Declares the callable or operator `NumMantissaBits`.
+  - CN: 声明可调用对象或运算符 `NumMantissaBits`。
+- **L292**: <code>  constexpr int max_exp = maximum_exponent_cxx17&lt;NumExpBits, NumMantissaBits, NaNEncoding&gt;();</code>
+  - EN: Declares the callable or operator `NaNEncoding`.
+  - CN: 声明可调用对象或运算符 `NaNEncoding`。
+- **L293**: <code>  constexpr int exp = max_exp + exp_bias;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L294**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L295**: <code>  // place the exponent</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L296**: <code>  Storage val = static_cast&lt;Storage&gt;(exp) &lt;&lt; NumMantissaBits;</code>
+  - EN: Declares the callable or operator `Storage`.
+  - CN: 声明可调用对象或运算符 `Storage`。
+- **L297**: <code>  // If there are no mantissa bits return the exponent</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L298**: <code>  if CUTLASS_CONSTEXPR_IF_CXX17 (NumMantissaBits == 0) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L299**: <code>    return val;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L300**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L301**: <code>  else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L302**: <code>    // If the NaN Inf encoding follows IEEE 754 or there is no (NaN and Inf) then mantissa can be all 1..1s</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L303**: <code>    if CUTLASS_CONSTEXPR_IF_CXX17 (NaNEncoding == NanInfEncoding::IEEE_754 ||</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L304**: <code>                  NaNEncoding == NanInfEncoding::NONE  ) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L305**: <code>      Storage mantissa = (1ull &lt;&lt; NumMantissaBits) - 1;</code>
+  - EN: Declares the callable or operator `mantissa`.
+  - CN: 声明可调用对象或运算符 `mantissa`。
+- **L306**: <code>      val |= mantissa;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L307**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L308**: <code>    else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L309**: <code>      // If we have a canonical NaN, then the exponent can be the maximum bit value</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L310**: <code>      // but mantissa=1..1s is reserved for NaN.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L311**: <code>      Storage mantissa = (1ull &lt;&lt; NumMantissaBits) - 2;</code>
+  - EN: Declares the callable or operator `mantissa`.
+  - CN: 声明可调用对象或运算符 `mantissa`。
+- **L312**: <code>      val |= mantissa;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L313**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L314**: <code>    return val;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L315**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L316**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L317**: <code>  CUTLASS_GCC_UNREACHABLE;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L318**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L319**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L320**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L321**: <code>template&lt;class Storage, uint32_t NumExpBits, uint32_t NumMantissaBits, NanInfEncoding NaNEncoding&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L322**: <code>constexpr Storage min_pos_normal_value_cxx11() {</code>
+  - EN: Starts the definition body for `min_pos_normal_value_cxx11`.
+  - CN: 开始 `min_pos_normal_value_cxx11` 的定义体。
+- **L323**: <code>  return</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L324**: <code>    ((NumExpBits == 0) ?</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L325**: <code>      Storage(0) :</code>
+  - EN: Provides part of the signature or implementation for `Storage`.
+  - CN: 提供 `Storage` 的签名或实现的一部分。
+- **L326**: <code>      (Storage((NumMantissaBits &gt; 0) ? 1 : 0) &lt;&lt; NumMantissaBits)</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L327**: <code>    );</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L328**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L329**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L330**: <code>#if (CUTLASS_CXX17_OR_LATER)</code>
+  - EN: Starts a conditional-compilation block controlled by `(CUTLASS_CXX17_OR_LATER)`.
+  - CN: 开始一个由 `(CUTLASS_CXX17_OR_LATER)` 控制的条件编译块。
+- **L331**: <code>template&lt;class Storage, uint32_t NumExpBits, uint32_t NumMantissaBits, NanInfEncoding NaNEncoding&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L332**: <code>constexpr Storage min_pos_normal_value_cxx17() {</code>
+  - EN: Starts the definition body for `min_pos_normal_value_cxx17`.
+  - CN: 开始 `min_pos_normal_value_cxx17` 的定义体。
+- **L333**: <code>  constexpr bool has_denorm = (NumMantissaBits &gt; 0);</code>
+  - EN: Declares the callable or operator `has_denorm`.
+  - CN: 声明可调用对象或运算符 `has_denorm`。
+- **L334**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L335**: <code>  if CUTLASS_CONSTEXPR_IF_CXX17 (NumExpBits == 0) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L336**: <code>    // if there are no exponent bits, we don&#x27;t have normal values.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L337**: <code>    return Storage(0);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L338**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L339**: <code>  Storage exp = 0;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L340**: <code>  if CUTLASS_CONSTEXPR_IF_CXX17 (has_denorm) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L341**: <code>    exp = 1;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L342**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L343**: <code>  return static_cast&lt;Storage&gt;(exp &lt;&lt; NumMantissaBits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L344**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L345**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L346**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L347**: <code>template&lt;class Storage, uint32_t NumExpBits, uint32_t NumMantissaBits, NanInfEncoding NaNEncoding&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L348**: <code>constexpr Storage max_value_cxx11() {</code>
+  - EN: Starts the definition body for `max_value_cxx11`.
+  - CN: 开始 `max_value_cxx11` 的定义体。
+- **L349**: <code>  return</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L350**: <code>    ((NumExpBits &gt; 0) ?</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L351**: <code>      max_pos_normal_value_cxx11&lt;Storage, NumExpBits, NumMantissaBits, NaNEncoding&gt;() :</code>
+  - EN: Provides part of the signature or implementation for `NaNEncoding`.
+  - CN: 提供 `NaNEncoding` 的签名或实现的一部分。
+- **L352**: <code>      max_pos_denormal_value_cxx11&lt;Storage, NumExpBits, NumMantissaBits, NaNEncoding&gt;()</code>
+  - EN: Provides part of the signature or implementation for `NaNEncoding`.
+  - CN: 提供 `NaNEncoding` 的签名或实现的一部分。
+- **L353**: <code>    );</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L354**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L355**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L356**: <code>#if (CUTLASS_CXX17_OR_LATER)</code>
+  - EN: Starts a conditional-compilation block controlled by `(CUTLASS_CXX17_OR_LATER)`.
+  - CN: 开始一个由 `(CUTLASS_CXX17_OR_LATER)` 控制的条件编译块。
+- **L357**: <code>template&lt;class Storage, uint32_t NumExpBits, uint32_t NumMantissaBits, NanInfEncoding NaNEncoding&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L358**: <code>constexpr Storage max_value_cxx17() {</code>
+  - EN: Starts the definition body for `max_value_cxx17`.
+  - CN: 开始 `max_value_cxx17` 的定义体。
+- **L359**: <code>  constexpr bool has_normal = (NumExpBits &gt; 0);</code>
+  - EN: Declares the callable or operator `has_normal`.
+  - CN: 声明可调用对象或运算符 `has_normal`。
+- **L360**: <code>  if CUTLASS_CONSTEXPR_IF_CXX17 (has_normal) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L361**: <code>    return max_pos_normal_value_cxx17&lt;Storage, NumExpBits, NumMantissaBits, NaNEncoding&gt;();</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L362**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L363**: <code>  else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L364**: <code>    return max_pos_denormal_value_cxx17&lt;Storage, NumExpBits, NumMantissaBits, NaNEncoding&gt;();</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L365**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L366**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L367**: <code>  CUTLASS_GCC_UNREACHABLE;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L368**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L369**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L370**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L371**: <code>template&lt;class Storage, uint32_t NumExpBits, uint32_t NumMantissaBits, NanInfEncoding NaNEncoding, bool IsSigned&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L372**: <code>constexpr Storage min_value_cxx11() {</code>
+  - EN: Starts the definition body for `min_value_cxx11`.
+  - CN: 开始 `min_value_cxx11` 的定义体。
+- **L373**: <code>  return</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L374**: <code>    (IsSigned ?</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L375**: <code>      Storage(1ull &lt;&lt; (NumExpBits + NumMantissaBits)) | max_value_cxx11&lt;Storage, NumExpBits, NumMantissaBits, NaNEncoding&gt;() :</code>
+  - EN: Provides part of the signature or implementation for `Storage`.
+  - CN: 提供 `Storage` 的签名或实现的一部分。
+- **L376**: <code>      Storage(0)</code>
+  - EN: Provides part of the signature or implementation for `Storage`.
+  - CN: 提供 `Storage` 的签名或实现的一部分。
+- **L377**: <code>    );</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L378**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L379**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L380**: <code>#if (CUTLASS_CXX17_OR_LATER)</code>
+  - EN: Starts a conditional-compilation block controlled by `(CUTLASS_CXX17_OR_LATER)`.
+  - CN: 开始一个由 `(CUTLASS_CXX17_OR_LATER)` 控制的条件编译块。
+- **L381**: <code>template&lt;class Storage, uint32_t NumExpBits, uint32_t NumMantissaBits, NanInfEncoding NaNEncoding, bool IsSigned&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L382**: <code>constexpr Storage min_value_cxx17() {</code>
+  - EN: Starts the definition body for `min_value_cxx17`.
+  - CN: 开始 `min_value_cxx17` 的定义体。
+- **L383**: <code>  if (IsSigned) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L384**: <code>    return Storage(1ull &lt;&lt; (NumExpBits + NumMantissaBits)) | max_value_cxx17&lt;Storage, NumExpBits, NumMantissaBits, NaNEncoding&gt;();</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L385**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L386**: <code>  else { // Unsigned number</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L387**: <code>    return Storage(0);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L388**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L389**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L390**: <code>  CUTLASS_GCC_UNREACHABLE;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L391**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L392**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L393**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L394**: <code>template &lt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L395**: <code>    class StorageType,</code>
+  - EN: Declares or defines the class `StorageType`.
+  - CN: 声明或定义 class `StorageType`。
+- **L396**: <code>    uint32_t NumBits, uint32_t NumExpBits, uint32_t NumMantissaBits,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L397**: <code>    NanInfEncoding Nan = NanInfEncoding::IEEE_754, bool IsSigned = true&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L398**: <code>struct FpBitRepresentation {</code>
+  - EN: Declares or defines the struct `FpBitRepresentation`.
+  - CN: 声明或定义 struct `FpBitRepresentation`。
+- **L399**: <code>public:</code>
+  - EN: Sets the `public` access level for subsequent class members.
+  - CN: 将后续类成员的访问级别设置为 `public`。
+- **L400**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L401**: <code>  using Storage = StorageType;</code>
+  - EN: Defines the alias `Storage` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Storage`。
+- **L402**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L403**: <code>#if (CUTLASS_CXX17_OR_LATER)</code>
+  - EN: Starts a conditional-compilation block controlled by `(CUTLASS_CXX17_OR_LATER)`.
+  - CN: 开始一个由 `(CUTLASS_CXX17_OR_LATER)` 控制的条件编译块。
+- **L404**: <code>  static_assert(cutlass::platform::is_unsigned_v&lt;Storage&gt;, &quot;Use an unsigned integer for StorageType&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L405**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L406**: <code>  static constexpr bool IS_SIGNED = IsSigned;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L407**: <code>  // Canonical NaN is always represented as exponent=11...11 and mantissa=11...11, if it exists</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L408**: <code>  static constexpr NanInfEncoding NAN_TYPE = Nan;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L409**: <code>  // Inf is always represented as exponent=11...11 and mantissa=00...00, if it exists</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L410**: <code>  static constexpr bool HAS_INF = (NAN_TYPE == NanInfEncoding::IEEE_754);</code>
+  - EN: Declares the callable or operator `HAS_INF`.
+  - CN: 声明可调用对象或运算符 `HAS_INF`。
+- **L411**: <code>  static constexpr bool HAS_NAN = (NAN_TYPE != NanInfEncoding::NONE);</code>
+  - EN: Declares the callable or operator `HAS_NAN`.
+  - CN: 声明可调用对象或运算符 `HAS_NAN`。
+- **L412**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L413**: <code>  static constexpr bool HAS_DENORM = (NumMantissaBits &gt; 0);</code>
+  - EN: Declares the callable or operator `HAS_DENORM`.
+  - CN: 声明可调用对象或运算符 `HAS_DENORM`。
+- **L414**: <code>  static constexpr bool HAS_NORMAL = !HAS_DENORM;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L415**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L416**: <code>  static constexpr uint32_t NUM_BITS = NumBits;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L417**: <code>  static constexpr uint32_t NUM_EXPONENT_BITS = NumExpBits;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L418**: <code>  static constexpr uint32_t NUM_MANTISSA_BITS = NumMantissaBits;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L419**: <code>  static_assert(NUM_BITS &gt;= (NUM_EXPONENT_BITS + NUM_MANTISSA_BITS + uint32_t(IS_SIGNED)), &quot;Number of bits do not match&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L420**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L421**: <code>  static constexpr Storage ONE = Storage(1);</code>
+  - EN: Declares the callable or operator `Storage`.
+  - CN: 声明可调用对象或运算符 `Storage`。
+- **L422**: <code>  static constexpr Storage ZERO = Storage(0);</code>
+  - EN: Declares the callable or operator `Storage`.
+  - CN: 声明可调用对象或运算符 `Storage`。
+- **L423**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L424**: <code>  // Note: Don&#x27;t rely on operator precedence. Use parenthesis.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L425**: <code>  static constexpr Storage EXPONENT_MASK = (Storage(1) &lt;&lt; Storage(NUM_EXPONENT_BITS)) - ONE;</code>
+  - EN: Declares the callable or operator `EXPONENT_MASK`.
+  - CN: 声明可调用对象或运算符 `EXPONENT_MASK`。
+- **L426**: <code>  static constexpr Storage MANTISSA_MASK = (Storage(1) &lt;&lt; Storage(NUM_MANTISSA_BITS)) - ONE;</code>
+  - EN: Declares the callable or operator `MANTISSA_MASK`.
+  - CN: 声明可调用对象或运算符 `MANTISSA_MASK`。
+- **L427**: <code>  static constexpr Storage EXPONENT_SHIFT = Storage(NUM_MANTISSA_BITS);</code>
+  - EN: Declares the callable or operator `Storage`.
+  - CN: 声明可调用对象或运算符 `Storage`。
+- **L428**: <code>  static constexpr Storage SIGN_SHIFT = (IS_SIGNED) ? Storage(NUM_MANTISSA_BITS + NUM_EXPONENT_BITS) : Storage(0);</code>
+  - EN: Declares the callable or operator `SIGN_SHIFT`.
+  - CN: 声明可调用对象或运算符 `SIGN_SHIFT`。
+- **L429**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L430**: <code>  // Note: All biased/real exponent calculation are done with signed ints</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L431**: <code>  // Use unsigned to represent data not exponent.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L432**: <code>  static constexpr int EXP_BIAS = detail::exponent_bias_cxx11&lt;NUM_EXPONENT_BITS, NUM_MANTISSA_BITS&gt;();</code>
+  - EN: Declares the callable or operator `NUM_MANTISSA_BITS`.
+  - CN: 声明可调用对象或运算符 `NUM_MANTISSA_BITS`。
+- **L433**: <code>  static constexpr int MAX_EXP = detail::maximum_exponent_cxx11&lt;NUM_EXPONENT_BITS, NUM_MANTISSA_BITS, NAN_TYPE&gt;();</code>
+  - EN: Declares the callable or operator `NAN_TYPE`.
+  - CN: 声明可调用对象或运算符 `NAN_TYPE`。
+- **L434**: <code>  static constexpr int MIN_EXP = detail::minimum_exponent_cxx11&lt;NUM_EXPONENT_BITS, NUM_MANTISSA_BITS&gt;();</code>
+  - EN: Declares the callable or operator `NUM_MANTISSA_BITS`.
+  - CN: 声明可调用对象或运算符 `NUM_MANTISSA_BITS`。
+- **L435**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L436**: <code>  // Floating-point Limits</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L437**: <code>  static constexpr Storage MAX_POS_NORMAL_VAL = detail::max_pos_normal_value_cxx11&lt;Storage, NUM_EXPONENT_BITS, NUM_MANTISSA_BITS, NAN_TYPE&gt;();</code>
+  - EN: Declares the callable or operator `NAN_TYPE`.
+  - CN: 声明可调用对象或运算符 `NAN_TYPE`。
+- **L438**: <code>  static constexpr Storage MAX_POS_DENORMAL_VAL = detail::max_pos_denormal_value_cxx11&lt;Storage, NUM_EXPONENT_BITS, NUM_MANTISSA_BITS, NAN_TYPE&gt;();</code>
+  - EN: Declares the callable or operator `NAN_TYPE`.
+  - CN: 声明可调用对象或运算符 `NAN_TYPE`。
+- **L439**: <code>  static constexpr Storage MIN_POS_NORMAL_VAL = detail::min_pos_normal_value_cxx11&lt;Storage, NUM_EXPONENT_BITS, NUM_MANTISSA_BITS, NAN_TYPE&gt;();</code>
+  - EN: Declares the callable or operator `NAN_TYPE`.
+  - CN: 声明可调用对象或运算符 `NAN_TYPE`。
+- **L440**: <code>  static constexpr Storage MIN_POS_DENORMAL_VAL = detail::min_pos_denormal_value_cxx11&lt;Storage, NUM_EXPONENT_BITS, NUM_MANTISSA_BITS, NAN_TYPE&gt;();</code>
+  - EN: Declares the callable or operator `NAN_TYPE`.
+  - CN: 声明可调用对象或运算符 `NAN_TYPE`。
+- **L441**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L442**: <code>  static constexpr Storage MAX_VALUE = max_value_cxx11&lt;Storage, NUM_EXPONENT_BITS, NUM_MANTISSA_BITS, NAN_TYPE&gt;();</code>
+  - EN: Declares the callable or operator `NAN_TYPE`.
+  - CN: 声明可调用对象或运算符 `NAN_TYPE`。
+- **L443**: <code>  static constexpr Storage MIN_VALUE = min_value_cxx11&lt;Storage, NUM_EXPONENT_BITS, NUM_MANTISSA_BITS, NAN_TYPE, IS_SIGNED&gt;();</code>
+  - EN: Declares the callable or operator `IS_SIGNED`.
+  - CN: 声明可调用对象或运算符 `IS_SIGNED`。
+- **L444**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L445**: <code>  //</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L446**: <code>  // C++17 Verification</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L447**: <code>  //</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L448**: <code>#if (CUTLASS_CXX17_OR_LATER)</code>
+  - EN: Starts a conditional-compilation block controlled by `(CUTLASS_CXX17_OR_LATER)`.
+  - CN: 开始一个由 `(CUTLASS_CXX17_OR_LATER)` 控制的条件编译块。
+- **L449**: <code>  static_assert(EXP_BIAS == detail::exponent_bias_cxx17&lt;NUM_EXPONENT_BITS, NUM_MANTISSA_BITS&gt;(),                &quot;Error&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L450**: <code>  static_assert(MAX_EXP  == detail::maximum_exponent_cxx17&lt;NUM_EXPONENT_BITS, NUM_MANTISSA_BITS, NAN_TYPE&gt;(),   &quot;Error&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L451**: <code>  static_assert(MIN_EXP  == detail::minimum_exponent_cxx17&lt;NUM_EXPONENT_BITS, NUM_MANTISSA_BITS&gt;(),             &quot;Error&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L452**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L453**: <code>  static_assert(MAX_POS_NORMAL_VAL   == detail::max_pos_normal_value_cxx17&lt;Storage, NUM_EXPONENT_BITS, NUM_MANTISSA_BITS, NAN_TYPE&gt;(), &quot;Error&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L454**: <code>  static_assert(MAX_POS_DENORMAL_VAL == detail::max_pos_denormal_value_cxx17&lt;Storage, NUM_EXPONENT_BITS, NUM_MANTISSA_BITS, NAN_TYPE&gt;(), &quot;Error&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L455**: <code>  static_assert(MIN_POS_NORMAL_VAL   == detail::min_pos_normal_value_cxx17&lt;Storage, NUM_EXPONENT_BITS, NUM_MANTISSA_BITS, NAN_TYPE&gt;(), &quot;Error&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L456**: <code>  static_assert(MIN_POS_DENORMAL_VAL == detail::min_pos_denormal_value_cxx17&lt;Storage, NUM_EXPONENT_BITS, NUM_MANTISSA_BITS, NAN_TYPE&gt;(), &quot;Error&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L457**: <code>  static_assert(MAX_VALUE            == max_value_cxx17&lt;Storage, NUM_EXPONENT_BITS, NUM_MANTISSA_BITS, NAN_TYPE&gt;(), &quot;Error&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L458**: <code>  static_assert(MIN_VALUE            == min_value_cxx17&lt;Storage, NUM_EXPONENT_BITS, NUM_MANTISSA_BITS, NAN_TYPE, IS_SIGNED&gt;(), &quot;Error&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L459**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L460**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L461**: <code>  // If we don&#x27;t have INF defined, set the largest number. Gives us .satfinite behavior.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L462**: <code>  static constexpr Storage INF_MASK = (HAS_INF) ?</code>
+  - EN: Provides part of the signature or implementation for `INF_MASK`.
+  - CN: 提供 `INF_MASK` 的签名或实现的一部分。
+- **L463**: <code>      (Storage(EXPONENT_MASK) &lt;&lt; Storage(NUM_MANTISSA_BITS)) : MAX_VALUE;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L464**: <code>  static constexpr Storage NAN_MASK = (Storage(EXPONENT_MASK) &lt;&lt; Storage(NUM_MANTISSA_BITS)) | MANTISSA_MASK;</code>
+  - EN: Declares the callable or operator `NAN_MASK`.
+  - CN: 声明可调用对象或运算符 `NAN_MASK`。
+- **L465**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L466**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L467**: <code>  static CUTLASS_CONSTEXPR_IF_CXX17 bool is_inf(Storage flt) {</code>
+  - EN: Starts the definition body for `is_inf`.
+  - CN: 开始 `is_inf` 的定义体。
+- **L468**: <code>    if CUTLASS_CONSTEXPR_IF_CXX17 (!HAS_INF) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L469**: <code>      return false;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L470**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L471**: <code>    bool exp_all_ones = (exponent_bits(flt) ^ EXPONENT_MASK) == 0;</code>
+  - EN: Declares the callable or operator `exp_all_ones`.
+  - CN: 声明可调用对象或运算符 `exp_all_ones`。
+- **L472**: <code>    bool mantissa_all_zeros = mantissa_bits(flt) == 0;</code>
+  - EN: Declares the callable or operator `mantissa_bits`.
+  - CN: 声明可调用对象或运算符 `mantissa_bits`。
+- **L473**: <code>    return exp_all_ones &amp;&amp; mantissa_all_zeros;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L474**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L475**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L476**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L477**: <code>  static CUTLASS_CONSTEXPR_IF_CXX17 bool is_canonical_nan(Storage flt) {</code>
+  - EN: Starts the definition body for `is_canonical_nan`.
+  - CN: 开始 `is_canonical_nan` 的定义体。
+- **L478**: <code>    if CUTLASS_CONSTEXPR_IF_CXX17 (NAN_TYPE == NanInfEncoding::NONE) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L479**: <code>      return false;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L480**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L481**: <code>    bool exp_all_ones = (exponent_bits(flt) ^ EXPONENT_MASK) == ZERO;</code>
+  - EN: Declares the callable or operator `exp_all_ones`.
+  - CN: 声明可调用对象或运算符 `exp_all_ones`。
+- **L482**: <code>    bool mantissa_all_ones = (mantissa_bits(flt) ^ MANTISSA_MASK) == ZERO;</code>
+  - EN: Declares the callable or operator `mantissa_all_ones`.
+  - CN: 声明可调用对象或运算符 `mantissa_all_ones`。
+- **L483**: <code>    return exp_all_ones &amp;&amp; mantissa_all_ones;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L484**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L485**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L486**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L487**: <code>  static CUTLASS_CONSTEXPR_IF_CXX17 bool is_nan(Storage flt) {</code>
+  - EN: Starts the definition body for `is_nan`.
+  - CN: 开始 `is_nan` 的定义体。
+- **L488**: <code>    if CUTLASS_CONSTEXPR_IF_CXX17 (NAN_TYPE == NanInfEncoding::NONE) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L489**: <code>      return false;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L490**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L491**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L492**: <code>    if CUTLASS_CONSTEXPR_IF_CXX17 (NAN_TYPE == NanInfEncoding::CANONICAL_ONLY) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L493**: <code>      return is_canonical_nan(flt);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L494**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L495**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L496**: <code>    bool exp_all_ones = (exponent_bits(flt) ^ EXPONENT_MASK) == ZERO;</code>
+  - EN: Declares the callable or operator `exp_all_ones`.
+  - CN: 声明可调用对象或运算符 `exp_all_ones`。
+- **L497**: <code>    bool mantissa_has_ones = mantissa_bits(flt) &gt; ZERO;</code>
+  - EN: Declares the callable or operator `mantissa_bits`.
+  - CN: 声明可调用对象或运算符 `mantissa_bits`。
+- **L498**: <code>    return exp_all_ones &amp;&amp; mantissa_has_ones;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L499**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L500**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L501**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L502**: <code>  static CUTLASS_CONSTEXPR_IF_CXX17 bool is_denorm(Storage flt) {</code>
+  - EN: Starts the definition body for `is_denorm`.
+  - CN: 开始 `is_denorm` 的定义体。
+- **L503**: <code>    if CUTLASS_CONSTEXPR_IF_CXX17 (!HAS_DENORM) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L504**: <code>      return false;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L505**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L506**: <code>    else if (exponent_bits(flt) == ZERO) {</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L507**: <code>      // Exponent bits are all 0s</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L508**: <code>      return true;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L509**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L510**: <code>    return false;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L511**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L512**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L513**: <code>  template&lt;typename T = Storage&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L514**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L515**: <code>  static CUTLASS_CONSTEXPR_IF_CXX17 T sign_bit(T flt) {</code>
+  - EN: Starts the definition body for `sign_bit`.
+  - CN: 开始 `sign_bit` 的定义体。
+- **L516**: <code>    if CUTLASS_CONSTEXPR_IF_CXX17 (!IS_SIGNED) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L517**: <code>      return T(0);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L518**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L519**: <code>    return static_cast&lt;T&gt;(flt &gt;&gt; T(SIGN_SHIFT));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L520**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L521**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L522**: <code>  template&lt;typename T = Storage&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L523**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L524**: <code>  static CUTLASS_CONSTEXPR_IF_CXX17 T set_sign_bit(T flt, T sign) {</code>
+  - EN: Starts the definition body for `set_sign_bit`.
+  - CN: 开始 `set_sign_bit` 的定义体。
+- **L525**: <code>    if CUTLASS_CONSTEXPR_IF_CXX17 (!IS_SIGNED) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L526**: <code>      return flt;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L527**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L528**: <code>    return static_cast&lt;T&gt;(flt | (sign &lt;&lt; T(SIGN_SHIFT)));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L529**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L530**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L531**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L532**: <code>  static CUTLASS_CONSTEXPR_IF_CXX17 Storage exponent_bits(Storage flt) {</code>
+  - EN: Starts the definition body for `exponent_bits`.
+  - CN: 开始 `exponent_bits` 的定义体。
+- **L533**: <code>    if CUTLASS_CONSTEXPR_IF_CXX17 (NUM_EXPONENT_BITS == ZERO) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L534**: <code>      return ZERO;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L535**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L536**: <code>    return (flt &gt;&gt; (NUM_MANTISSA_BITS)) &amp; EXPONENT_MASK;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L537**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L538**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L539**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L540**: <code>  static CUTLASS_CONSTEXPR_IF_CXX17 int exponent(Storage flt) {</code>
+  - EN: Starts the definition body for `exponent`.
+  - CN: 开始 `exponent` 的定义体。
+- **L541**: <code>    if CUTLASS_CONSTEXPR_IF_CXX17 (NUM_EXPONENT_BITS == ZERO) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L542**: <code>      return -int(EXP_BIAS);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L543**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L544**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L545**: <code>    if (HAS_DENORM &amp;&amp; (exponent_bits(flt) == ZERO)) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L546**: <code>      return 1 - int(EXP_BIAS);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L547**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L548**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L549**: <code>    return int(flt &gt;&gt; (NUM_MANTISSA_BITS) &amp; EXPONENT_MASK) - int(EXP_BIAS);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L550**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L551**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L552**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L553**: <code>  static CUTLASS_CONSTEXPR_IF_CXX17 Storage mantissa_bits(Storage flt) {</code>
+  - EN: Starts the definition body for `mantissa_bits`.
+  - CN: 开始 `mantissa_bits` 的定义体。
+- **L554**: <code>    if CUTLASS_CONSTEXPR_IF_CXX17 (NUM_MANTISSA_BITS == ZERO) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L555**: <code>      return ZERO;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L556**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L557**: <code>    return (flt &amp; MANTISSA_MASK);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L558**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L559**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L560**: <code>  template &lt;class FpType&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L561**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L562**: <code>  static CUTLASS_CONSTEXPR_IF_CXX17 Storage to_bits(FpType flt) {</code>
+  - EN: Starts the definition body for `to_bits`.
+  - CN: 开始 `to_bits` 的定义体。
+- **L563**: <code>    return copy_bits&lt;FpType, Storage&gt;(flt);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L564**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L565**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L566**: <code>  template &lt;class DstFpBits&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L567**: <code>  CUTLASS_HOST_DEVICE static typename DstFpBits::Storage convert_to(</code>
+  - EN: Begins or continues the signature/parameter list for `convert_to`.
+  - CN: 开始或继续 `convert_to` 的签名/参数列表。
+- **L568**: <code>      Storage src_val,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L569**: <code>      DstFpBits dst_encoding) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L570**: <code>    return convert(FpBitRepresentation{}, src_val, dst_encoding);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L571**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L572**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L573**: <code>  template &lt;class SrcFpBits&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L574**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L575**: <code>  static CUTLASS_CONSTEXPR_IF_CXX17 Storage convert_from(</code>
+  - EN: Begins or continues the signature/parameter list for `convert_from`.
+  - CN: 开始或继续 `convert_from` 的签名/参数列表。
+- **L576**: <code>      typename SrcFpBits::Storage src_val,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L577**: <code>      SrcFpBits src_encoding) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L578**: <code>    return convert(src_encoding, src_val, FpBitRepresentation{});</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L579**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L580**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L581**: <code>private:</code>
+  - EN: Sets the `private` access level for subsequent class members.
+  - CN: 将后续类成员的访问级别设置为 `private`。
+- **L582**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L583**: <code>  template&lt;typename T = Storage&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L584**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L585**: <code>  static CUTLASS_CONSTEXPR_IF_CXX17 T make_fp_from_bits(T sign, T exp, T mantissa) {</code>
+  - EN: Starts the definition body for `make_fp_from_bits`.
+  - CN: 开始 `make_fp_from_bits` 的定义体。
+- **L586**: <code>    T fp_bits = T(ZERO);</code>
+  - EN: Declares the callable or operator `T`.
+  - CN: 声明可调用对象或运算符 `T`。
+- **L587**: <code>    CUTLASS_UNUSED(sign);</code>
+  - EN: Declares the callable or operator `CUTLASS_UNUSED`.
+  - CN: 声明可调用对象或运算符 `CUTLASS_UNUSED`。
+- **L588**: <code>    if CUTLASS_CONSTEXPR_IF_CXX17 (IS_SIGNED) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L589**: <code>      fp_bits = sign &lt;&lt; SIGN_SHIFT;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L590**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L591**: <code>    fp_bits |= (exp &lt;&lt; T(NUM_MANTISSA_BITS));</code>
+  - EN: Declares the callable or operator `fp_bits`.
+  - CN: 声明可调用对象或运算符 `fp_bits`。
+- **L592**: <code>    fp_bits |= (mantissa);</code>
+  - EN: Declares the callable or operator `fp_bits`.
+  - CN: 声明可调用对象或运算符 `fp_bits`。
+- **L593**: <code>    return fp_bits;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L594**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L595**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L596**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L597**: <code>  static CUTLASS_CONSTEXPR_IF_CXX17 Storage nan_with_sign(Storage sign) {</code>
+  - EN: Starts the definition body for `nan_with_sign`.
+  - CN: 开始 `nan_with_sign` 的定义体。
+- **L598**: <code>    Storage fp_bits = NAN_MASK;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L599**: <code>    return set_sign_bit(fp_bits, sign);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L600**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L601**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L602**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L603**: <code>  static CUTLASS_CONSTEXPR_IF_CXX17 Storage inf_with_sign(Storage sign) {</code>
+  - EN: Starts the definition body for `inf_with_sign`.
+  - CN: 开始 `inf_with_sign` 的定义体。
+- **L604**: <code>    if CUTLASS_CONSTEXPR_IF_CXX17 (HAS_INF) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L605**: <code>      Storage fp_bits = INF_MASK;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L606**: <code>      return set_sign_bit(fp_bits, sign);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L607**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L608**: <code>    else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L609**: <code>      // If INF is not defined assume satfinite behavior</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L610**: <code>      return (sign == ZERO) ? MAX_VALUE : MIN_VALUE;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L611**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L612**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L613**: <code>    CUTLASS_GCC_UNREACHABLE;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L614**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L615**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L616**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L617**: <code>  static CUTLASS_CONSTEXPR_IF_CXX17 Storage significand(Storage flt) {</code>
+  - EN: Starts the definition body for `significand`.
+  - CN: 开始 `significand` 的定义体。
+- **L618**: <code>    if (is_denorm(flt)) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L619**: <code>      return mantissa_bits(flt);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L620**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L621**: <code>    else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L622**: <code>      return (ONE &lt;&lt; Storage(NUM_MANTISSA_BITS)) | mantissa_bits(flt);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L623**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L624**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L625**: <code>    CUTLASS_GCC_UNREACHABLE;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L626**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L627**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L628**: <code>  template&lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L629**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L630**: <code>  static CUTLASS_CONSTEXPR_IF_CXX17 T significand_hidden_bits(T significand) {</code>
+  - EN: Starts the definition body for `significand_hidden_bits`.
+  - CN: 开始 `significand_hidden_bits` 的定义体。
+- **L631**: <code>    if CUTLASS_CONSTEXPR_IF_CXX17 (NUM_MANTISSA_BITS == 0) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L632**: <code>      return T(1);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L633**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L634**: <code>    return ((T(0b11) &lt;&lt; T(NUM_MANTISSA_BITS)) &amp; significand) &gt;&gt; T(NUM_MANTISSA_BITS);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L635**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L636**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L637**: <code>  // Current assumption round to nearest even</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L638**: <code>  template&lt;class T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L639**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L640**: <code>  static CUTLASS_CONSTEXPR_IF_CXX17 T round_significand(T src, int shift_amount) {</code>
+  - EN: Starts the definition body for `round_significand`.
+  - CN: 开始 `round_significand` 的定义体。
+- **L641**: <code>    T dst_mantissa = src;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L642**: <code>    // If the shift amount is positive, we are shifting left</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L643**: <code>    // Type with less mantissa bits is rounded to a type with more</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L644**: <code>    // mantissa bits.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L645**: <code>    if (shift_amount &gt; 0) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L646**: <code>      dst_mantissa = (dst_mantissa &lt;&lt; (shift_amount));</code>
+  - EN: Declares the callable or operator `dst_mantissa`.
+  - CN: 声明可调用对象或运算符 `dst_mantissa`。
+- **L647**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L648**: <code>    else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L649**: <code>      // There are fewer mantissa bits in the target type</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L650**: <code>      // we need to round the destination number up for all</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L651**: <code>      // lower precision bits removed.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L652**: <code>      // We assume round-to-nearest-even here.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L653**: <code>      int pos_shift_amount = -shift_amount;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L654**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L655**: <code>      // Too large shift return all zeros to prevent undefined behavior for shift.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L656**: <code>      if (pos_shift_amount &gt;= static_cast&lt;int&gt;(sizeof(T) * 8)) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L657**: <code>        return T(0);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L658**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L659**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L660**: <code>      T guard_bit_mask = (T(1) &lt;&lt; T(pos_shift_amount));            // Last bit to remain in mantissa</code>
+  - EN: Provides part of the signature or implementation for `guard_bit_mask`.
+  - CN: 提供 `guard_bit_mask` 的签名或实现的一部分。
+- **L661**: <code>      T sticky_mask    = (T(1) &lt;&lt; T(pos_shift_amount - 1)) - T(1); // Remaining bits</code>
+  - EN: Provides part of the signature or implementation for `sticky_mask`.
+  - CN: 提供 `sticky_mask` 的签名或实现的一部分。
+- **L662**: <code>      T round_bit_mask = (T(1) &lt;&lt; T(pos_shift_amount - 1));        // First bit removed from mantissa</code>
+  - EN: Provides part of the signature or implementation for `round_bit_mask`.
+  - CN: 提供 `round_bit_mask` 的签名或实现的一部分。
+- **L663**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L664**: <code>      bool sticky_bit = (src &amp; sticky_mask) &gt;= T(1);                      // ORing all sticky bits</code>
+  - EN: Provides part of the signature or implementation for `sticky_bit`.
+  - CN: 提供 `sticky_bit` 的签名或实现的一部分。
+- **L665**: <code>      bool round_bit = (src &amp; round_bit_mask) &gt;= T(1);</code>
+  - EN: Declares the callable or operator `round_bit`.
+  - CN: 声明可调用对象或运算符 `round_bit`。
+- **L666**: <code>      bool guard_bit = (src &amp; guard_bit_mask) &gt;= T(1);</code>
+  - EN: Declares the callable or operator `guard_bit`.
+  - CN: 声明可调用对象或运算符 `guard_bit`。
+- **L667**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L668**: <code>      // Shift mantissa bits to right to remove lowest precision bits</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L669**: <code>      dst_mantissa = dst_mantissa &gt;&gt; pos_shift_amount;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L670**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L671**: <code>      if ((sticky_bit &amp;&amp; round_bit) || (guard_bit &amp;&amp; round_bit &amp;&amp; !sticky_bit)) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L672**: <code>        dst_mantissa += 1;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L673**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L674**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L675**: <code>    return dst_mantissa;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L676**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L677**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L678**: <code>  template &lt;class SrcFpBits, class DstFpBits&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L679**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L680**: <code>  static typename DstFpBits::Storage convert(</code>
+  - EN: Begins or continues the signature/parameter list for `convert`.
+  - CN: 开始或继续 `convert` 的签名/参数列表。
+- **L681**: <code>      SrcFpBits src_encoding,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L682**: <code>      typename SrcFpBits::Storage src_val,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L683**: <code>      DstFpBits dst_encoding) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L684**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L685**: <code>    using SrcT = typename SrcFpBits::Storage;</code>
+  - EN: Defines the alias `SrcT` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `SrcT`。
+- **L686**: <code>    using DstT = typename DstFpBits::Storage;</code>
+  - EN: Defines the alias `DstT` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `DstT`。
+- **L687**: <code>    using LargeStorage = typename cutlass::platform::conditional&lt;(sizeof(SrcT) &gt; sizeof(DstT)), SrcT, DstT&gt;::type;</code>
+  - EN: Defines the alias `LargeStorage` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `LargeStorage`。
+- **L688**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L689**: <code>    LargeStorage src_sign_bit = src_encoding.sign_bit(src_val);</code>
+  - EN: Declares the callable or operator `sign_bit`.
+  - CN: 声明可调用对象或运算符 `sign_bit`。
+- **L690**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L691**: <code>    // If the source is NaN, set the destination to NaN carrying the sign bit</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L692**: <code>    if (src_encoding.is_nan(src_val)) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L693**: <code>      return dst_encoding.nan_with_sign(DstT(src_sign_bit));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L694**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L695**: <code>    // If the source is INF, set the destination to INF carrying the sign bit</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L696**: <code>    else if (src_encoding.is_inf(src_val)) {</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L697**: <code>      return dst_encoding.set_sign_bit(DstFpBits::INF_MASK, DstT(src_sign_bit));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L698**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L699**: <code>    // Number is not NaN or INF: Zero and others</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L700**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L701**: <code>    LargeStorage src_exp_bits = src_encoding.exponent_bits(src_val);</code>
+  - EN: Declares the callable or operator `exponent_bits`.
+  - CN: 声明可调用对象或运算符 `exponent_bits`。
+- **L702**: <code>    LargeStorage src_significand = src_encoding.significand(src_val);</code>
+  - EN: Declares the callable or operator `significand`.
+  - CN: 声明可调用对象或运算符 `significand`。
+- **L703**: <code>    int src_exp = src_encoding.exponent(src_val);</code>
+  - EN: Declares the callable or operator `exponent`.
+  - CN: 声明可调用对象或运算符 `exponent`。
+- **L704**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L705**: <code>    // The source value is 0. Return a signed 0.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L706**: <code>    if (src_exp_bits == LargeStorage(0) &amp;&amp; src_significand == LargeStorage(0)) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L707**: <code>      return dst_encoding.set_sign_bit(DstT(0), DstT(src_sign_bit));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L708**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L709**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L710**: <code>#if (CUTLASS_DEBUG_TRACE_LEVEL &gt; 1)</code>
+  - EN: Starts a conditional-compilation block controlled by `(CUTLASS_DEBUG_TRACE_LEVEL > 1)`.
+  - CN: 开始一个由 `(CUTLASS_DEBUG_TRACE_LEVEL > 1)` 控制的条件编译块。
+- **L711**: <code>    printf(&quot;(1) src_sign: %llu src_exp_bits %llx src_exp %d src_significand %llx\n&quot;,</code>
+  - EN: Begins or continues the signature/parameter list for `printf`.
+  - CN: 开始或继续 `printf` 的签名/参数列表。
+- **L712**: <code>      static_cast&lt;unsigned long long&gt;(src_sign_bit), static_cast&lt;unsigned long long&gt;(src_exp_bits), src_exp, static_cast&lt;unsigned long long&gt;(src_significand));</code>
+  - EN: Declares the callable or operator `long`.
+  - CN: 声明可调用对象或运算符 `long`。
+- **L713**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L714**: <code>    // Normalize the number: Left shift the significand bits until hidden &quot;1&quot; appears.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L715**: <code>    // Only needed if the src value is denormal.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L716**: <code>    // Conditions:</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L717**: <code>    //  If the exponent is 0, then the significand can&#x27;t be 0 (src_val==0 case handled above):</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L718**: <code>    //    there is at least one &quot;1&quot; bit in the significand. Loop executes.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L719**: <code>    //  If the exponent is not 0, then the number is normal:</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L720**: <code>    //    significand has hidden bit set. Loop doesn&#x27;t execute.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L721**: <code>    // Assumption: Zero is always defined for the floating point types and detected above</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L722**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L723**: <code>    while (src_encoding.significand_hidden_bits(src_significand) == LargeStorage(0)) {</code>
+  - EN: Starts a loop that repeats while its condition remains true.
+  - CN: 开始一个在条件为真时重复执行的循环。
+- **L724**: <code>      src_significand &lt;&lt;= LargeStorage(1);</code>
+  - EN: Declares the callable or operator `LargeStorage`.
+  - CN: 声明可调用对象或运算符 `LargeStorage`。
+- **L725**: <code>      src_exp--;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L726**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L727**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L728**: <code>#if (CUTLASS_DEBUG_TRACE_LEVEL &gt; 1)</code>
+  - EN: Starts a conditional-compilation block controlled by `(CUTLASS_DEBUG_TRACE_LEVEL > 1)`.
+  - CN: 开始一个由 `(CUTLASS_DEBUG_TRACE_LEVEL > 1)` 控制的条件编译块。
+- **L729**: <code>    printf(&quot;(2) src_sign: %llu src_exp_bits %llx src_exp %d src_significand %llx\n&quot;,</code>
+  - EN: Begins or continues the signature/parameter list for `printf`.
+  - CN: 开始或继续 `printf` 的签名/参数列表。
+- **L730**: <code>      static_cast&lt;unsigned long long&gt;(src_sign_bit), static_cast&lt;unsigned long long&gt;(src_exp_bits), src_exp, static_cast&lt;unsigned long long&gt;(src_significand));</code>
+  - EN: Declares the callable or operator `long`.
+  - CN: 声明可调用对象或运算符 `long`。
+- **L731**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L732**: <code>    // The exponent exceeds DstFormat&#x27;s exponent capacity</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L733**: <code>    // Return positive/negative infinity.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L734**: <code>    // If no INF is defined, return positive/negative largest value.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L735**: <code>    if (src_exp &gt; DstFpBits::MAX_EXP) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L736**: <code>      return dst_encoding.set_sign_bit(DstFpBits::INF_MASK, DstT(src_sign_bit));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L737**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L738**: <code>    else if (src_exp &lt;= DstFpBits::MAX_EXP &amp;&amp; src_exp &gt;= DstFpBits::MIN_EXP) {</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L739**: <code>#if (CUTLASS_DEBUG_TRACE_LEVEL &gt; 1)</code>
+  - EN: Starts a conditional-compilation block controlled by `(CUTLASS_DEBUG_TRACE_LEVEL > 1)`.
+  - CN: 开始一个由 `(CUTLASS_DEBUG_TRACE_LEVEL > 1)` 控制的条件编译块。
+- **L740**: <code>      printf(&quot;(3) Exp match: src_sign: %d src_exp_bits: %x src_exp: %d src_significand: %x\n&quot;,</code>
+  - EN: Begins or continues the signature/parameter list for `printf`.
+  - CN: 开始或继续 `printf` 的签名/参数列表。
+- **L741**: <code>        src_sign_bit, src_exp_bits, src_exp, src_significand);</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L742**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L743**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L744**: <code>      int shift_amount = int(DstFpBits::NUM_MANTISSA_BITS) - int(SrcFpBits::NUM_MANTISSA_BITS);</code>
+  - EN: Declares the callable or operator `int`.
+  - CN: 声明可调用对象或运算符 `int`。
+- **L745**: <code>      int dst_exponent = src_exp + DstFpBits::EXP_BIAS;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L746**: <code>      LargeStorage dst_mantissa = src_significand;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L747**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L748**: <code>      // if we have an M0 case, the floating point number is always denormal.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L749**: <code>      // Therefore, if exponents are equal, we need to check whether it is inf</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L750**: <code>      if (DstFpBits::NUM_EXPONENT_BITS == 0) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L751**: <code>        if (dst_mantissa &gt; DstFpBits::INF_MASK) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L752**: <code>          return dst_encoding.inf_with_sign(DstT(src_sign_bit));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L753**: <code>        }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L754**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L755**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L756**: <code>      // Round to nearest even</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L757**: <code>      dst_mantissa = round_significand(dst_mantissa, shift_amount);</code>
+  - EN: Declares the callable or operator `round_significand`.
+  - CN: 声明可调用对象或运算符 `round_significand`。
+- **L758**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L759**: <code>#if (CUTLASS_DEBUG_TRACE_LEVEL &gt; 1)</code>
+  - EN: Starts a conditional-compilation block controlled by `(CUTLASS_DEBUG_TRACE_LEVEL > 1)`.
+  - CN: 开始一个由 `(CUTLASS_DEBUG_TRACE_LEVEL > 1)` 控制的条件编译块。
+- **L760**: <code>      printf(&quot;(4) after rounding src_sign: %d dst_exponent: %d dst_mantissa: %x\n&quot;,</code>
+  - EN: Begins or continues the signature/parameter list for `printf`.
+  - CN: 开始或继续 `printf` 的签名/参数列表。
+- **L761**: <code>        src_sign_bit, dst_exponent, dst_mantissa);</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L762**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L763**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L764**: <code>      if (dst_encoding.significand_hidden_bits(dst_mantissa) &gt; 0b1) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L765**: <code>        // Significant became larger than 01.X...X. Divide significand by 2 and multiply exp by 2</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L766**: <code>        while (dst_exponent &lt; (DstFpBits::MAX_EXP+DstFpBits::EXP_BIAS) &amp;&amp;</code>
+  - EN: Starts a loop that repeats while its condition remains true.
+  - CN: 开始一个在条件为真时重复执行的循环。
+- **L767**: <code>               dst_encoding.significand_hidden_bits(dst_mantissa) &gt; LargeStorage(0b1)) {</code>
+  - EN: Starts the definition body for `significand_hidden_bits`.
+  - CN: 开始 `significand_hidden_bits` 的定义体。
+- **L768**: <code>          dst_mantissa &gt;&gt;= LargeStorage(1);</code>
+  - EN: Declares the callable or operator `LargeStorage`.
+  - CN: 声明可调用对象或运算符 `LargeStorage`。
+- **L769**: <code>          dst_exponent++;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L770**: <code>        }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L771**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L772**: <code>#if (CUTLASS_DEBUG_TRACE_LEVEL &gt; 1)</code>
+  - EN: Starts a conditional-compilation block controlled by `(CUTLASS_DEBUG_TRACE_LEVEL > 1)`.
+  - CN: 开始一个由 `(CUTLASS_DEBUG_TRACE_LEVEL > 1)` 控制的条件编译块。
+- **L773**: <code>        printf(&quot;(5) after rounding  max_exp: %d src_sign: %d dst_exponent: %d dst_mantissa: %x\n&quot;,</code>
+  - EN: Begins or continues the signature/parameter list for `printf`.
+  - CN: 开始或继续 `printf` 的签名/参数列表。
+- **L774**: <code>          DstFpBits::MAX_EXP,src_sign_bit, dst_exponent, dst_mantissa);</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L775**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L776**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L777**: <code>        if (dst_encoding.significand_hidden_bits(dst_mantissa) &gt; LargeStorage(0b1)) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L778**: <code>          return dst_encoding.set_sign_bit(DstFpBits::INF_MASK, DstT(src_sign_bit));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L779**: <code>        }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L780**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L781**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L782**: <code>      dst_mantissa = dst_mantissa &amp; DstFpBits::MANTISSA_MASK;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L783**: <code>      static_assert(sizeof(LargeStorage) &gt;= sizeof(decltype(dst_exponent)),</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L784**: <code>        &quot;sizeof(LargeStorage) must be greater than or equal to sizeof(decltype(dst_exponent))&quot;);</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L785**: <code>      LargeStorage dst_exponent_bits = static_cast&lt;LargeStorage&gt;(dst_exponent);</code>
+  - EN: Declares the callable or operator `LargeStorage`.
+  - CN: 声明可调用对象或运算符 `LargeStorage`。
+- **L786**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L787**: <code>      DstT final_val = static_cast&lt;DstT&gt;(dst_encoding.template make_fp_from_bits&lt;LargeStorage&gt;(src_sign_bit, dst_exponent_bits, dst_mantissa));</code>
+  - EN: Declares the callable or operator `DstT`.
+  - CN: 声明可调用对象或运算符 `DstT`。
+- **L788**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L789**: <code>#if (CUTLASS_DEBUG_TRACE_LEVEL &gt; 1)</code>
+  - EN: Starts a conditional-compilation block controlled by `(CUTLASS_DEBUG_TRACE_LEVEL > 1)`.
+  - CN: 开始一个由 `(CUTLASS_DEBUG_TRACE_LEVEL > 1)` 控制的条件编译块。
+- **L790**: <code>      printf(&quot;(6) Final Value src_sign: %d dst_exp_bits: %x dst_mantissa: %x\n&quot;,</code>
+  - EN: Begins or continues the signature/parameter list for `printf`.
+  - CN: 开始或继续 `printf` 的签名/参数列表。
+- **L791**: <code>        src_sign_bit, dst_exponent_bits, dst_mantissa);</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L792**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L793**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L794**: <code>      if (DstFpBits::is_nan(final_val)) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L795**: <code>        // This NAN is generated when:</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L796**: <code>        //  Src is not an Nan</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L797**: <code>        //  the exp of Src == the max_exp of Dst.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L798**: <code>        //  The mantissa becomes all-1s after rounding.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L799**: <code>        // Return max value of Dst (not NAN) as it just couldn&#x27;t be represented in the range of Dst.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L800**: <code>        return dst_encoding.set_sign_bit(DstFpBits::INF_MASK, DstT(src_sign_bit));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L801**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L802**: <code>      else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L803**: <code>        return final_val;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L804**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L805**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L806**: <code>    else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L807**: <code>      // Result is denormal</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L808**: <code>#if (CUTLASS_DEBUG_TRACE_LEVEL &gt; 1)</code>
+  - EN: Starts a conditional-compilation block controlled by `(CUTLASS_DEBUG_TRACE_LEVEL > 1)`.
+  - CN: 开始一个由 `(CUTLASS_DEBUG_TRACE_LEVEL > 1)` 控制的条件编译块。
+- **L809**: <code>      printf(&quot;(7) Denormal case src_sign: %d src_exp: %d src_significand: %x MIN_EXP: %d\n&quot;,</code>
+  - EN: Begins or continues the signature/parameter list for `printf`.
+  - CN: 开始或继续 `printf` 的签名/参数列表。
+- **L810**: <code>        src_sign_bit, src_exp, src_significand, DstFpBits::MIN_EXP);</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L811**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L812**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L813**: <code>      int exp_diff = src_exp - DstFpBits::MIN_EXP;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L814**: <code>      int shift_amount = int(DstFpBits::NUM_MANTISSA_BITS) - int(SrcFpBits::NUM_MANTISSA_BITS);</code>
+  - EN: Declares the callable or operator `int`.
+  - CN: 声明可调用对象或运算符 `int`。
+- **L815**: <code>      shift_amount += exp_diff;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L816**: <code>      LargeStorage dst_mantissa = src_significand;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L817**: <code>      dst_mantissa = round_significand(dst_mantissa, shift_amount);</code>
+  - EN: Declares the callable or operator `round_significand`.
+  - CN: 声明可调用对象或运算符 `round_significand`。
+- **L818**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L819**: <code>      if (dst_encoding.significand_hidden_bits(dst_mantissa) &gt;= LargeStorage(0b1)) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L820**: <code>        if CUTLASS_CONSTEXPR_IF_CXX17 (DstFpBits::NUM_EXPONENT_BITS == 0) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L821**: <code>          return dst_encoding.inf_with_sign(DstT(src_sign_bit));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L822**: <code>        }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L823**: <code>        else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L824**: <code>          LargeStorage dst_exp_bits = 1;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L825**: <code>          dst_mantissa &amp;= DstFpBits::MANTISSA_MASK;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L826**: <code>          DstT final_val = static_cast&lt;DstT&gt;(dst_encoding.template make_fp_from_bits&lt;LargeStorage&gt;(src_sign_bit, dst_exp_bits, dst_mantissa));</code>
+  - EN: Declares the callable or operator `DstT`.
+  - CN: 声明可调用对象或运算符 `DstT`。
+- **L827**: <code>          return final_val;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L828**: <code>        }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L829**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L830**: <code>#if (CUTLASS_DEBUG_TRACE_LEVEL &gt; 1)</code>
+  - EN: Starts a conditional-compilation block controlled by `(CUTLASS_DEBUG_TRACE_LEVEL > 1)`.
+  - CN: 开始一个由 `(CUTLASS_DEBUG_TRACE_LEVEL > 1)` 控制的条件编译块。
+- **L831**: <code>      printf(&quot;(7.1) Denormal case exp_diff: %d shift_amount: %d dst_mantissa %d\n&quot;, exp_diff, shift_amount, dst_mantissa);</code>
+  - EN: Declares the callable or operator `printf`.
+  - CN: 声明可调用对象或运算符 `printf`。
+- **L832**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L833**: <code>      dst_mantissa &amp;= DstFpBits::MANTISSA_MASK;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L834**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L835**: <code>#if (CUTLASS_DEBUG_TRACE_LEVEL &gt; 1)</code>
+  - EN: Starts a conditional-compilation block controlled by `(CUTLASS_DEBUG_TRACE_LEVEL > 1)`.
+  - CN: 开始一个由 `(CUTLASS_DEBUG_TRACE_LEVEL > 1)` 控制的条件编译块。
+- **L836**: <code>      printf(&quot;(8) Final Value src_sign: %d src_exp: %d dst_mantissa: %x\n&quot;,</code>
+  - EN: Begins or continues the signature/parameter list for `printf`.
+  - CN: 开始或继续 `printf` 的签名/参数列表。
+- **L837**: <code>        src_sign_bit, src_exp, dst_mantissa);</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L838**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L839**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L840**: <code>      DstT final_val = static_cast&lt;DstT&gt;(dst_encoding.template make_fp_from_bits&lt;LargeStorage&gt;(src_sign_bit, LargeStorage(0), dst_mantissa));</code>
+  - EN: Declares the callable or operator `DstT`.
+  - CN: 声明可调用对象或运算符 `DstT`。
+- **L841**: <code>      return final_val;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L842**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L843**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L844**: <code>    return DstT(0);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L845**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L846**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L847**: <code>  template &lt;class StorageType_, uint32_t NumBits_, uint32_t NumExpBits_,</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L848**: <code>            uint32_t NumMantissaBits_, NanInfEncoding Nan_, bool IsSigned_&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L849**: <code>            friend struct FpBitRepresentation;</code>
+  - EN: Declares or defines the struct `FpBitRepresentation`.
+  - CN: 声明或定义 struct `FpBitRepresentation`。
+- **L850**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L851**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L852**: <code>#if (CUTLASS_CXX17_OR_LATER)</code>
+  - EN: Starts a conditional-compilation block controlled by `(CUTLASS_CXX17_OR_LATER)`.
+  - CN: 开始一个由 `(CUTLASS_CXX17_OR_LATER)` 控制的条件编译块。
+- **L853**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L854**: <code>template&lt;FpEncoding FpExMyCode&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L855**: <code>CUTLASS_CONSTEXPR_IF_CXX17 auto fp_encoding_selector() {</code>
+  - EN: Starts the definition body for `fp_encoding_selector`.
+  - CN: 开始 `fp_encoding_selector` 的定义体。
+- **L856**: <code>  if CUTLASS_CONSTEXPR_IF_CXX17      (FpExMyCode == FpEncoding::E11M52) { // double</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L857**: <code>    return cutlass::detail::FpBitRepresentation&lt;uint64_t, 64, 11, 52, cutlass::detail::NanInfEncoding::IEEE_754&gt;{};</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L858**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L859**: <code>  else if CUTLASS_CONSTEXPR_IF_CXX17 (FpExMyCode == FpEncoding::E8M23)  { // float</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L860**: <code>    return cutlass::detail::FpBitRepresentation&lt;uint32_t, 32, 8, 23, cutlass::detail::NanInfEncoding::IEEE_754&gt;{};</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L861**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L862**: <code>  else if CUTLASS_CONSTEXPR_IF_CXX17 (FpExMyCode == FpEncoding::E5M2)   {   // FP8</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L863**: <code>    return cutlass::detail::FpBitRepresentation&lt;uint8_t, 8, 5, 2, cutlass::detail::NanInfEncoding::IEEE_754&gt;{};</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L864**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L865**: <code>  else if CUTLASS_CONSTEXPR_IF_CXX17 (FpExMyCode == FpEncoding::E4M3)   {   // FP8</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L866**: <code>    return cutlass::detail::FpBitRepresentation&lt;uint8_t, 8, 4, 3, cutlass::detail::NanInfEncoding::CANONICAL_ONLY&gt;{};</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L867**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L868**: <code>  </code>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L869**: <code>  else if CUTLASS_CONSTEXPR_IF_CXX17 (FpExMyCode == FpEncoding::UE4M3)   {   // FP8</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L870**: <code>    return cutlass::detail::FpBitRepresentation&lt;uint8_t, 8, 4, 3, cutlass::detail::NanInfEncoding::CANONICAL_ONLY, false&gt;{};</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L871**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L872**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L873**: <code>  else if CUTLASS_CONSTEXPR_IF_CXX17 (FpExMyCode == FpEncoding::UE8M0)   {   // FP8</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L874**: <code>    return cutlass::detail::FpBitRepresentation&lt;uint8_t, 8, 8, 0, cutlass::detail::NanInfEncoding::CANONICAL_ONLY, false&gt;{};</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L875**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L876**: <code>  else if CUTLASS_CONSTEXPR_IF_CXX17 (FpExMyCode == FpEncoding::E3M2)   {   // FP6</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L877**: <code>    return cutlass::detail::FpBitRepresentation&lt;uint8_t, 6, 3, 2, cutlass::detail::NanInfEncoding::NONE&gt;{};</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L878**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L879**: <code>  else if CUTLASS_CONSTEXPR_IF_CXX17 (FpExMyCode == FpEncoding::E2M3)   {   // FP6</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L880**: <code>    return cutlass::detail::FpBitRepresentation&lt;uint8_t, 6, 2, 3, cutlass::detail::NanInfEncoding::NONE&gt;{};</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L881**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L882**: <code>  else if CUTLASS_CONSTEXPR_IF_CXX17 (FpExMyCode == FpEncoding::E2M1)   {   // FP4</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L883**: <code>    return cutlass::detail::FpBitRepresentation&lt;uint8_t, 4, 2, 1, cutlass::detail::NanInfEncoding::NONE&gt;{};</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L884**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L885**: <code>  CUTLASS_GCC_UNREACHABLE;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L886**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L887**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L888**: <code>#else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L889**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L890**: <code>// Definitions for floating point encodings.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L891**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L892**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L893**: <code>template &lt;FpEncoding FpExMyCode&gt; struct FpEncodingSelector {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L894**: <code>  using type = void;</code>
+  - EN: Defines the alias `type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `type`。
+- **L895**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L896**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L897**: <code>template &lt;&gt; struct FpEncodingSelector&lt;FpEncoding::E11M52&gt; {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L898**: <code>  using type = cutlass::detail::FpBitRepresentation&lt;uint64_t, 64, 11, 52, cutlass::detail::NanInfEncoding::IEEE_754&gt;;</code>
+  - EN: Defines the alias `type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `type`。
+- **L899**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L900**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L901**: <code>template &lt;&gt; struct FpEncodingSelector&lt;FpEncoding::E8M23&gt; {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L902**: <code>  using type = cutlass::detail::FpBitRepresentation&lt;uint32_t, 32, 8, 23, cutlass::detail::NanInfEncoding::IEEE_754&gt;;</code>
+  - EN: Defines the alias `type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `type`。
+- **L903**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L904**: <code>template &lt;&gt; struct FpEncodingSelector&lt;FpEncoding::E5M2&gt; {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L905**: <code>  using type = cutlass::detail::FpBitRepresentation&lt;uint8_t, 8, 5, 2, cutlass::detail::NanInfEncoding::IEEE_754&gt;;</code>
+  - EN: Defines the alias `type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `type`。
+- **L906**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L907**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L908**: <code>template &lt;&gt; struct FpEncodingSelector&lt;FpEncoding::E4M3&gt; {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L909**: <code>  using type = cutlass::detail::FpBitRepresentation&lt;uint8_t, 8, 4, 3, cutlass::detail::NanInfEncoding::CANONICAL_ONLY&gt;;</code>
+  - EN: Defines the alias `type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `type`。
+- **L910**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L911**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L912**: <code>template &lt;&gt; struct FpEncodingSelector&lt;FpEncoding::UE4M3&gt; {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L913**: <code>  using type = cutlass::detail::FpBitRepresentation&lt;uint8_t, 8, 4, 3, cutlass::detail::NanInfEncoding::CANONICAL_ONLY, false&gt;;</code>
+  - EN: Defines the alias `type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `type`。
+- **L914**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L915**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L916**: <code>template &lt;&gt; struct FpEncodingSelector&lt;FpEncoding::UE8M0&gt; {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L917**: <code>  using type = cutlass::detail::FpBitRepresentation&lt;uint8_t, 8, 8, 0, cutlass::detail::NanInfEncoding::CANONICAL_ONLY, false&gt;;</code>
+  - EN: Defines the alias `type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `type`。
+- **L918**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L919**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L920**: <code>template &lt;&gt; struct FpEncodingSelector&lt;FpEncoding::E3M2&gt; {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L921**: <code>  using type = cutlass::detail::FpBitRepresentation&lt;uint8_t, 6, 3, 2, cutlass::detail::NanInfEncoding::NONE&gt;;</code>
+  - EN: Defines the alias `type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `type`。
+- **L922**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L923**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L924**: <code>template &lt;&gt; struct FpEncodingSelector&lt;FpEncoding::E2M3&gt; {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L925**: <code>  using type = cutlass::detail::FpBitRepresentation&lt;uint8_t, 6, 2, 3, cutlass::detail::NanInfEncoding::NONE&gt;;</code>
+  - EN: Defines the alias `type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `type`。
+- **L926**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L927**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L928**: <code>template &lt;&gt; struct FpEncodingSelector&lt;FpEncoding::E2M1&gt; {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L929**: <code>  using type = cutlass::detail::FpBitRepresentation&lt;uint8_t, 4, 2, 1, cutlass::detail::NanInfEncoding::NONE&gt;;</code>
+  - EN: Defines the alias `type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `type`。
+- **L930**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L931**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L932**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L933**: <code>} // namespace detail</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L934**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L935**: <code>template &lt;detail::FpEncoding T, class Derived&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L936**: <code>struct float_exmy_base</code>
+  - EN: Declares or defines the struct `float_exmy_base`.
+  - CN: 声明或定义 struct `float_exmy_base`。
+- **L937**: <code>{</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L938**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L939**: <code>  static constexpr detail::FpEncoding Encoding = T;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L940**: <code>  using BitRepresentation =</code>
+  - EN: Defines the alias `BitRepresentation` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `BitRepresentation`。
+- **L941**: <code>    #if (CUTLASS_CXX17_OR_LATER)</code>
+  - EN: Starts a conditional-compilation block controlled by `(CUTLASS_CXX17_OR_LATER)`.
+  - CN: 开始一个由 `(CUTLASS_CXX17_OR_LATER)` 控制的条件编译块。
+- **L942**: <code>      decltype(detail::fp_encoding_selector&lt;T&gt;())</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L943**: <code>    #else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L944**: <code>      typename detail::FpEncodingSelector&lt;T&gt;::type</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L945**: <code>    #endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L946**: <code>      ;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L947**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L948**: <code>  using FP32BitRepresentation =</code>
+  - EN: Defines the alias `FP32BitRepresentation` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `FP32BitRepresentation`。
+- **L949**: <code>    #if (CUTLASS_CXX17_OR_LATER)</code>
+  - EN: Starts a conditional-compilation block controlled by `(CUTLASS_CXX17_OR_LATER)`.
+  - CN: 开始一个由 `(CUTLASS_CXX17_OR_LATER)` 控制的条件编译块。
+- **L950**: <code>      decltype(cutlass::detail::fp_encoding_selector&lt;cutlass::detail::FpEncoding::E8M23&gt;())</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L951**: <code>    #else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L952**: <code>      typename detail::FpEncodingSelector&lt;cutlass::detail::FpEncoding::E8M23&gt;::type</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L953**: <code>    #endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L954**: <code>      ;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L955**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L956**: <code>  using Storage = typename BitRepresentation::Storage;</code>
+  - EN: Defines the alias `Storage` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Storage`。
+- **L957**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L958**: <code>  //</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L959**: <code>  // Data members</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L960**: <code>  //</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L961**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L962**: <code>  /// Data container</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L963**: <code>  Storage storage;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L964**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L965**: <code>  /// Ctors.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L966**: <code>  float_exmy_base() = default;</code>
+  - EN: Declares the callable or operator `float_exmy_base`.
+  - CN: 声明可调用对象或运算符 `float_exmy_base`。
+- **L967**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L968**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L969**: <code>  float_exmy_base(Storage s) : storage(s) {</code>
+  - EN: Starts the definition body for `float_exmy_base`.
+  - CN: 开始 `float_exmy_base` 的定义体。
+- **L970**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L971**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L972**: <code>  /// Is finite implementation</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L973**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L974**: <code>  static bool isfinite(float_exmy_base flt) {</code>
+  - EN: Starts the definition body for `isfinite`.
+  - CN: 开始 `isfinite` 的定义体。
+- **L975**: <code>    return !BitRepresentation::is_inf(flt.storage);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L976**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L977**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L978**: <code>  /// Is NaN implementation</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L979**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L980**: <code>  static bool isnan(float_exmy_base flt) {</code>
+  - EN: Starts the definition body for `isnan`.
+  - CN: 开始 `isnan` 的定义体。
+- **L981**: <code>    return BitRepresentation::is_nan(flt.storage);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L982**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L983**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L984**: <code>  /// Is infinite implementation</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L985**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L986**: <code>  static bool isinf(float_exmy_base flt) {</code>
+  - EN: Starts the definition body for `isinf`.
+  - CN: 开始 `isinf` 的定义体。
+- **L987**: <code>    return BitRepresentation::is_inf(flt.storage);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L988**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L989**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L990**: <code>  /// Is infinite implementation</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L991**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L992**: <code>  static bool isnormal(float_exmy_base flt) {</code>
+  - EN: Starts the definition body for `isnormal`.
+  - CN: 开始 `isnormal` 的定义体。
+- **L993**: <code>    return !BitRepresentation::is_denorm(flt.storage);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L994**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L995**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L996**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L997**: <code>  static float_exmy_base&lt;T, Derived&gt; bitcast(Storage x) {</code>
+  - EN: Starts the definition body for `bitcast`.
+  - CN: 开始 `bitcast` 的定义体。
+- **L998**: <code>    float_exmy_base f;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L999**: <code>    f.storage = x;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L1000**: <code>    return f;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1001**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1002**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1003**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1004**: <code>  float_exmy_base convert_from_float(float const &amp;flt) const {</code>
+  - EN: Starts the definition body for `convert_from_float`.
+  - CN: 开始 `convert_from_float` 的定义体。
+- **L1005**: <code>    FP32BitRepresentation::Storage fp32_bits = FP32BitRepresentation::to_bits(flt);</code>
+  - EN: Declares the callable or operator `to_bits`.
+  - CN: 声明可调用对象或运算符 `to_bits`。
+- **L1006**: <code>    float_exmy_base float_exmy;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L1007**: <code>    float_exmy.storage = BitRepresentation::convert_from(fp32_bits, FP32BitRepresentation{});</code>
+  - EN: Declares the callable or operator `convert_from`.
+  - CN: 声明可调用对象或运算符 `convert_from`。
+- **L1008**: <code>    return float_exmy;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1009**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1010**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1011**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1012**: <code>  float convert_to_float(float_exmy_base&lt;T, Derived&gt; const &amp;x) const {</code>
+  - EN: Starts the definition body for `convert_to_float`.
+  - CN: 开始 `convert_to_float` 的定义体。
+- **L1013**: <code>    FP32BitRepresentation::Storage fp32_bits;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L1014**: <code>    fp32_bits = BitRepresentation::convert_to(x.storage, FP32BitRepresentation{});</code>
+  - EN: Declares the callable or operator `convert_to`.
+  - CN: 声明可调用对象或运算符 `convert_to`。
+- **L1015**: <code>    return detail::copy_bits&lt;FP32BitRepresentation::Storage, float&gt;(fp32_bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1016**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1017**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1018**: <code>  // Note: Only consider float/int conversions in this Base class</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L1019**: <code>  // Types inheriting from this class should define their own constructors and</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L1020**: <code>  // specialized type conversions</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L1021**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1022**: <code>  /// Floating point conversion</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1023**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1024**: <code>  explicit float_exmy_base&lt;T, Derived&gt;(float x) {</code>
+  - EN: Starts the definition body for `Derived`.
+  - CN: 开始 `Derived` 的定义体。
+- **L1025**: <code>    storage = static_cast&lt;Derived*&gt;(this)-&gt;convert_from_float(x).storage;</code>
+  - EN: Declares the callable or operator `Derived`.
+  - CN: 声明可调用对象或运算符 `Derived`。
+- **L1026**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1027**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1028**: <code>  // Integer conversion</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L1029**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1030**: <code>  explicit float_exmy_base&lt;T, Derived&gt;(int x) {</code>
+  - EN: Starts the definition body for `Derived`.
+  - CN: 开始 `Derived` 的定义体。
+- **L1031**: <code>    storage = static_cast&lt;Derived*&gt;(this)-&gt;convert_from_float(float(x)).storage;</code>
+  - EN: Declares the callable or operator `Derived`.
+  - CN: 声明可调用对象或运算符 `Derived`。
+- **L1032**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1033**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1034**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1035**: <code>  explicit float_exmy_base&lt;T, Derived&gt;(unsigned x) {</code>
+  - EN: Starts the definition body for `Derived`.
+  - CN: 开始 `Derived` 的定义体。
+- **L1036**: <code>    storage = static_cast&lt;Derived*&gt;(this)-&gt;convert_from_float(float(x)).storage;</code>
+  - EN: Declares the callable or operator `Derived`.
+  - CN: 声明可调用对象或运算符 `Derived`。
+- **L1037**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1038**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1039**: <code>  /// Converts to float</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1040**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1041**: <code>  operator float() const {</code>
+  - EN: Starts the definition body for `operatorfloat`.
+  - CN: 开始 `operatorfloat` 的定义体。
+- **L1042**: <code>    return static_cast&lt;const Derived*&gt;(this)-&gt;convert_to_float(*this);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1043**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1044**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1045**: <code>  /// Converts to int</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1046**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1047**: <code>  explicit operator int() const {</code>
+  - EN: Starts the definition body for `operatorint`.
+  - CN: 开始 `operatorint` 的定义体。
+- **L1048**: <code>    return int(static_cast&lt;const Derived*&gt;(this)-&gt;convert_to_float(*this));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1049**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1050**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1051**: <code>  /// Accesses raw internal state</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1052**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1053**: <code>  Storage &amp;raw() {</code>
+  - EN: Starts the definition body for `raw`.
+  - CN: 开始 `raw` 的定义体。
+- **L1054**: <code>    return storage;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1055**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1056**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1057**: <code>  /// Accesses raw internal state</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1058**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1059**: <code>  Storage raw() const {</code>
+  - EN: Starts the definition body for `raw`.
+  - CN: 开始 `raw` 的定义体。
+- **L1060**: <code>    return storage;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1061**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1062**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1063**: <code>  /// Returns the sign bit</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1064**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1065**: <code>  bool signbit() const {</code>
+  - EN: Starts the definition body for `signbit`.
+  - CN: 开始 `signbit` 的定义体。
+- **L1066**: <code>    return bool(BitRepresentation::sign_bit(storage));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1067**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1068**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1069**: <code>  /// Returns the biased exponent</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1070**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1071**: <code>  int exponent_biased() const {</code>
+  - EN: Starts the definition body for `exponent_biased`.
+  - CN: 开始 `exponent_biased` 的定义体。
+- **L1072**: <code>    return int(BitRepresentation::exponent_bits(storage));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1073**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1074**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1075**: <code>  /// Returns the unbiased exponent</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1076**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1077**: <code>  int exponent() const {</code>
+  - EN: Starts the definition body for `exponent`.
+  - CN: 开始 `exponent` 的定义体。
+- **L1078**: <code>    return int(BitRepresentation::exponent(storage));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1079**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1080**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1081**: <code>  /// Returns the mantissa</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1082**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1083**: <code>  int mantissa() const {</code>
+  - EN: Starts the definition body for `mantissa`.
+  - CN: 开始 `mantissa` 的定义体。
+- **L1084**: <code>    return int(BitRepresentation::mantissa_bits(storage));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1085**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1086**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1087**: <code>  ///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L1088**: <code>  //</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L1089**: <code>  // Arithmetic operators</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L1090**: <code>  //</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L1091**: <code>  ///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L1092**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1093**: <code>  // Note: Almost all data types cast to float then do the arithmetic operations</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L1094**: <code>  // Types inheriting from this class can overload them if specialized instructions are available</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L1095**: <code>  // in HW (e.g. half_t)</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L1096**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1097**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1098**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1099**: <code>  friend bool operator==(float_exmy_base const &amp;lhs, float_exmy_base const &amp;rhs) {</code>
+  - EN: Declares a friend entity so it can access otherwise restricted members.
+  - CN: 声明友元实体，使其可以访问原本受限的成员。
+- **L1100**: <code>    return float(lhs) == float(rhs);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1101**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1102**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1103**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1104**: <code>  friend bool operator!=(float_exmy_base const &amp;lhs, float_exmy_base const &amp;rhs) {</code>
+  - EN: Declares a friend entity so it can access otherwise restricted members.
+  - CN: 声明友元实体，使其可以访问原本受限的成员。
+- **L1105**: <code>    return float(lhs) != float(rhs);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1106**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1107**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1108**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1109**: <code>  friend bool operator&lt;(float_exmy_base const &amp;lhs, float_exmy_base const &amp;rhs) {</code>
+  - EN: Declares a friend entity so it can access otherwise restricted members.
+  - CN: 声明友元实体，使其可以访问原本受限的成员。
+- **L1110**: <code>    return float(lhs) &lt; float(rhs);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1111**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1112**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1113**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1114**: <code>  friend bool operator&lt;=(float_exmy_base const &amp;lhs, float_exmy_base const &amp;rhs) {</code>
+  - EN: Declares a friend entity so it can access otherwise restricted members.
+  - CN: 声明友元实体，使其可以访问原本受限的成员。
+- **L1115**: <code>    return float(lhs) &lt;= float(rhs);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1116**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1117**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1118**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1119**: <code>  friend bool operator&gt;(float_exmy_base const &amp;lhs, float_exmy_base const &amp;rhs) {</code>
+  - EN: Declares a friend entity so it can access otherwise restricted members.
+  - CN: 声明友元实体，使其可以访问原本受限的成员。
+- **L1120**: <code>    return float(lhs) &gt; float(rhs);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1121**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1122**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1123**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1124**: <code>  friend bool operator&gt;=(float_exmy_base const &amp;lhs, float_exmy_base const &amp;rhs) {</code>
+  - EN: Declares a friend entity so it can access otherwise restricted members.
+  - CN: 声明友元实体，使其可以访问原本受限的成员。
+- **L1125**: <code>    return float(lhs) &gt;= float(rhs);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1126**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1127**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1128**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1129**: <code>  friend float_exmy_base operator+(float_exmy_base const &amp;lhs, float_exmy_base const &amp;rhs) {</code>
+  - EN: Declares a friend entity so it can access otherwise restricted members.
+  - CN: 声明友元实体，使其可以访问原本受限的成员。
+- **L1130**: <code>    return float_exmy_base(float(lhs) + float(rhs));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1131**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1132**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1133**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1134**: <code>  friend float_exmy_base operator-(float_exmy_base const &amp;lhs) {</code>
+  - EN: Declares a friend entity so it can access otherwise restricted members.
+  - CN: 声明友元实体，使其可以访问原本受限的成员。
+- **L1135**: <code>    return float_exmy_base(-float(lhs));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1136**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1137**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1138**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1139**: <code>  friend float_exmy_base operator-(float_exmy_base const &amp;lhs, float_exmy_base const &amp;rhs) {</code>
+  - EN: Declares a friend entity so it can access otherwise restricted members.
+  - CN: 声明友元实体，使其可以访问原本受限的成员。
+- **L1140**: <code>    return float_exmy_base(float(lhs) - float(rhs));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1141**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1142**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1143**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1144**: <code>  friend float_exmy_base operator*(float_exmy_base const &amp;lhs, float_exmy_base const &amp;rhs) {</code>
+  - EN: Declares a friend entity so it can access otherwise restricted members.
+  - CN: 声明友元实体，使其可以访问原本受限的成员。
+- **L1145**: <code>    return float_exmy_base(float(lhs) * float(rhs));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1146**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1147**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1148**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1149**: <code>  friend float_exmy_base operator/(float_exmy_base const &amp;lhs, float_exmy_base const &amp;rhs) {</code>
+  - EN: Declares a friend entity so it can access otherwise restricted members.
+  - CN: 声明友元实体，使其可以访问原本受限的成员。
+- **L1150**: <code>    return float_exmy_base(float(lhs) / float(rhs));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1151**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1152**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1153**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1154**: <code>  friend float_exmy_base &amp;operator+=(float_exmy_base &amp;lhs, float_exmy_base const &amp;rhs) {</code>
+  - EN: Declares a friend entity so it can access otherwise restricted members.
+  - CN: 声明友元实体，使其可以访问原本受限的成员。
+- **L1155**: <code>    lhs = float_exmy_base(float(lhs) + float(rhs));</code>
+  - EN: Declares the callable or operator `float_exmy_base`.
+  - CN: 声明可调用对象或运算符 `float_exmy_base`。
+- **L1156**: <code>    return lhs;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1157**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1158**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1159**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1160**: <code>  friend float_exmy_base &amp;operator-=(float_exmy_base &amp;lhs, float_exmy_base const &amp;rhs) {</code>
+  - EN: Declares a friend entity so it can access otherwise restricted members.
+  - CN: 声明友元实体，使其可以访问原本受限的成员。
+- **L1161**: <code>    lhs = float_exmy_base(float(lhs) - float(rhs));</code>
+  - EN: Declares the callable or operator `float_exmy_base`.
+  - CN: 声明可调用对象或运算符 `float_exmy_base`。
+- **L1162**: <code>    return lhs;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1163**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1164**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1165**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1166**: <code>  friend float_exmy_base &amp;operator*=(float_exmy_base &amp;lhs, float_exmy_base const &amp;rhs) {</code>
+  - EN: Declares a friend entity so it can access otherwise restricted members.
+  - CN: 声明友元实体，使其可以访问原本受限的成员。
+- **L1167**: <code>    lhs = float_exmy_base(float(lhs) * float(rhs));</code>
+  - EN: Declares the callable or operator `float_exmy_base`.
+  - CN: 声明可调用对象或运算符 `float_exmy_base`。
+- **L1168**: <code>    return lhs;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1169**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1170**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1171**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1172**: <code>  friend float_exmy_base &amp;operator/=(float_exmy_base &amp;lhs, float_exmy_base const &amp;rhs) {</code>
+  - EN: Declares a friend entity so it can access otherwise restricted members.
+  - CN: 声明友元实体，使其可以访问原本受限的成员。
+- **L1173**: <code>    lhs = float_exmy_base(float(lhs) / float(rhs));</code>
+  - EN: Declares the callable or operator `float_exmy_base`.
+  - CN: 声明可调用对象或运算符 `float_exmy_base`。
+- **L1174**: <code>    return lhs;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1175**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1176**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1177**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1178**: <code>  friend float_exmy_base &amp;operator++(float_exmy_base &amp;lhs) {</code>
+  - EN: Declares a friend entity so it can access otherwise restricted members.
+  - CN: 声明友元实体，使其可以访问原本受限的成员。
+- **L1179**: <code>    float tmp(lhs);</code>
+  - EN: Declares the callable or operator `tmp`.
+  - CN: 声明可调用对象或运算符 `tmp`。
+- **L1180**: <code>    ++tmp;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L1181**: <code>    lhs = float_exmy_base(tmp);</code>
+  - EN: Declares the callable or operator `float_exmy_base`.
+  - CN: 声明可调用对象或运算符 `float_exmy_base`。
+- **L1182**: <code>    return lhs;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1183**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1184**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1185**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1186**: <code>  friend float_exmy_base &amp;operator--(float_exmy_base &amp;lhs) {</code>
+  - EN: Declares a friend entity so it can access otherwise restricted members.
+  - CN: 声明友元实体，使其可以访问原本受限的成员。
+- **L1187**: <code>    float tmp(lhs);</code>
+  - EN: Declares the callable or operator `tmp`.
+  - CN: 声明可调用对象或运算符 `tmp`。
+- **L1188**: <code>    --tmp;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L1189**: <code>    lhs = float_exmy_base(tmp);</code>
+  - EN: Declares the callable or operator `float_exmy_base`.
+  - CN: 声明可调用对象或运算符 `float_exmy_base`。
+- **L1190**: <code>    return lhs;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1191**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1192**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1193**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1194**: <code>  friend float_exmy_base operator++(float_exmy_base &amp;lhs, int) {</code>
+  - EN: Declares a friend entity so it can access otherwise restricted members.
+  - CN: 声明友元实体，使其可以访问原本受限的成员。
+- **L1195**: <code>    float_exmy_base ret(lhs);</code>
+  - EN: Declares the callable or operator `ret`.
+  - CN: 声明可调用对象或运算符 `ret`。
+- **L1196**: <code>    float tmp(lhs);</code>
+  - EN: Declares the callable or operator `tmp`.
+  - CN: 声明可调用对象或运算符 `tmp`。
+- **L1197**: <code>    tmp++;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L1198**: <code>    lhs = float_exmy_base(tmp);</code>
+  - EN: Declares the callable or operator `float_exmy_base`.
+  - CN: 声明可调用对象或运算符 `float_exmy_base`。
+- **L1199**: <code>    return ret;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1200**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1201**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1202**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1203**: <code>  friend float_exmy_base operator--(float_exmy_base &amp;lhs, int) {</code>
+  - EN: Declares a friend entity so it can access otherwise restricted members.
+  - CN: 声明友元实体，使其可以访问原本受限的成员。
+- **L1204**: <code>    float_exmy_base ret(lhs);</code>
+  - EN: Declares the callable or operator `ret`.
+  - CN: 声明可调用对象或运算符 `ret`。
+- **L1205**: <code>    float tmp(lhs);</code>
+  - EN: Declares the callable or operator `tmp`.
+  - CN: 声明可调用对象或运算符 `tmp`。
+- **L1206**: <code>    tmp--;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L1207**: <code>    lhs = float_exmy_base(tmp);</code>
+  - EN: Declares the callable or operator `float_exmy_base`.
+  - CN: 声明可调用对象或运算符 `float_exmy_base`。
+- **L1208**: <code>    return ret;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1209**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1210**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1211**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1212**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1213**: <code>template &lt;detail::FpEncoding T, class Derived&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1214**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1215**: <code>cutlass::float_exmy_base&lt;T, Derived&gt; abs(cutlass::float_exmy_base&lt;T, Derived&gt; const&amp; h) {</code>
+  - EN: Starts the definition body for `abs`.
+  - CN: 开始 `abs` 的定义体。
+- **L1216**: <code>  using BitRepresentation = typename cutlass::float_exmy_base&lt;T, Derived&gt;::BitRepresentation;</code>
+  - EN: Defines the alias `BitRepresentation` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `BitRepresentation`。
+- **L1217**: <code>  using Storage = typename cutlass::float_exmy_base&lt;T, Derived&gt;::Storage;</code>
+  - EN: Defines the alias `Storage` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Storage`。
+- **L1218**: <code>  return BitRepresentation::IS_SIGNED ?</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1219**: <code>      cutlass::float_exmy_base&lt;T, Derived&gt;(Storage(h.raw() &amp; Storage((1&lt;&lt;BitRepresentation::SIGN_SHIFT) - 1))) :</code>
+  - EN: Provides part of the signature or implementation for `Derived`.
+  - CN: 提供 `Derived` 的签名或实现的一部分。
+- **L1220**: <code>      cutlass::float_exmy_base&lt;T, Derived&gt;(h.raw());</code>
+  - EN: Declares the callable or operator `Derived`.
+  - CN: 声明可调用对象或运算符 `Derived`。
+- **L1221**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1222**: <code>} // namespace cutlass</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+
+## Key Concepts / 关键概念
+- Templates / 模板
+- Namespaces / 命名空间
+- Constexpr evaluation / constexpr 求值
+- Compile-time checks / 编译期检查
+- Host-device annotations / 主机设备限定符
+- Operator overloads / 运算符重载
+- Conditional compilation / 条件编译
+- Symbol focus: `Src` / 重点符号：`Src`
+- Symbol focus: `copy_bits` / 重点符号：`copy_bits`
+- Symbol focus: `memcpy` / 重点符号：`memcpy`
+
+## Dependencies / 依赖关系
+- Project headers / 项目头文件:
+  - `"cutlass/cutlass.h"`
+  - `"cutlass/numeric_size.h"`
+  - `"cutlass/platform/platform.h"`

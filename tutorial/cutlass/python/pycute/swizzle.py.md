@@ -1,0 +1,149 @@
+# swizzle.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/pycute/swizzle.py`
+
+## Purpose / 作用
+- EN: Methods for layout swizzling
+- CN: 该模块的文档字符串将其描述为：Methods for layout swizzling
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L34** `Methods for layout swizzling` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L35** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `from .layout import *` — **EN:** Imports * from `.layout`. **CN:** 从 `.layout` 导入 *。
+- **L38** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L39** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L40** `def shiftr(a, s):` — **EN:** Defines function `shiftr`. **CN:** 定义函数 `shiftr`。
+- **L41** `  return a >> s if s > 0 else shiftl(a, -s)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L42** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L43** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L44** `def shiftl(a, s):` — **EN:** Defines function `shiftl`. **CN:** 定义函数 `shiftl`。
+- **L45** `  return a << s if s > 0 else shiftr(a, -s)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L46** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L47** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L48** `## A generic Swizzle functor` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L49** ` # 0bxxxxxxxxxxxxxxxYYYxxxxxxxZZZxxxx` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L50** ` #                               ^--^  Base is the number of least-sig bits to keep constant` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L51** ` #                  ^-^       ^-^      Bits is the number of bits in the mask` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L52** ` #                    ^---------^      Shift is the distance to shift the YYY mask` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L53** ` #                                       (pos shifts YYY to the right, neg shifts YYY to the left)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L54** ` #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L55** ` # e.g. Given` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L56** ` # 0bxxxxxxxxxxxxxxxxYYxxxxxxxxxZZxxx` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L57** ` # the result is` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L58** ` # 0bxxxxxxxxxxxxxxxxYYxxxxxxxxxAAxxx where AA = ZZ xor YY` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L59** ` #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L60** `class Swizzle:` — **EN:** Defines class `Swizzle`. **CN:** 定义类 `Swizzle`。
+- **L61** `  def __init__(self, bits, base, shift):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L62** `    assert bits >= 0` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L63** `    assert base >= 0` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L64** `    assert abs(shift) >= bits` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L65** `    self.bits = bits` — **EN:** Assigns a value to self.bits. **CN:** 将一个值赋给 self.bits。
+- **L66** `    self.base = base` — **EN:** Assigns a value to self.base. **CN:** 将一个值赋给 self.base。
+- **L67** `    self.shift = shift` — **EN:** Assigns a value to self.shift. **CN:** 将一个值赋给 self.shift。
+- **L68** `    bit_msk = (1 << bits) - 1` — **EN:** Assigns a value to bit_msk. **CN:** 将一个值赋给 bit_msk。
+- **L69** `    self.yyy_msk = bit_msk << (base + max(0,shift))` — **EN:** Assigns a value to self.yyy_msk. **CN:** 将一个值赋给 self.yyy_msk。
+- **L70** `    self.zzz_msk = bit_msk << (base - min(0,shift))` — **EN:** Assigns a value to self.zzz_msk. **CN:** 将一个值赋给 self.zzz_msk。
+- **L71** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L72** `  # operator ()    (transform integer)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L73** `  def __call__(self, offset):` — **EN:** Defines function `__call__`. **CN:** 定义函数 `__call__`。
+- **L74** `    return offset ^ shiftr(offset & self.yyy_msk, self.shift)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L75** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L76** `  # Size of the domain` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L77** `  def size(self):` — **EN:** Defines function `size`. **CN:** 定义函数 `size`。
+- **L78** `    return 1 << (self.bits + self.base + abs(self.shift))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L79** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L80** `  # Size of the codomain` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L81** `  def cosize(self):` — **EN:** Defines function `cosize`. **CN:** 定义函数 `cosize`。
+- **L82** `    return self.size()` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L83** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L84** `  # print and str` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L85** `  def __str__(self):` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L86** `    return f"SW_{self.bits}_{self.base}_{self.shift}"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L87** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L88** `  # error msgs and representation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L89** `  def __repr__(self):` — **EN:** Defines function `__repr__`. **CN:** 定义函数 `__repr__`。
+- **L90** `    return f"Swizzle({self.bits},{self.base},{self.shift})"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L91** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L92** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L93** `class ComposedLayout(LayoutBase):` — **EN:** Defines class `ComposedLayout` with bases LayoutBase. **CN:** 定义类 `ComposedLayout`，其基类为 LayoutBase。
+- **L94** `  def __init__(self, layoutB, offset, layoutA):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L95** `    self.layoutB = layoutB` — **EN:** Assigns a value to self.layoutB. **CN:** 将一个值赋给 self.layoutB。
+- **L96** `    self.offset  = offset` — **EN:** Assigns a value to self.offset. **CN:** 将一个值赋给 self.offset。
+- **L97** `    self.layoutA = layoutA` — **EN:** Assigns a value to self.layoutA. **CN:** 将一个值赋给 self.layoutA。
+- **L98** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L99** `  # operator ==` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L100** `  def __eq__(self, other):` — **EN:** Defines function `__eq__`. **CN:** 定义函数 `__eq__`。
+- **L101** `    return self.layoutB == other.layoutB and self.offset == other.offset and self.layoutA == other.layoutA` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L102** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L103** `  # operator len(L)  (len [rank] like tuples)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L104** `  def __len__(self):` — **EN:** Defines function `__len__`. **CN:** 定义函数 `__len__`。
+- **L105** `    return len(self.layoutA)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L106** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L107** `  # operator ()    (map coord to idx)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L108** `  def __call__(self, *args):` — **EN:** Defines function `__call__`. **CN:** 定义函数 `__call__`。
+- **L109** `    return self.layoutB(self.offset + self.layoutA(*args))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L110** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L111** `  # operator []    (get-i like tuples)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L112** `  def __getitem__(self, i):` — **EN:** Defines function `__getitem__`. **CN:** 定义函数 `__getitem__`。
+- **L113** `    return ComposedLayout(self.layoutB, self.offset, self.layoutA[i])` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L114** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L115** `  # size(layout)   Size of the domain` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L116** `  def size(self):` — **EN:** Defines function `size`. **CN:** 定义函数 `size`。
+- **L117** `    return size(self.layoutA)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L118** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L119** `  # cosize(layout)   Size of the codomain` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L120** `  def cosize(self):` — **EN:** Defines function `cosize`. **CN:** 定义函数 `cosize`。
+- **L121** `    return cosize(self.layoutB)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L122** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L123** `  # print and str` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L124** `  def __str__(self):` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L125** `    return f"{self.layoutB} o {self.offset} o {self.layoutA}"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L126** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L127** `  # error msgs and representation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L128** `  def __repr__(self):` — **EN:** Defines function `__repr__`. **CN:** 定义函数 `__repr__`。
+- **L129** `    return f"ComposedLayout({repr(self.layoutB)},{repr(self.offset)},{repr(self.layoutA)})"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `pycute.swizzle`. CN: 模块名为 `pycute.swizzle`。
+- EN: Module docstring summary: Methods for layout swizzling CN: 模块文档摘要为：Methods for layout swizzling
+- EN: Top-level classes: Swizzle, ComposedLayout CN: 顶层类包括：Swizzle, ComposedLayout
+- EN: Top-level functions: shiftr, shiftl CN: 顶层函数包括：shiftr, shiftl
+
+## Dependencies / 依赖
+- EN: Internal dependencies: .layout:* CN: 内部依赖：.layout:*

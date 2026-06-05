@@ -1,0 +1,250 @@
+# heuristics_provider.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_library/heuristics_provider.py`
+
+## Purpose / 作用
+- EN: Providers for kernel selection heuristics
+- CN: 该模块的文档字符串将其描述为：Providers for kernel selection heuristics
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L34** `Providers for kernel selection heuristics` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L35** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `import sys` — **EN:** Imports sys for later use. **CN:** 导入 sys 供后续使用。
+- **L38** `import os` — **EN:** Imports os for later use. **CN:** 导入 os 供后续使用。
+- **L39** `import glob` — **EN:** Imports glob for later use. **CN:** 导入 glob 供后续使用。
+- **L40** `import logging` — **EN:** Imports logging for later use. **CN:** 导入 logging 供后续使用。
+- **L41** `import ctypes` — **EN:** Imports ctypes for later use. **CN:** 导入 ctypes 供后续使用。
+- **L42** `import functools` — **EN:** Imports functools for later use. **CN:** 导入 functools 供后续使用。
+- **L43** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L44** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L45** `try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L46** `  import builtins` — **EN:** Imports builtins for later use. **CN:** 导入 builtins 供后续使用。
+- **L47** `  if hasattr(builtins, "CUTLASS_IGNORE_PACKAGE") and CUTLASS_IGNORE_PACKAGE == True:` — **EN:** Starts a conditional branch guarded by `hasattr(builtins, 'CUTLASS_IGNORE_PACKAGE') and CUTLASS_I...`. **CN:** 开始一个由 `hasattr(builtins, 'CUTLASS_IGNORE_PACKAGE') and CUTLASS_I...` 控制的条件分支。
+- **L48** `    raise ImportError("Disabling attempt to import cutlass_library")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L49** `  from cutlass_library.library import DataType, LayoutType` — **EN:** Imports DataType, LayoutType from `cutlass_library.library`. **CN:** 从 `cutlass_library.library` 导入 DataType, LayoutType。
+- **L50** `except ImportError:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L51** `  from library import DataType, LayoutType` — **EN:** Imports DataType, LayoutType from `library`. **CN:** 从 `library` 导入 DataType, LayoutType。
+- **L52** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L53** `class MatmulHeuristics:` — **EN:** Defines class `MatmulHeuristics`. **CN:** 定义类 `MatmulHeuristics`。
+- **L54** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L55** `  def __init__(self, gpu = None):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L56** `    import nvMatmulHeuristics` — **EN:** Imports nvMatmulHeuristics for later use. **CN:** 导入 nvMatmulHeuristics 供后续使用。
+- **L57** `    import inspect` — **EN:** Imports inspect for later use. **CN:** 导入 inspect 供后续使用。
+- **L58** `    self.mmh_lib = nvMatmulHeuristics` — **EN:** Assigns a value to self.mmh_lib. **CN:** 将一个值赋给 self.mmh_lib。
+- **L59** `    self.gpu = gpu` — **EN:** Assigns a value to self.gpu. **CN:** 将一个值赋给 self.gpu。
+- **L60** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L61** `    if 'CUTLASS_NVMMH_SO_PATH' in os.environ:` — **EN:** Starts a conditional branch guarded by `'CUTLASS_NVMMH_SO_PATH' in os.environ`. **CN:** 开始一个由 `'CUTLASS_NVMMH_SO_PATH' in os.environ` 控制的条件分支。
+- **L62** `      nvmmhInterfaceEx = functools.partial(self.mmh_lib.NvMatmulHeuristicsInterfaceEx, path=os.environ['CUTLASS_NVMMH_SO_PATH'])` — **EN:** Assigns a value to nvmmhInterfaceEx. **CN:** 将一个值赋给 nvmmhInterfaceEx。
+- **L63** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L64** `      nvmmhInterfaceEx = self.mmh_lib.NvMatmulHeuristicsInterfaceEx` — **EN:** Assigns a value to nvmmhInterfaceEx. **CN:** 将一个值赋给 nvmmhInterfaceEx。
+- **L65** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L66** `    # nvidia-matmul-heuristics 0.1.0.28 changed the API:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L67** `    #   - Constructor: removed 'load_discovery_implicitly' and 'gpu' params` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L68** `    #   - GPU: now set via createHardwareDescriptor() + setHardwarePredefinedGpu()` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L69** `    #   - setBackendValueProperty renamed to setBackendPropertyValue (simpler signature)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L70** `    #   - getEx: added hardware_descriptor parameter` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L71** `    init_params = set(inspect.signature(self.mmh_lib.NvMatmulHeuristicsInterfaceEx.__init__).parameters.keys())` — **EN:** Assigns a value to init_params. **CN:** 将一个值赋给 init_params。
+- **L72** `    self._legacy_api = 'load_discovery_implicitly' in init_params` — **EN:** Assigns a value to self._legacy_api. **CN:** 将一个值赋给 self._legacy_api。
+- **L73** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L74** `    init_kwargs = dict(` — **EN:** Assigns a value to init_kwargs. **CN:** 将一个值赋给 init_kwargs。
+- **L75** `      backend=self.mmh_lib.NvMatmulHeuristicsTarget["CUTLASS3"],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L76** `      flags=self.mmh_lib.NvMatmulHeuristicsFlags.PERF_MODEL_BASED_AUTO_TUNING,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L77** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L78** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L79** `    if self._legacy_api:` — **EN:** Starts a conditional branch guarded by `self._legacy_api`. **CN:** 开始一个由 `self._legacy_api` 控制的条件分支。
+- **L80** `      # <= 0.1.0.27` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L81** `      init_kwargs['gpu'] = self.mmh_lib.NvMatmulHeuristicsNvidiaGpu[self.gpu] if self.gpu else None` — **EN:** Assigns a value to init_kwargs['gpu']. **CN:** 将一个值赋给 init_kwargs['gpu']。
+- **L82** `      init_kwargs['load_discovery_implicitly'] = True` — **EN:** Assigns a value to init_kwargs['load_discovery_implicitly']. **CN:** 将一个值赋给 init_kwargs['load_discovery_implicitly']。
+- **L83** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L84** `    self.lh = nvmmhInterfaceEx(**init_kwargs)` — **EN:** Assigns a value to self.lh. **CN:** 将一个值赋给 self.lh。
+- **L85** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L86** `    # >= 0.1.0.28: gpu is set via hardware descriptor after construction,` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L87** `    # and passed to getEx() calls` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L88** `    self.hw_desc = None` — **EN:** Assigns a value to self.hw_desc. **CN:** 将一个值赋给 self.hw_desc。
+- **L89** `    if not self._legacy_api and self.gpu:` — **EN:** Starts a conditional branch guarded by `not self._legacy_api and self.gpu`. **CN:** 开始一个由 `not self._legacy_api and self.gpu` 控制的条件分支。
+- **L90** `      self.hw_desc = self.lh.createHardwareDescriptor()` — **EN:** Assigns a value to self.hw_desc. **CN:** 将一个值赋给 self.hw_desc。
+- **L91** `      if self.hw_desc is None:` — **EN:** Starts a conditional branch guarded by `self.hw_desc is None`. **CN:** 开始一个由 `self.hw_desc is None` 控制的条件分支。
+- **L92** `        raise RuntimeError("Failed to create hardware descriptor for GPU: " + self.gpu)` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L93** `      self.lh.setHardwarePredefinedGpu(self.hw_desc, self.mmh_lib.NvMatmulHeuristicsNvidiaGpu[self.gpu])` — **EN:** Invokes `self.lh.setHardwarePredefinedGpu` as a standalone call. **CN:** 以独立语句方式调用 `self.lh.setHardwarePredefinedGpu`。
+- **L94** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L95** `    self.backend = self.lh.createBackend(self.mmh_lib.NvMatmulHeuristicsTarget["CUTLASS3"])` — **EN:** Assigns a value to self.backend. **CN:** 将一个值赋给 self.backend。
+- **L96** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L97** `    if not self._legacy_api:` — **EN:** Starts a conditional branch guarded by `not self._legacy_api`. **CN:** 开始一个由 `not self._legacy_api` 控制的条件分支。
+- **L98** `      lh = self.lh` — **EN:** Assigns a value to lh. **CN:** 将一个值赋给 lh。
+- **L99** `      original_del = type(lh).__del__` — **EN:** Assigns a value to original_del. **CN:** 将一个值赋给 original_del。
+- **L100** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L101** `      def _safe_del(self_lh):` — **EN:** Defines function `_safe_del`. **CN:** 定义函数 `_safe_del`。
+- **L102** `        try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L103** `          original_del(self_lh)` — **EN:** Invokes `original_del` as a standalone call. **CN:** 以独立语句方式调用 `original_del`。
+- **L104** `        except Exception:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L105** `          pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L106** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L107** `      type(lh).__del__ = _safe_del` — **EN:** Assigns a value to type(lh).__del__. **CN:** 将一个值赋给 type(lh).__del__。
+- **L108** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L109** `  def __del__(self):` — **EN:** Defines function `__del__`. **CN:** 定义函数 `__del__`。
+- **L110** `    """Clean up resources in correct order before the library's __del__ runs."""` — **EN:** Docstring line documenting the function `__del__`. **CN:** 文档字符串行，用于说明 function `__del__`。
+- **L111** `    try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L112** `      if hasattr(self, 'backend') and self.backend:` — **EN:** Starts a conditional branch guarded by `hasattr(self, 'backend') and self.backend`. **CN:** 开始一个由 `hasattr(self, 'backend') and self.backend` 控制的条件分支。
+- **L113** `        self.lh.destroyBackend(self.backend)` — **EN:** Invokes `self.lh.destroyBackend` as a standalone call. **CN:** 以独立语句方式调用 `self.lh.destroyBackend`。
+- **L114** `        self.backend = None` — **EN:** Assigns a value to self.backend. **CN:** 将一个值赋给 self.backend。
+- **L115** `      if hasattr(self, 'hw_desc') and self.hw_desc:` — **EN:** Starts a conditional branch guarded by `hasattr(self, 'hw_desc') and self.hw_desc`. **CN:** 开始一个由 `hasattr(self, 'hw_desc') and self.hw_desc` 控制的条件分支。
+- **L116** `        self.lh.destroyHardwareDescriptor(self.hw_desc)` — **EN:** Invokes `self.lh.destroyHardwareDescriptor` as a standalone call. **CN:** 以独立语句方式调用 `self.lh.destroyHardwareDescriptor`。
+- **L117** `        self.hw_desc = None` — **EN:** Assigns a value to self.hw_desc. **CN:** 将一个值赋给 self.hw_desc。
+- **L118** `      # Null out the handle so the library's __del__ skips nvMatmulHeuristicsDestroy` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L119** `      if hasattr(self, 'lh') and self.lh and hasattr(self.lh, 'handle'):` — **EN:** Starts a conditional branch guarded by `hasattr(self, 'lh') and self.lh and hasattr(self.lh, 'han...`. **CN:** 开始一个由 `hasattr(self, 'lh') and self.lh and hasattr(self.lh, 'han...` 控制的条件分支。
+- **L120** `        self.lh.handle = None` — **EN:** Assigns a value to self.lh.handle. **CN:** 将一个值赋给 self.lh.handle。
+- **L121** `    except Exception:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L122** `      pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L123** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L124** `  def _layout_from_cutlass(self, layouts):` — **EN:** Defines function `_layout_from_cutlass`. **CN:** 定义函数 `_layout_from_cutlass`。
+- **L125** `    assert(len(layouts)==3)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L126** `    full_layout_str = ''.join('t' if l == LayoutType.RowMajor else 'n' for l in layouts)` — **EN:** Assigns a value to full_layout_str. **CN:** 将一个值赋给 full_layout_str。
+- **L127** `    input_layouts = full_layout_str[:2].upper() ` — **EN:** Assigns a value to input_layouts. **CN:** 将一个值赋给 input_layouts。
+- **L128** `    lh_layout = input_layouts + '_' + str("ROW_MAJOR" if full_layout_str[-1]=='t' else "COL_MAJOR")` — **EN:** Assigns a value to lh_layout. **CN:** 将一个值赋给 lh_layout。
+- **L129** `    return self.mmh_lib.NvMatmulHeuristicsMatmulLayout[lh_layout]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L130** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L131** `  def _precision_from_cutlass_dtypes(self, dtypes):` — **EN:** Defines function `_precision_from_cutlass_dtypes`. **CN:** 定义函数 `_precision_from_cutlass_dtypes`。
+- **L132** `    dtype_to_cublas = {` — **EN:** Assigns a value to dtype_to_cublas. **CN:** 将一个值赋给 dtype_to_cublas。
+- **L133** `      DataType.f64: 'D',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L134** `      DataType.f32: 'S',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L135** `      DataType.f16: 'H',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L136** `      DataType.bf16: 'T',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L137** `      DataType.e4m3: 'Q',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L138** `      DataType.e5m2: 'R',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L139** `      DataType.s32: 'I',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L140** `      DataType.s8: 'B',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L141** `    }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L142** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L143** `    dtype_a, dtype_b, dtype_compute, dtype_c, dtype_d = dtypes` — **EN:** Assigns a value to (dtype_a, dtype_b, dtype_compute, dtype_c, dtype_d). **CN:** 将一个值赋给 (dtype_a, dtype_b, dtype_compute, dtype_c, dtype_d)。
+- **L144** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L145** `    a_c = dtype_to_cublas[dtype_a]` — **EN:** Assigns a value to a_c. **CN:** 将一个值赋给 a_c。
+- **L146** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L147** `    if a_c.lower() != 'q':` — **EN:** Starts a conditional branch guarded by `a_c.lower() != 'q'`. **CN:** 开始一个由 `a_c.lower() != 'q'` 控制的条件分支。
+- **L148** `      return a_c + dtype_to_cublas[dtype_compute] + dtype_to_cublas[dtype_d]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L149** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L150** `      return a_c + dtype_to_cublas[dtype_b] + dtype_to_cublas[dtype_c] + dtype_to_cublas[dtype_compute] + dtype_to_cublas[dtype_d]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L151** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L152** `  def _set_backend_property(self, property, value):` — **EN:** Defines function `_set_backend_property`. **CN:** 定义函数 `_set_backend_property`。
+- **L153** `    """Compat wrapper: setBackendValueProperty (<=0.1.0.27) vs setBackendPropertyValue (>=0.1.0.28)"""` — **EN:** Docstring line documenting the function `_set_backend_property`. **CN:** 文档字符串行，用于说明 function `_set_backend_property`。
+- **L154** `    if self._legacy_api:` — **EN:** Starts a conditional branch guarded by `self._legacy_api`. **CN:** 开始一个由 `self._legacy_api` 控制的条件分支。
+- **L155** `      c_val = ctypes.c_int(value)` — **EN:** Assigns a value to c_val. **CN:** 将一个值赋给 c_val。
+- **L156** `      self.lh.setBackendValueProperty(` — **EN:** Invokes `self.lh.setBackendValueProperty` as a standalone call. **CN:** 以独立语句方式调用 `self.lh.setBackendValueProperty`。
+- **L157** `        self.backend, property,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L158** `        ctypes.byref(c_val), ctypes.sizeof(c_val)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L159** `      )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L160** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L161** `      self.lh.setBackendPropertyValue(self.backend, property, value)` — **EN:** Invokes `self.lh.setBackendPropertyValue` as a standalone call. **CN:** 以独立语句方式调用 `self.lh.setBackendPropertyValue`。
+- **L162** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L163** `  def set_cta_div_n(self, div_n):` — **EN:** Defines function `set_cta_div_n`. **CN:** 定义函数 `set_cta_div_n`。
+- **L164** `    self._set_backend_property(` — **EN:** Invokes `self._set_backend_property` as a standalone call. **CN:** 以独立语句方式调用 `self._set_backend_property`。
+- **L165** `      self.mmh_lib.NvMatmulHeuristicsBackendProperty.CTA_TILE_N_DIV_REQUIREMENT, div_n)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L166** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L167** `  def set_cta_div_m(self, div_m):` — **EN:** Defines function `set_cta_div_m`. **CN:** 定义函数 `set_cta_div_m`。
+- **L168** `    self._set_backend_property(` — **EN:** Invokes `self._set_backend_property` as a standalone call. **CN:** 以独立语句方式调用 `self._set_backend_property`。
+- **L169** `      self.mmh_lib.NvMatmulHeuristicsBackendProperty.CTA_TILE_M_DIV_REQUIREMENT, div_m)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L170** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L171** `  def get_configs(self, m, n, k, batch_count, dtypes, layouts, align_a, align_b, voidC=False, use_fast_acc=True, count=1):` — **EN:** Defines function `get_configs`. **CN:** 定义函数 `get_configs`。
+- **L172** `    self._set_backend_property(` — **EN:** Invokes `self._set_backend_property` as a standalone call. **CN:** 以独立语句方式调用 `self._set_backend_property`。
+- **L173** `      self.mmh_lib.NvMatmulHeuristicsBackendProperty.DISABLE_FAST_ACC_FOR_FP8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L174** `      0 if use_fast_acc else 1` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L175** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L176** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L177** `    precision = self._precision_from_cutlass_dtypes(dtypes)` — **EN:** Assigns a value to precision. **CN:** 将一个值赋给 precision。
+- **L178** `    layout = self._layout_from_cutlass(layouts)` — **EN:** Assigns a value to layout. **CN:** 将一个值赋给 layout。
+- **L179** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L180** `    if self._legacy_api:` — **EN:** Starts a conditional branch guarded by `self._legacy_api`. **CN:** 开始一个由 `self._legacy_api` 控制的条件分支。
+- **L181** `      matmul_problem = self.lh.makeNvMatmulHeuristicsProblem(m, n, k, layout, batch_count)` — **EN:** Assigns a value to matmul_problem. **CN:** 将一个值赋给 matmul_problem。
+- **L182** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L183** `      # >= 0.1.0.28: takes (m,n,k) as a tuple` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L184** `      matmul_problem = self.lh.makeNvMatmulHeuristicsProblem((m, n, k), layout, batch_count)` — **EN:** Assigns a value to matmul_problem. **CN:** 将一个值赋给 matmul_problem。
+- **L185** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L186** `    getEx_kwargs = dict(precision=precision)` — **EN:** Assigns a value to getEx_kwargs. **CN:** 将一个值赋给 getEx_kwargs。
+- **L187** `    if not self._legacy_api:` — **EN:** Starts a conditional branch guarded by `not self._legacy_api`. **CN:** 开始一个由 `not self._legacy_api` 控制的条件分支。
+- **L188** `      # >= 0.1.0.28: pass hardware descriptor to getEx` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L189** `      getEx_kwargs['hardware_descriptor'] = self.hw_desc` — **EN:** Assigns a value to getEx_kwargs['hardware_descriptor']. **CN:** 将一个值赋给 getEx_kwargs['hardware_descriptor']。
+- **L190** `    configs = self.lh.getEx(matmul_problem, count, self.backend, **getEx_kwargs)` — **EN:** Assigns a value to configs. **CN:** 将一个值赋给 configs。
+- **L191** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L192** `    ret = []` — **EN:** Assigns a value to ret. **CN:** 将一个值赋给 ret。
+- **L193** `    for c in configs:` — **EN:** Starts a loop assigning items from `configs` to `c`. **CN:** 开始一个循环，将 `configs` 的元素赋给 `c`。
+- **L194** `      kernel = c['kernel']` — **EN:** Assigns a value to kernel. **CN:** 将一个值赋给 kernel。
+- **L195** `      problem = c['problem']` — **EN:** Assigns a value to problem. **CN:** 将一个值赋给 problem。
+- **L196** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L197** `      r = {}` — **EN:** Assigns a value to r. **CN:** 将一个值赋给 r。
+- **L198** `      r['estimated_runtime'] = c['runtime']` — **EN:** Assigns a value to r['estimated_runtime']. **CN:** 将一个值赋给 r['estimated_runtime']。
+- **L199** `      r['cta_tile_m'] = kernel.cta_tile_m` — **EN:** Assigns a value to r['cta_tile_m']. **CN:** 将一个值赋给 r['cta_tile_m']。
+- **L200** `      r['cta_tile_n'] = kernel.cta_tile_n` — **EN:** Assigns a value to r['cta_tile_n']. **CN:** 将一个值赋给 r['cta_tile_n']。
+- **L201** `      r['cta_tile_k'] = kernel.cta_tile_k` — **EN:** Assigns a value to r['cta_tile_k']. **CN:** 将一个值赋给 r['cta_tile_k']。
+- **L202** `      r['instr_tile_m'] = kernel.instr_tile_m` — **EN:** Assigns a value to r['instr_tile_m']. **CN:** 将一个值赋给 r['instr_tile_m']。
+- **L203** `      r['instr_tile_n'] = kernel.instr_tile_n` — **EN:** Assigns a value to r['instr_tile_n']. **CN:** 将一个值赋给 r['instr_tile_n']。
+- **L204** `      r['instr_tile_k'] = kernel.instr_tile_k` — **EN:** Assigns a value to r['instr_tile_k']. **CN:** 将一个值赋给 r['instr_tile_k']。
+- **L205** `      r['warp_tile_m'] = kernel.warp_tile_m` — **EN:** Assigns a value to r['warp_tile_m']. **CN:** 将一个值赋给 r['warp_tile_m']。
+- **L206** `      r['warp_tile_n'] = kernel.warp_tile_n` — **EN:** Assigns a value to r['warp_tile_n']. **CN:** 将一个值赋给 r['warp_tile_n']。
+- **L207** `      r['warp_tile_k'] = kernel.warp_tile_k` — **EN:** Assigns a value to r['warp_tile_k']. **CN:** 将一个值赋给 r['warp_tile_k']。
+- **L208** `      r['cluster_m'] = kernel.cluster_m` — **EN:** Assigns a value to r['cluster_m']. **CN:** 将一个值赋给 r['cluster_m']。
+- **L209** `      r['cluster_n'] = kernel.cluster_n` — **EN:** Assigns a value to r['cluster_n']. **CN:** 将一个值赋给 r['cluster_n']。
+- **L210** `      r['cluster_k'] = 1` — **EN:** Assigns a value to r['cluster_k']. **CN:** 将一个值赋给 r['cluster_k']。
+- **L211** `      r['layout_a'] = layouts[0]` — **EN:** Assigns a value to r['layout_a']. **CN:** 将一个值赋给 r['layout_a']。
+- **L212** `      r['layout_b'] = layouts[1]` — **EN:** Assigns a value to r['layout_b']. **CN:** 将一个值赋给 r['layout_b']。
+- **L213** `      r['layout_d'] = layouts[2]` — **EN:** Assigns a value to r['layout_d']. **CN:** 将一个值赋给 r['layout_d']。
+- **L214** `      r['dtype_a'] = dtypes[0]` — **EN:** Assigns a value to r['dtype_a']. **CN:** 将一个值赋给 r['dtype_a']。
+- **L215** `      r['dtype_b'] = dtypes[1]` — **EN:** Assigns a value to r['dtype_b']. **CN:** 将一个值赋给 r['dtype_b']。
+- **L216** `      r['dtype_acc'] = dtypes[2]` — **EN:** Assigns a value to r['dtype_acc']. **CN:** 将一个值赋给 r['dtype_acc']。
+- **L217** `      r['dtype_c'] = dtypes[3]` — **EN:** Assigns a value to r['dtype_c']. **CN:** 将一个值赋给 r['dtype_c']。
+- **L218** `      r['dtype_d'] = dtypes[4]` — **EN:** Assigns a value to r['dtype_d']. **CN:** 将一个值赋给 r['dtype_d']。
+- **L219** `      r['alignment_a'] = align_a` — **EN:** Assigns a value to r['alignment_a']. **CN:** 将一个值赋给 r['alignment_a']。
+- **L220** `      r['alignment_b'] = align_b` — **EN:** Assigns a value to r['alignment_b']. **CN:** 将一个值赋给 r['alignment_b']。
+- **L221** `      r['swizzle_size'] = kernel.swizzle_factor` — **EN:** Assigns a value to r['swizzle_size']. **CN:** 将一个值赋给 r['swizzle_size']。
+- **L222** `      r['raster_order'] = 'along_m' if kernel.cta_order==0 else 'along_n'` — **EN:** Assigns a value to r['raster_order']. **CN:** 将一个值赋给 r['raster_order']。
+- **L223** `      r['split_k_slices'] = kernel.split_k` — **EN:** Assigns a value to r['split_k_slices']. **CN:** 将一个值赋给 r['split_k_slices']。
+- **L224** `      r['use_fast_acc'] = use_fast_acc` — **EN:** Assigns a value to r['use_fast_acc']. **CN:** 将一个值赋给 r['use_fast_acc']。
+- **L225** `      r['voidC'] = voidC` — **EN:** Assigns a value to r['voidC']. **CN:** 将一个值赋给 r['voidC']。
+- **L226** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L227** `      ret.append(r)` — **EN:** Invokes `ret.append` as a standalone call. **CN:** 以独立语句方式调用 `ret.append`。
+- **L228** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L229** `    return ret` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L230** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_library.heuristics_provider`. CN: 模块名为 `cutlass_library.heuristics_provider`。
+- EN: Module docstring summary: Providers for kernel selection heuristics CN: 模块文档摘要为：Providers for kernel selection heuristics
+- EN: Top-level classes: MatmulHeuristics CN: 顶层类包括：MatmulHeuristics
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_library.library:DataType,LayoutType CN: 内部依赖：cutlass_library.library:DataType,LayoutType
+- EN: External or standard-library dependencies: sys, os, glob, logging, ctypes, functools, builtins, library:DataType,LayoutType, nvMatmulHeuristics, inspect CN: 外部或标准库依赖：sys, os, glob, logging, ctypes, functools, builtins, library:DataType,LayoutType, nvMatmulHeuristics, inspect

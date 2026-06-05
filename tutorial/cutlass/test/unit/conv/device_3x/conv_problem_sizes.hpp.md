@@ -1,0 +1,4334 @@
+# conv_problem_sizes.hpp — Code Analysis / 代码分析
+**Source / 源文件**: `test/unit/conv/device_3x/conv_problem_sizes.hpp`
+**Purpose / 用途**: Defines reusable `ConvProblemShape` vectors for CUTLASS 3.x ConvNd tests, covering padding, stride, dilation, packed, and non-packed layouts. / 定义可复用的 `ConvProblemShape` 向量，供 CUTLASS 3.x ConvNd 测试使用，覆盖 padding、步幅、膨胀、紧凑与非紧凑布局等情况。
+---
+## Line-by-Line Analysis / 逐行分析
+
+### Lines 1-25 / 第1-25行
+
+- **L1** `/***************************************************************************************************`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L2** ` * Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L3** ` * SPDX-License-Identifier: BSD-3-Clause`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L4** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L5** ` * Redistribution and use in source and binary forms, with or without`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L6** ` * modification, are permitted provided that the following conditions are met:`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L7** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L8** ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L9** ` * list of conditions and the following disclaimer.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L10** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L11** ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L12** ` * this list of conditions and the following disclaimer in the documentation`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L13** ` * and/or other materials provided with the distribution.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L14** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L15** ` * 3. Neither the name of the copyright holder nor the names of its`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L16** ` * contributors may be used to endorse or promote products derived from`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L17** ` * this software without specific prior written permission.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L18** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L19** ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L20** ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L21** ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L22** ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L23** ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L24** ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L25** ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+
+### Lines 26-50 / 第26-50行
+
+- **L26** ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L27** ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L28** ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L29** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L30** ` **************************************************************************************************/`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L31** `/*! \file`
+  - **EN**: Marks the start of the Doxygen file documentation block.
+  - **CN**: 标记 Doxygen 文件说明块的开始。
+- **L32** `    \brief CUTLASS 3.x Implicit GEMM testbed sizes for ConvNd problem`
+  - **EN**: Records the file-level brief description: CUTLASS 3.x Implicit GEMM testbed sizes for ConvNd problem.
+  - **CN**: 记录文件级简述：CUTLASS 3.x Implicit GEMM testbed sizes for ConvNd problem。
+- **L33** `*/`
+  - **EN**: Continues the file-level Doxygen documentation.
+  - **CN**: 继续补充文件级 Doxygen 说明。
+- **L34** `#pragma once`
+  - **EN**: Makes this header idempotent by preventing multiple inclusion.
+  - **CN**: 通过防止重复包含，让该头文件具备幂等性。
+- **L35** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L36** `#include "cutlass/conv/convnd_problem_shape.hpp"`
+  - **EN**: ConvNd problem-shape data structure used to describe tensor extents, padding, stride, and dilation.
+  - **CN**: 用于描述张量尺寸、padding、步幅和膨胀的 ConvNd 问题形状数据结构。
+- **L37** `#include <vector>`
+  - **EN**: Dynamic array container used throughout the examples.
+  - **CN**: 示例中广泛使用的动态数组容器。
+- **L38** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L39** `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L40** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L41** `namespace test::conv::device {`
+  - **EN**: Opens namespace `test::conv::device` for the surrounding declarations.
+  - **CN**: 为周围声明打开命名空间 `test::conv::device`。
+- **L42** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L43** `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L44** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L45** `template<int SpatialDim, cutlass::conv::Operator ConvOp, bool SupportStrides = (ConvOp != cutlass::conv::Operator::kDgrad)>`
+  - **EN**: Declares template parameters for the following type or function.
+  - **CN**: 为后续类型或函数声明模板参数。
+- **L46** `std::vector<cutlass::conv::ConvProblemShape<ConvOp, SpatialDim>>`
+  - **EN**: References the templated convolution problem-shape type.
+  - **CN**: 引用模板化的卷积问题形状类型。
+- **L47** `inline`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L48** `get_conv_problem_vector();`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L49** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L50** `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+
+### Lines 51-75 / 第51-75行
+
+- **L51** `// Fprop`
+  - **EN**: Comment explaining: Fprop.
+  - **CN**: 说明性注释：Fprop。
+- **L52** `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L53** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L54** `// Specialization for 1D fprop problems`
+  - **EN**: Comment explaining: Specialization for 1D fprop problems.
+  - **CN**: 说明性注释：Specialization for 1D fprop problems。
+- **L55** `template<>`
+  - **EN**: Declares template parameters for the following type or function.
+  - **CN**: 为后续类型或函数声明模板参数。
+- **L56** `std::vector<cutlass::conv::ConvProblemShape<cutlass::conv::Operator::kFprop, 1>> inline`
+  - **EN**: References the templated convolution problem-shape type.
+  - **CN**: 引用模板化的卷积问题形状类型。
+- **L57** `get_conv_problem_vector<1, cutlass::conv::Operator::kFprop>() {`
+  - **EN**: Starts a constructor or function definition.
+  - **CN**: 开始定义一个构造函数或函数。
+- **L58** `  using ProblemShape = cutlass::conv::ConvProblemShape<cutlass::conv::Operator::kFprop, 1>;`
+  - **EN**: Aliases the convolution problem-shape type consumed by the universal kernel.
+  - **CN**: 为通用卷积内核要消费的问题形状类型创建别名。
+- **L59** `  std::vector<ProblemShape> problem_shapes;`
+  - **EN**: Declares the vector that will collect convolution problem shapes for the test sweep.
+  - **CN**: 声明用于收集卷积问题形状、供测试遍历使用的向量。
+- **L60** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L61** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L62** `    {1,  8, 64},  // nwc`
+  - **EN**: Stores the tensor extents or strides labelled `nwc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `nwc` 的张量尺寸或步长。
+- **L63** `    {64, 1, 64},  // ksc`
+  - **EN**: Stores the tensor extents or strides labelled `ksc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `ksc` 的张量尺寸或步长。
+- **L64** `    {0},          // padding lower (pad_w)`
+  - **EN**: Stores the lower-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在低侧的 padding 值。
+- **L65** `    {0},          // padding upper (pad_w)`
+  - **EN**: Stores the upper-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在高侧的 padding 值。
+- **L66** `    {1},          // stride (stride_w)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L67** `    {1},          // dilation (dilation_w)`
+  - **EN**: Stores the dilation values for this problem shape.
+  - **CN**: 记录该问题形状的 dilation 值。
+- **L68** `    1             // group`
+  - **EN**: Stores the convolution group count for this test problem.
+  - **CN**: 记录该测试问题的卷积分组数量。
+- **L69** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L70** `  // non-packed input strides.`
+  - **EN**: Comment explaining: non-packed input strides..
+  - **CN**: 说明性注释：non-packed input strides.。
+- **L71** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L72** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L73** `    {1,   8,  64},  // nwc`
+  - **EN**: Stores the tensor extents or strides labelled `nwc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `nwc` 的张量尺寸或步长。
+- **L74** `    {800, 80, 1},   // stride (nwc)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L75** `    {64,  1,  64},  // ksc`
+  - **EN**: Stores the tensor extents or strides labelled `ksc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `ksc` 的张量尺寸或步长。
+
+### Lines 76-100 / 第76-100行
+
+- **L76** `    {64,  64, 1},   // stride (ksc)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L77** `    {0},            // padding lower (pad_w)`
+  - **EN**: Stores the lower-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在低侧的 padding 值。
+- **L78** `    {0},            // padding upper (pad_w)`
+  - **EN**: Stores the upper-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在高侧的 padding 值。
+- **L79** `    {1},            // stride (stride_w)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L80** `    {1},            // dilation (dilation_w)`
+  - **EN**: Stores the dilation values for this problem shape.
+  - **CN**: 记录该问题形状的 dilation 值。
+- **L81** `    1               // group`
+  - **EN**: Stores the convolution group count for this test problem.
+  - **CN**: 记录该测试问题的卷积分组数量。
+- **L82** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L83** `  // non-packed output strides.`
+  - **EN**: Comment explaining: non-packed output strides..
+  - **CN**: 说明性注释：non-packed output strides.。
+- **L84** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L85** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L86** `    {1,   8,  64},  // nwc`
+  - **EN**: Stores the tensor extents or strides labelled `nwc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `nwc` 的张量尺寸或步长。
+- **L87** `    {512, 64, 1},   // stride (nwc)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L88** `    {64,  1,  64},  // ksc`
+  - **EN**: Stores the tensor extents or strides labelled `ksc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `ksc` 的张量尺寸或步长。
+- **L89** `    {64,  64, 1},   // stride (ksc)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L90** `    {800, 80, 1},   // stride (nqk)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L91** `    {0},            // padding lower (pad_w)`
+  - **EN**: Stores the lower-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在低侧的 padding 值。
+- **L92** `    {0},            // padding upper (pad_w)`
+  - **EN**: Stores the upper-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在高侧的 padding 值。
+- **L93** `    {1},            // stride (stride_w)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L94** `    {1},            // dilation (dilation_w)`
+  - **EN**: Stores the dilation values for this problem shape.
+  - **CN**: 记录该问题形状的 dilation 值。
+- **L95** `    1               // group`
+  - **EN**: Stores the convolution group count for this test problem.
+  - **CN**: 记录该测试问题的卷积分组数量。
+- **L96** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L97** `  // Filter-K = 16 for predication`
+  - **EN**: Comment explaining: Filter-K = 16 for predication.
+  - **CN**: 说明性注释：Filter-K = 16 for predication。
+- **L98** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L99** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L100** `    {1, 8, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+
+### Lines 101-125 / 第101-125行
+
+- **L101** `    {16,1, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L102** `    {0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L103** `    {0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L104** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L105** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L106** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L107** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L108** `  // N = 2 and K = 128 for a larger grid`
+  - **EN**: Comment explaining: N = 2 and K = 128 for a larger grid.
+  - **CN**: 说明性注释：N = 2 and K = 128 for a larger grid。
+- **L109** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L110** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L111** `    {2,  8, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L112** `    {96, 1, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L113** `    {0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L114** `    {0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L115** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L116** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L117** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L118** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L119** `  // N = 7 and K = 256 for a even larger grid`
+  - **EN**: Comment explaining: N = 7 and K = 256 for a even larger grid.
+  - **CN**: 说明性注释：N = 7 and K = 256 for a even larger grid。
+- **L120** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L121** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L122** `    {7,   8, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L123** `    {256, 1, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L124** `    {0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L125** `    {0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+
+### Lines 126-150 / 第126-150行
+
+- **L126** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L127** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L128** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L129** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L130** `  // 3 filter, no padding`
+  - **EN**: Comment explaining: 3 filter, no padding.
+  - **CN**: 说明性注释：3 filter, no padding。
+- **L131** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L132** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L133** `    {2,   8, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L134** `    {256, 3, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L135** `    {0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L136** `    {0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L137** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L138** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L139** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L140** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L141** `  // 3 filter, symmetric padding with c % cta_k !=0`
+  - **EN**: Comment explaining: 3 filter, symmetric padding with c % cta_k !=0.
+  - **CN**: 说明性注释：3 filter, symmetric padding with c % cta_k !=0。
+- **L142** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L143** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L144** `    {2,   8, 32},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L145** `    {256, 3, 32},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L146** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L147** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L148** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L149** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L150** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+
+### Lines 151-175 / 第151-175行
+
+- **L151** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L152** `  // 4 filter, asymmetric padding`
+  - **EN**: Comment explaining: 4 filter, asymmetric padding.
+  - **CN**: 说明性注释：4 filter, asymmetric padding。
+- **L153** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L154** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L155** `    {2,   8, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L156** `    {256, 4, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L157** `    {0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L158** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L159** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L160** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L161** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L162** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L163** `  // 3 filter, asymmetric padding and tstride of 2`
+  - **EN**: Comment explaining: 3 filter, asymmetric padding and tstride of 2.
+  - **CN**: 说明性注释：3 filter, asymmetric padding and tstride of 2。
+- **L164** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L165** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L166** `    {2,   8, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L167** `    {256, 3, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L168** `    {0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L169** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L170** `    {2},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L171** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L172** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L173** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L174** `  // 3 filter, asymmetric padding and dilation of 2`
+  - **EN**: Comment explaining: 3 filter, asymmetric padding and dilation of 2.
+  - **CN**: 说明性注释：3 filter, asymmetric padding and dilation of 2。
+- **L175** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+
+### Lines 176-200 / 第176-200行
+
+- **L176** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L177** `    {2,   8, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L178** `    {256, 3, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L179** `    {0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L180** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L181** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L182** `    {2},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L183** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L184** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L185** `  return problem_shapes;`
+  - **EN**: Returns the computed value from the current function.
+  - **CN**: 从当前函数返回计算结果。
+- **L186** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L187** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L188** `// Specialization for 2D fprop problems`
+  - **EN**: Comment explaining: Specialization for 2D fprop problems.
+  - **CN**: 说明性注释：Specialization for 2D fprop problems。
+- **L189** `template<>`
+  - **EN**: Declares template parameters for the following type or function.
+  - **CN**: 为后续类型或函数声明模板参数。
+- **L190** `std::vector<cutlass::conv::ConvProblemShape<cutlass::conv::Operator::kFprop, 2>> inline`
+  - **EN**: References the templated convolution problem-shape type.
+  - **CN**: 引用模板化的卷积问题形状类型。
+- **L191** `get_conv_problem_vector<2, cutlass::conv::Operator::kFprop>() {`
+  - **EN**: Starts a constructor or function definition.
+  - **CN**: 开始定义一个构造函数或函数。
+- **L192** `  using ProblemShape = cutlass::conv::ConvProblemShape<cutlass::conv::Operator::kFprop, 2>;`
+  - **EN**: Aliases the convolution problem-shape type consumed by the universal kernel.
+  - **CN**: 为通用卷积内核要消费的问题形状类型创建别名。
+- **L193** `  std::vector<ProblemShape> problem_shapes;`
+  - **EN**: Declares the vector that will collect convolution problem shapes for the test sweep.
+  - **CN**: 声明用于收集卷积问题形状、供测试遍历使用的向量。
+- **L194** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L195** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L196** `    {1,  8, 8, 64},  // nhwc`
+  - **EN**: Stores the tensor extents or strides labelled `nhwc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `nhwc` 的张量尺寸或步长。
+- **L197** `    {64, 1, 1, 64},  // krsc`
+  - **EN**: Stores the tensor extents or strides labelled `krsc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `krsc` 的张量尺寸或步长。
+- **L198** `    {0, 0},          // padding lower (pad_h, pad_w)`
+  - **EN**: Stores the lower-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在低侧的 padding 值。
+- **L199** `    {0, 0},          // padding upper (pad_h, pad_w)`
+  - **EN**: Stores the upper-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在高侧的 padding 值。
+- **L200** `    {1, 1},          // stride (stride_h, stride_w)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+
+### Lines 201-225 / 第201-225行
+
+- **L201** `    {1, 1},          // dilation (dilation_h, dilation_w)`
+  - **EN**: Stores the dilation values for this problem shape.
+  - **CN**: 记录该问题形状的 dilation 值。
+- **L202** `    1                // group`
+  - **EN**: Stores the convolution group count for this test problem.
+  - **CN**: 记录该测试问题的卷积分组数量。
+- **L203** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L204** `  // non-packed input strides.`
+  - **EN**: Comment explaining: non-packed input strides..
+  - **CN**: 说明性注释：non-packed input strides.。
+- **L205** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L206** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L207** `    {1,    8,   8,  64},  // nhwc`
+  - **EN**: Stores the tensor extents or strides labelled `nhwc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `nhwc` 的张量尺寸或步长。
+- **L208** `    {8000, 800, 80, 1},   // stride (nhwc)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L209** `    {64,   1,   1,  64},  // krsc`
+  - **EN**: Stores the tensor extents or strides labelled `krsc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `krsc` 的张量尺寸或步长。
+- **L210** `    {64,   64,  64, 1},   // stride (krsc)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L211** `    {0, 0},               // padding lower (pad_h, pad_w)`
+  - **EN**: Stores the lower-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在低侧的 padding 值。
+- **L212** `    {0, 0},               // padding upper (pad_h, pad_w)`
+  - **EN**: Stores the upper-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在高侧的 padding 值。
+- **L213** `    {1, 1},               // stride (stride_h, stride_w)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L214** `    {1, 1},               // dilation (dilation_h, dilation_w)`
+  - **EN**: Stores the dilation values for this problem shape.
+  - **CN**: 记录该问题形状的 dilation 值。
+- **L215** `    1                     // group`
+  - **EN**: Stores the convolution group count for this test problem.
+  - **CN**: 记录该测试问题的卷积分组数量。
+- **L216** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L217** `  // non-packed output strides.`
+  - **EN**: Comment explaining: non-packed output strides..
+  - **CN**: 说明性注释：non-packed output strides.。
+- **L218** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L219** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L220** `    {1,    8,   8,  64},  // nhwc`
+  - **EN**: Stores the tensor extents or strides labelled `nhwc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `nhwc` 的张量尺寸或步长。
+- **L221** `    {4096, 512, 64, 1},   // stride (nhwc)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L222** `    {64,   1,   1,  64},  // krsc`
+  - **EN**: Stores the tensor extents or strides labelled `krsc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `krsc` 的张量尺寸或步长。
+- **L223** `    {64,   64,  64, 1},   // stride (krsc)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L224** `    {8000, 800, 80, 1},   // stride (npqk)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L225** `    {0, 0},               // padding lower (pad_h, pad_w)`
+  - **EN**: Stores the lower-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在低侧的 padding 值。
+
+### Lines 226-250 / 第226-250行
+
+- **L226** `    {0, 0},               // padding upper (pad_h, pad_w)`
+  - **EN**: Stores the upper-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在高侧的 padding 值。
+- **L227** `    {1, 1},               // stride (stride_h, stride_w)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L228** `    {1, 1},               // dilation (dilation_h, dilation_w)`
+  - **EN**: Stores the dilation values for this problem shape.
+  - **CN**: 记录该问题形状的 dilation 值。
+- **L229** `    1                     // group`
+  - **EN**: Stores the convolution group count for this test problem.
+  - **CN**: 记录该测试问题的卷积分组数量。
+- **L230** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L231** `  // Filter-K = 16 for predication`
+  - **EN**: Comment explaining: Filter-K = 16 for predication.
+  - **CN**: 说明性注释：Filter-K = 16 for predication。
+- **L232** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L233** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L234** `    {1,  8, 8, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L235** `    {16, 1, 1, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L236** `    {0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L237** `    {0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L238** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L239** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L240** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L241** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L242** `  // N = 2 and K = 128 for a larger grid`
+  - **EN**: Comment explaining: N = 2 and K = 128 for a larger grid.
+  - **CN**: 说明性注释：N = 2 and K = 128 for a larger grid。
+- **L243** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L244** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L245** `    {2,  8, 8, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L246** `    {96, 1, 1, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L247** `    {0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L248** `    {0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L249** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L250** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+
+### Lines 251-275 / 第251-275行
+
+- **L251** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L252** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L253** `  // N = 7 and K = 256 for a even larger grid`
+  - **EN**: Comment explaining: N = 7 and K = 256 for a even larger grid.
+  - **CN**: 说明性注释：N = 7 and K = 256 for a even larger grid。
+- **L254** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L255** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L256** `    {7,   8, 8, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L257** `    {256, 1, 1, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L258** `    {0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L259** `    {0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L260** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L261** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L262** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L263** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L264** `  // 3x3 filter, no padding`
+  - **EN**: Comment explaining: 3x3 filter, no padding.
+  - **CN**: 说明性注释：3x3 filter, no padding。
+- **L265** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L266** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L267** `    {2,   8, 8, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L268** `    {256, 3, 3, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L269** `    {0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L270** `    {0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L271** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L272** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L273** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L274** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L275** `  // 3x3 filter, symmetric padding with c % cta_k !=0`
+  - **EN**: Comment explaining: 3x3 filter, symmetric padding with c % cta_k !=0.
+  - **CN**: 说明性注释：3x3 filter, symmetric padding with c % cta_k !=0。
+
+### Lines 276-300 / 第276-300行
+
+- **L276** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L277** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L278** `    {2,   8, 8, 32},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L279** `    {256, 3, 3, 32},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L280** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L281** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L282** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L283** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L284** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L285** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L286** `  // 2x5 filter, asymmetric padding 1,2/1,2`
+  - **EN**: Comment explaining: 2x5 filter, asymmetric padding 1,2/1,2.
+  - **CN**: 说明性注释：2x5 filter, asymmetric padding 1,2/1,2。
+- **L287** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L288** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L289** `    {2,   8, 8, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L290** `    {256, 2, 5, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L291** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L292** `    {2, 2},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L293** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L294** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L295** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L296** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L297** `  // 2x5 filter, asymmetric padding 1,0/1,0, w/ stride`
+  - **EN**: Comment explaining: 2x5 filter, asymmetric padding 1,0/1,0, w/ stride.
+  - **CN**: 说明性注释：2x5 filter, asymmetric padding 1,0/1,0, w/ stride。
+- **L298** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L299** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L300** `    {2,   7, 7, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+
+### Lines 301-325 / 第301-325行
+
+- **L301** `    {256, 2, 5, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L302** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L303** `    {0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L304** `    {2, 3},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L305** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L306** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L307** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L308** `  // 2x5 filter, asymmetric padding 1,0/1,0, w/ dilation`
+  - **EN**: Comment explaining: 2x5 filter, asymmetric padding 1,0/1,0, w/ dilation.
+  - **CN**: 说明性注释：2x5 filter, asymmetric padding 1,0/1,0, w/ dilation。
+- **L309** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L310** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L311** `    {2,   16, 16, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L312** `    {256, 2,  5,  64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L313** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L314** `    {0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L315** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L316** `    {2, 3},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L317** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L318** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L319** `  // 2x5 filter, asymmetric padding 1,0/1,0, w/ stride, w/ dilation`
+  - **EN**: Comment explaining: 2x5 filter, asymmetric padding 1,0/1,0, w/ stride, w/ dilation.
+  - **CN**: 说明性注释：2x5 filter, asymmetric padding 1,0/1,0, w/ stride, w/ dilation。
+- **L320** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L321** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L322** `    {2,   16, 15, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L323** `    {256, 2,  5,  64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L324** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L325** `    {0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+
+### Lines 326-350 / 第326-350行
+
+- **L326** `    {2, 3},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L327** `    {2, 3},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L328** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L329** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L330** `  return problem_shapes;`
+  - **EN**: Returns the computed value from the current function.
+  - **CN**: 从当前函数返回计算结果。
+- **L331** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L332** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L333** `// Specialization for 3D fprop problems`
+  - **EN**: Comment explaining: Specialization for 3D fprop problems.
+  - **CN**: 说明性注释：Specialization for 3D fprop problems。
+- **L334** `template<>`
+  - **EN**: Declares template parameters for the following type or function.
+  - **CN**: 为后续类型或函数声明模板参数。
+- **L335** `std::vector<cutlass::conv::ConvProblemShape<cutlass::conv::Operator::kFprop, 3>> inline`
+  - **EN**: References the templated convolution problem-shape type.
+  - **CN**: 引用模板化的卷积问题形状类型。
+- **L336** `get_conv_problem_vector<3, cutlass::conv::Operator::kFprop>() {`
+  - **EN**: Starts a constructor or function definition.
+  - **CN**: 开始定义一个构造函数或函数。
+- **L337** `  using ProblemShape = cutlass::conv::ConvProblemShape<cutlass::conv::Operator::kFprop, 3>;`
+  - **EN**: Aliases the convolution problem-shape type consumed by the universal kernel.
+  - **CN**: 为通用卷积内核要消费的问题形状类型创建别名。
+- **L338** `  std::vector<ProblemShape> problem_shapes;`
+  - **EN**: Declares the vector that will collect convolution problem shapes for the test sweep.
+  - **CN**: 声明用于收集卷积问题形状、供测试遍历使用的向量。
+- **L339** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L340** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L341** `    {1,  1, 8, 8, 64},  // ndhwc`
+  - **EN**: Stores the tensor extents or strides labelled `ndhwc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `ndhwc` 的张量尺寸或步长。
+- **L342** `    {64, 1, 1, 1, 64},  // ktrsc`
+  - **EN**: Stores the tensor extents or strides labelled `ktrsc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `ktrsc` 的张量尺寸或步长。
+- **L343** `    {0, 0, 0},          // padding lower (pad_d, pad_h, pad_w)`
+  - **EN**: Stores the lower-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在低侧的 padding 值。
+- **L344** `    {0, 0, 0},          // padding upper (pad_d, pad_h, pad_w)`
+  - **EN**: Stores the upper-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在高侧的 padding 值。
+- **L345** `    {1, 1, 1},          // stride (stride_d, stride_h, stride_w)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L346** `    {1, 1, 1},          // dilation (dilation_d, dilation_h, dilation_w)`
+  - **EN**: Stores the dilation values for this problem shape.
+  - **CN**: 记录该问题形状的 dilation 值。
+- **L347** `    1                   // group`
+  - **EN**: Stores the convolution group count for this test problem.
+  - **CN**: 记录该测试问题的卷积分组数量。
+- **L348** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L349** `  // non-packed input output strides.`
+  - **EN**: Comment explaining: non-packed input output strides..
+  - **CN**: 说明性注释：non-packed input output strides.。
+- **L350** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+
+### Lines 351-375 / 第351-375行
+
+- **L351** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L352** `    {1,    1,    8,   8,  64},  // ndhwc`
+  - **EN**: Stores the tensor extents or strides labelled `ndhwc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `ndhwc` 的张量尺寸或步长。
+- **L353** `    {8000, 8000, 800, 80, 1},   // stride (ndhwc)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L354** `    {64,   1,    1,   1,  64},  // ktrsc`
+  - **EN**: Stores the tensor extents or strides labelled `ktrsc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `ktrsc` 的张量尺寸或步长。
+- **L355** `    {64,   64,   64,  64, 1},   // stride (ktrsc)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L356** `    {8000, 8000, 800, 80, 1},   // stride (nzpqk)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L357** `    {0, 0, 0},                  // padding lower (pad_d, pad_h, pad_w)`
+  - **EN**: Stores the lower-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在低侧的 padding 值。
+- **L358** `    {0, 0, 0},                  // padding upper (pad_d, pad_h, pad_w)`
+  - **EN**: Stores the upper-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在高侧的 padding 值。
+- **L359** `    {1, 1, 1},                  // stride (stride_d, stride_h, stride_w)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L360** `    {1, 1, 1},                  // dilation (dilation_d, dilation_h, dilation_w)`
+  - **EN**: Stores the dilation values for this problem shape.
+  - **CN**: 记录该问题形状的 dilation 值。
+- **L361** `    1                           // group`
+  - **EN**: Stores the convolution group count for this test problem.
+  - **CN**: 记录该测试问题的卷积分组数量。
+- **L362** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L363** `  // Filter-K = 16 for predication`
+  - **EN**: Comment explaining: Filter-K = 16 for predication.
+  - **CN**: 说明性注释：Filter-K = 16 for predication。
+- **L364** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L365** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L366** `    {1,  1, 8, 8, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L367** `    {16, 1, 1, 1, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L368** `    {0, 0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L369** `    {0, 0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L370** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L371** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L372** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L373** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L374** `  // N = 7 and K = 256 for a larger grid`
+  - **EN**: Comment explaining: N = 7 and K = 256 for a larger grid.
+  - **CN**: 说明性注释：N = 7 and K = 256 for a larger grid。
+- **L375** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+
+### Lines 376-400 / 第376-400行
+
+- **L376** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L377** `    {2,  1, 8, 8, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L378** `    {96, 1, 1, 1, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L379** `    {0, 0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L380** `    {0, 0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L381** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L382** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L383** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L384** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L385** `  // Filter 3x3x3 + no padding`
+  - **EN**: Comment explaining: Filter 3x3x3 + no padding.
+  - **CN**: 说明性注释：Filter 3x3x3 + no padding。
+- **L386** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L387** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L388** `    {2,  3, 5, 8, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L389** `    {96, 3, 3, 3, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L390** `    {0, 0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L391** `    {0, 0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L392** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L393** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L394** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L395** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L396** `  // Filter 3x3x3 + symmetric padding with c % cta_k !=0`
+  - **EN**: Comment explaining: Filter 3x3x3 + symmetric padding with c % cta_k !=0.
+  - **CN**: 说明性注释：Filter 3x3x3 + symmetric padding with c % cta_k !=0。
+- **L397** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L398** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L399** `    {2,  3, 5, 8, 32},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L400** `    {96, 3, 3, 3, 32},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+
+### Lines 401-425 / 第401-425行
+
+- **L401** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L402** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L403** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L404** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L405** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L406** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L407** `  // Filter 3x4x5 + symmetric padding 111`
+  - **EN**: Comment explaining: Filter 3x4x5 + symmetric padding 111.
+  - **CN**: 说明性注释：Filter 3x4x5 + symmetric padding 111。
+- **L408** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L409** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L410** `    {2,  3, 5, 8, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L411** `    {96, 3, 4, 5, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L412** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L413** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L414** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L415** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L416** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L417** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L418** `  // Filter 3x4x5 + asymmetric padding 102/010`
+  - **EN**: Comment explaining: Filter 3x4x5 + asymmetric padding 102/010.
+  - **CN**: 说明性注释：Filter 3x4x5 + asymmetric padding 102/010。
+- **L419** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L420** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L421** `    {2,  3, 5, 8, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L422** `    {96, 3, 4, 5, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L423** `    {1, 0, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L424** `    {0, 2, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L425** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+
+### Lines 426-450 / 第426-450行
+
+- **L426** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L427** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L428** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L429** `  // Filter 3x4x5 + asymmetric padding 102/010, w/ stride`
+  - **EN**: Comment explaining: Filter 3x4x5 + asymmetric padding 102/010, w/ stride.
+  - **CN**: 说明性注释：Filter 3x4x5 + asymmetric padding 102/010, w/ stride。
+- **L430** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L431** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L432** `    {2,  16, 10, 16, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L433** `    {96, 3, 4, 5, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L434** `    {1, 0, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L435** `    {0, 2, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L436** `    {2, 2, 3},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L437** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L438** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L439** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L440** `  // Filter 3x4x5 + asymmetric padding 102/010, w/ dilation`
+  - **EN**: Comment explaining: Filter 3x4x5 + asymmetric padding 102/010, w/ dilation.
+  - **CN**: 说明性注释：Filter 3x4x5 + asymmetric padding 102/010, w/ dilation。
+- **L441** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L442** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L443** `    {2,  16, 10, 16, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L444** `    {96, 3,  4,  5,  64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L445** `    {1, 0, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L446** `    {0, 2, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L447** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L448** `    {2, 2, 3},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L449** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L450** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+
+### Lines 451-475 / 第451-475行
+
+- **L451** `  // Filter 3x4x5 + asymmetric padding 102/010, w/ stride, w/ dilation`
+  - **EN**: Comment explaining: Filter 3x4x5 + asymmetric padding 102/010, w/ stride, w/ dilation.
+  - **CN**: 说明性注释：Filter 3x4x5 + asymmetric padding 102/010, w/ stride, w/ dilation。
+- **L452** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L453** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L454** `    {2,  16, 10, 16, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L455** `    {96, 3,  4,  5,  64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L456** `    {1, 0, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L457** `    {0, 2, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L458** `    {2, 2, 3},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L459** `    {2, 2, 3},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L460** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L461** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L462** `  return problem_shapes;`
+  - **EN**: Returns the computed value from the current function.
+  - **CN**: 从当前函数返回计算结果。
+- **L463** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L464** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L465** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L466** `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L467** `// Wgrad`
+  - **EN**: Comment explaining: Wgrad.
+  - **CN**: 说明性注释：Wgrad。
+- **L468** `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L469** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L470** `// Specialization for 1D wgrad problems`
+  - **EN**: Comment explaining: Specialization for 1D wgrad problems.
+  - **CN**: 说明性注释：Specialization for 1D wgrad problems。
+- **L471** `template<>`
+  - **EN**: Declares template parameters for the following type or function.
+  - **CN**: 为后续类型或函数声明模板参数。
+- **L472** `std::vector<cutlass::conv::ConvProblemShape<cutlass::conv::Operator::kWgrad, 1>> inline`
+  - **EN**: References the templated convolution problem-shape type.
+  - **CN**: 引用模板化的卷积问题形状类型。
+- **L473** `get_conv_problem_vector<1, cutlass::conv::Operator::kWgrad>() {`
+  - **EN**: Starts a constructor or function definition.
+  - **CN**: 开始定义一个构造函数或函数。
+- **L474** `  using ProblemShape = cutlass::conv::ConvProblemShape<cutlass::conv::Operator::kWgrad, 1>;`
+  - **EN**: Aliases the convolution problem-shape type consumed by the universal kernel.
+  - **CN**: 为通用卷积内核要消费的问题形状类型创建别名。
+- **L475** `  std::vector<ProblemShape> problem_shapes;`
+  - **EN**: Declares the vector that will collect convolution problem shapes for the test sweep.
+  - **CN**: 声明用于收集卷积问题形状、供测试遍历使用的向量。
+
+### Lines 476-500 / 第476-500行
+
+- **L476** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L477** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L478** `    {1,  8, 64},  // nwc`
+  - **EN**: Stores the tensor extents or strides labelled `nwc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `nwc` 的张量尺寸或步长。
+- **L479** `    {64, 1, 64},  // ksc`
+  - **EN**: Stores the tensor extents or strides labelled `ksc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `ksc` 的张量尺寸或步长。
+- **L480** `    {0},          // padding lower (pad_w)`
+  - **EN**: Stores the lower-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在低侧的 padding 值。
+- **L481** `    {0},          // padding upper (pad_w)`
+  - **EN**: Stores the upper-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在高侧的 padding 值。
+- **L482** `    {1},          // stride (stride_w)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L483** `    {1},          // dilation (dilation_w)`
+  - **EN**: Stores the dilation values for this problem shape.
+  - **CN**: 记录该问题形状的 dilation 值。
+- **L484** `    1             // group`
+  - **EN**: Stores the convolution group count for this test problem.
+  - **CN**: 记录该测试问题的卷积分组数量。
+- **L485** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L486** `  // Filter-K = 16 for predication`
+  - **EN**: Comment explaining: Filter-K = 16 for predication.
+  - **CN**: 说明性注释：Filter-K = 16 for predication。
+- **L487** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L488** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L489** `    {1, 8, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L490** `    {16,1, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L491** `    {0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L492** `    {0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L493** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L494** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L495** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L496** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L497** `  // N = 2 and K = 128 for a larger grid`
+  - **EN**: Comment explaining: N = 2 and K = 128 for a larger grid.
+  - **CN**: 说明性注释：N = 2 and K = 128 for a larger grid。
+- **L498** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L499** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L500** `    {2,  8, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+
+### Lines 501-525 / 第501-525行
+
+- **L501** `    {96, 1, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L502** `    {0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L503** `    {0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L504** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L505** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L506** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L507** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L508** `  // N = 7 and K = 256 for a even larger grid`
+  - **EN**: Comment explaining: N = 7 and K = 256 for a even larger grid.
+  - **CN**: 说明性注释：N = 7 and K = 256 for a even larger grid。
+- **L509** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L510** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L511** `    {7,   8, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L512** `    {256, 1, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L513** `    {0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L514** `    {0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L515** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L516** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L517** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L518** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L519** `  // 3 filter, no padding`
+  - **EN**: Comment explaining: 3 filter, no padding.
+  - **CN**: 说明性注释：3 filter, no padding。
+- **L520** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L521** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L522** `    {2,   8, 32},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L523** `    {256, 3, 32},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L524** `    {0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L525** `    {0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+
+### Lines 526-550 / 第526-550行
+
+- **L526** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L527** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L528** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L529** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L530** `  // 3 filter, symmetric padding`
+  - **EN**: Comment explaining: 3 filter, symmetric padding.
+  - **CN**: 说明性注释：3 filter, symmetric padding。
+- **L531** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L532** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L533** `    {2,   8, 32},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L534** `    {256, 3, 32},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L535** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L536** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L537** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L538** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L539** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L540** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L541** `  // 4 filter, asymmetric padding`
+  - **EN**: Comment explaining: 4 filter, asymmetric padding.
+  - **CN**: 说明性注释：4 filter, asymmetric padding。
+- **L542** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L543** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L544** `    {2,   8, 32},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L545** `    {256, 4, 32},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L546** `    {0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L547** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L548** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L549** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L550** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+
+### Lines 551-575 / 第551-575行
+
+- **L551** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L552** `  // 3 filter, asymmetric padding and tstride of 2`
+  - **EN**: Comment explaining: 3 filter, asymmetric padding and tstride of 2.
+  - **CN**: 说明性注释：3 filter, asymmetric padding and tstride of 2。
+- **L553** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L554** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L555** `    {2,   8, 32},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L556** `    {256, 3, 32},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L557** `    {0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L558** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L559** `    {2},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L560** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L561** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L562** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L563** `  // 3 filter, asymmetric padding and dilation of 2`
+  - **EN**: Comment explaining: 3 filter, asymmetric padding and dilation of 2.
+  - **CN**: 说明性注释：3 filter, asymmetric padding and dilation of 2。
+- **L564** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L565** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L566** `    {2,   8, 32},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L567** `    {256, 3, 32},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L568** `    {0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L569** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L570** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L571** `    {2},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L572** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L573** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L574** `  // To test streamk, equals to gemm-MxNxK size 128x640x2048`
+  - **EN**: Comment explaining: To test streamk, equals to gemm-MxNxK size 128x640x2048.
+  - **CN**: 说明性注释：To test streamk, equals to gemm-MxNxK size 128x640x2048。
+- **L575** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+
+### Lines 576-600 / 第576-600行
+
+- **L576** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L577** `    {2,   1024, 128},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L578** `    {640, 1,    128},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L579** `    {0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L580** `    {0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L581** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L582** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L583** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L584** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L585** `  // To test streamk, equals to gemm-MxNxK size 128x640x2080`
+  - **EN**: Comment explaining: To test streamk, equals to gemm-MxNxK size 128x640x2080.
+  - **CN**: 说明性注释：To test streamk, equals to gemm-MxNxK size 128x640x2080。
+- **L586** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L587** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L588** `    {2,   1040, 128},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L589** `    {640, 1,    128},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L590** `    {0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L591** `    {0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L592** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L593** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L594** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L595** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L596** `  return problem_shapes;`
+  - **EN**: Returns the computed value from the current function.
+  - **CN**: 从当前函数返回计算结果。
+- **L597** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L598** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L599** `// Specialization for 2D wgrad problems`
+  - **EN**: Comment explaining: Specialization for 2D wgrad problems.
+  - **CN**: 说明性注释：Specialization for 2D wgrad problems。
+- **L600** `template<>`
+  - **EN**: Declares template parameters for the following type or function.
+  - **CN**: 为后续类型或函数声明模板参数。
+
+### Lines 601-625 / 第601-625行
+
+- **L601** `std::vector<cutlass::conv::ConvProblemShape<cutlass::conv::Operator::kWgrad, 2>> inline`
+  - **EN**: References the templated convolution problem-shape type.
+  - **CN**: 引用模板化的卷积问题形状类型。
+- **L602** `get_conv_problem_vector<2, cutlass::conv::Operator::kWgrad>() {`
+  - **EN**: Starts a constructor or function definition.
+  - **CN**: 开始定义一个构造函数或函数。
+- **L603** `  using ProblemShape = cutlass::conv::ConvProblemShape<cutlass::conv::Operator::kWgrad, 2>;`
+  - **EN**: Aliases the convolution problem-shape type consumed by the universal kernel.
+  - **CN**: 为通用卷积内核要消费的问题形状类型创建别名。
+- **L604** `  std::vector<ProblemShape> problem_shapes;`
+  - **EN**: Declares the vector that will collect convolution problem shapes for the test sweep.
+  - **CN**: 声明用于收集卷积问题形状、供测试遍历使用的向量。
+- **L605** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L606** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L607** `    {1,  8, 8, 64},  // nhwc`
+  - **EN**: Stores the tensor extents or strides labelled `nhwc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `nhwc` 的张量尺寸或步长。
+- **L608** `    {64, 1, 1, 64},  // krsc`
+  - **EN**: Stores the tensor extents or strides labelled `krsc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `krsc` 的张量尺寸或步长。
+- **L609** `    {0, 0},          // padding lower (pad_h, pad_w)`
+  - **EN**: Stores the lower-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在低侧的 padding 值。
+- **L610** `    {0, 0},          // padding upper (pad_h, pad_w)`
+  - **EN**: Stores the upper-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在高侧的 padding 值。
+- **L611** `    {1, 1},          // stride (stride_h, stride_w)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L612** `    {1, 1},          // dilation (dilation_h, dilation_w)`
+  - **EN**: Stores the dilation values for this problem shape.
+  - **CN**: 记录该问题形状的 dilation 值。
+- **L613** `    1                // group`
+  - **EN**: Stores the convolution group count for this test problem.
+  - **CN**: 记录该测试问题的卷积分组数量。
+- **L614** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L615** `  // Filter-K = 16 for predication`
+  - **EN**: Comment explaining: Filter-K = 16 for predication.
+  - **CN**: 说明性注释：Filter-K = 16 for predication。
+- **L616** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L617** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L618** `    {1,  8, 8, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L619** `    {16, 1, 1, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L620** `    {0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L621** `    {0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L622** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L623** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L624** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L625** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+
+### Lines 626-650 / 第626-650行
+
+- **L626** `  // N = 2 and K = 128 for a larger grid`
+  - **EN**: Comment explaining: N = 2 and K = 128 for a larger grid.
+  - **CN**: 说明性注释：N = 2 and K = 128 for a larger grid。
+- **L627** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L628** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L629** `    {2,  8, 8, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L630** `    {96, 1, 1, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L631** `    {0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L632** `    {0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L633** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L634** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L635** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L636** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L637** `  // N = 7 and K = 256 for a even larger grid`
+  - **EN**: Comment explaining: N = 7 and K = 256 for a even larger grid.
+  - **CN**: 说明性注释：N = 7 and K = 256 for a even larger grid。
+- **L638** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L639** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L640** `    {7,   8, 8, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L641** `    {256, 1, 1, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L642** `    {0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L643** `    {0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L644** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L645** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L646** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L647** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L648** `  // 3x3 filter, no padding`
+  - **EN**: Comment explaining: 3x3 filter, no padding.
+  - **CN**: 说明性注释：3x3 filter, no padding。
+- **L649** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L650** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+
+### Lines 651-675 / 第651-675行
+
+- **L651** `    {2,   8, 8, 32},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L652** `    {256, 3, 3, 32},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L653** `    {0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L654** `    {0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L655** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L656** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L657** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L658** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L659** `  // 3x3 filter, symmetric padding`
+  - **EN**: Comment explaining: 3x3 filter, symmetric padding.
+  - **CN**: 说明性注释：3x3 filter, symmetric padding。
+- **L660** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L661** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L662** `    {2,   8, 8, 32},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L663** `    {256, 3, 3, 32},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L664** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L665** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L666** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L667** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L668** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L669** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L670** `  // 2x5 filter, asymmetric padding 1,0/1,0`
+  - **EN**: Comment explaining: 2x5 filter, asymmetric padding 1,0/1,0.
+  - **CN**: 说明性注释：2x5 filter, asymmetric padding 1,0/1,0。
+- **L671** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L672** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L673** `    {2,   8, 8, 32},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L674** `    {256, 2, 5, 32},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L675** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+
+### Lines 676-700 / 第676-700行
+
+- **L676** `    {0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L677** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L678** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L679** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L680** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L681** `  // 2x5 filter, asymmetric padding 1,0/1,0, w/ stride`
+  - **EN**: Comment explaining: 2x5 filter, asymmetric padding 1,0/1,0, w/ stride.
+  - **CN**: 说明性注释：2x5 filter, asymmetric padding 1,0/1,0, w/ stride。
+- **L682** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L683** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L684** `    {2,   15, 16, 32},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L685** `    {256, 2,  5,  32},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L686** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L687** `    {0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L688** `    {2, 3},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L689** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L690** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L691** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L692** `  // 2x5 filter, asymmetric padding 1,0/1,0, w/ dilation`
+  - **EN**: Comment explaining: 2x5 filter, asymmetric padding 1,0/1,0, w/ dilation.
+  - **CN**: 说明性注释：2x5 filter, asymmetric padding 1,0/1,0, w/ dilation。
+- **L693** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L694** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L695** `    {2,   16, 16, 32},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L696** `    {256, 2,  5,  32},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L697** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L698** `    {0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L699** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L700** `    {2, 3},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+
+### Lines 701-725 / 第701-725行
+
+- **L701** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L702** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L703** `  // 2x5 filter, asymmetric padding 1,0/1,0, w/ stride, w/ dilation`
+  - **EN**: Comment explaining: 2x5 filter, asymmetric padding 1,0/1,0, w/ stride, w/ dilation.
+  - **CN**: 说明性注释：2x5 filter, asymmetric padding 1,0/1,0, w/ stride, w/ dilation。
+- **L704** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L705** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L706** `    {2,   16, 15, 32},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L707** `    {256, 2,  5,  32},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L708** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L709** `    {0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L710** `    {2, 3},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L711** `    {2, 3},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L712** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L713** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L714** `  // To test streamk, equals to gemm-MxNxK size 128x640x2048`
+  - **EN**: Comment explaining: To test streamk, equals to gemm-MxNxK size 128x640x2048.
+  - **CN**: 说明性注释：To test streamk, equals to gemm-MxNxK size 128x640x2048。
+- **L715** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L716** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L717** `    {2,   64, 16, 128},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L718** `    {640, 1,  1,  128},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L719** `    {0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L720** `    {0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L721** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L722** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L723** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L724** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L725** `  // To test streamk, equals to gemm-MxNxK size 128x640x2080`
+  - **EN**: Comment explaining: To test streamk, equals to gemm-MxNxK size 128x640x2080.
+  - **CN**: 说明性注释：To test streamk, equals to gemm-MxNxK size 128x640x2080。
+
+### Lines 726-750 / 第726-750行
+
+- **L726** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L727** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L728** `    {2,   65, 16, 128},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L729** `    {640, 1,  1,  128},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L730** `    {0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L731** `    {0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L732** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L733** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L734** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L735** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L736** `  return problem_shapes;`
+  - **EN**: Returns the computed value from the current function.
+  - **CN**: 从当前函数返回计算结果。
+- **L737** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L738** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L739** `// Specialization for 3D wgrad problems`
+  - **EN**: Comment explaining: Specialization for 3D wgrad problems.
+  - **CN**: 说明性注释：Specialization for 3D wgrad problems。
+- **L740** `template<>`
+  - **EN**: Declares template parameters for the following type or function.
+  - **CN**: 为后续类型或函数声明模板参数。
+- **L741** `std::vector<cutlass::conv::ConvProblemShape<cutlass::conv::Operator::kWgrad, 3>> inline`
+  - **EN**: References the templated convolution problem-shape type.
+  - **CN**: 引用模板化的卷积问题形状类型。
+- **L742** `get_conv_problem_vector<3, cutlass::conv::Operator::kWgrad>() {`
+  - **EN**: Starts a constructor or function definition.
+  - **CN**: 开始定义一个构造函数或函数。
+- **L743** `  using ProblemShape = cutlass::conv::ConvProblemShape<cutlass::conv::Operator::kWgrad, 3>;`
+  - **EN**: Aliases the convolution problem-shape type consumed by the universal kernel.
+  - **CN**: 为通用卷积内核要消费的问题形状类型创建别名。
+- **L744** `  std::vector<ProblemShape> problem_shapes;`
+  - **EN**: Declares the vector that will collect convolution problem shapes for the test sweep.
+  - **CN**: 声明用于收集卷积问题形状、供测试遍历使用的向量。
+- **L745** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L746** `     cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L747** `     {2,  1, 8, 8, 64},  // ndhwc`
+  - **EN**: Stores the tensor extents or strides labelled `ndhwc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `ndhwc` 的张量尺寸或步长。
+- **L748** `     {64, 1, 1, 1, 64},  // ktrsc`
+  - **EN**: Stores the tensor extents or strides labelled `ktrsc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `ktrsc` 的张量尺寸或步长。
+- **L749** `     {0, 0, 0},          // padding lower (pad_d, pad_h, pad_w)`
+  - **EN**: Stores the lower-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在低侧的 padding 值。
+- **L750** `     {0, 0, 0},          // padding upper (pad_d, pad_h, pad_w)`
+  - **EN**: Stores the upper-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在高侧的 padding 值。
+
+### Lines 751-775 / 第751-775行
+
+- **L751** `     {1, 1, 1},          // stride (stride_d, stride_h, stride_w)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L752** `     {1, 1, 1},          // dilation (dilation_d, dilation_h, dilation_w)`
+  - **EN**: Stores the dilation values for this problem shape.
+  - **CN**: 记录该问题形状的 dilation 值。
+- **L753** `     1                   // group`
+  - **EN**: Stores the convolution group count for this test problem.
+  - **CN**: 记录该测试问题的卷积分组数量。
+- **L754** `   });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L755** `  // Filter 3x3x3 + no padding`
+  - **EN**: Comment explaining: Filter 3x3x3 + no padding.
+  - **CN**: 说明性注释：Filter 3x3x3 + no padding。
+- **L756** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L757** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L758** `    {2,  3, 5, 8, 32},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L759** `    {96, 3, 3, 3, 32},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L760** `    {0, 0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L761** `    {0, 0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L762** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L763** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L764** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L765** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L766** `  // Filter 3x4x5 + asymmetric padding 102/010`
+  - **EN**: Comment explaining: Filter 3x4x5 + asymmetric padding 102/010.
+  - **CN**: 说明性注释：Filter 3x4x5 + asymmetric padding 102/010。
+- **L767** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L768** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L769** `    {2,  3, 5, 8, 32},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L770** `    {96, 3, 4, 5, 32},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L771** `    {1, 0, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L772** `    {0, 2, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L773** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L774** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L775** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+
+### Lines 776-800 / 第776-800行
+
+- **L776** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L777** `  // Filter 3x4x5 + asymmetric padding 102/010, w/ stride`
+  - **EN**: Comment explaining: Filter 3x4x5 + asymmetric padding 102/010, w/ stride.
+  - **CN**: 说明性注释：Filter 3x4x5 + asymmetric padding 102/010, w/ stride。
+- **L778** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L779** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L780** `    {2,  16, 10, 16, 32},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L781** `    {96, 3,  4,  5,  32},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L782** `    {1, 0, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L783** `    {0, 2, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L784** `    {2, 2, 3},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L785** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L786** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L787** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L788** `  // Filter 3x4x5 + asymmetric padding 102/010, w/ dilation`
+  - **EN**: Comment explaining: Filter 3x4x5 + asymmetric padding 102/010, w/ dilation.
+  - **CN**: 说明性注释：Filter 3x4x5 + asymmetric padding 102/010, w/ dilation。
+- **L789** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L790** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L791** `    {2,  16, 10, 16, 32},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L792** `    {96, 3,  4,  5,  32},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L793** `    {1, 0, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L794** `    {0, 2, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L795** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L796** `    {2, 2, 3},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L797** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L798** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L799** `  // To test streamk, equals to gemm-MxNxK size 128x640x2048`
+  - **EN**: Comment explaining: To test streamk, equals to gemm-MxNxK size 128x640x2048.
+  - **CN**: 说明性注释：To test streamk, equals to gemm-MxNxK size 128x640x2048。
+- **L800** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+
+### Lines 801-825 / 第801-825行
+
+- **L801** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L802** `    {2,   1, 64, 16, 128},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L803** `    {640, 1, 1,  1,  128},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L804** `    {0, 0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L805** `    {0, 0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L806** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L807** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L808** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L809** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L810** `  // To test streamk, equals to gemm-MxNxK size 128x640x2080`
+  - **EN**: Comment explaining: To test streamk, equals to gemm-MxNxK size 128x640x2080.
+  - **CN**: 说明性注释：To test streamk, equals to gemm-MxNxK size 128x640x2080。
+- **L811** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L812** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L813** `    {2,   1, 65, 16, 128},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L814** `    {640, 1, 1,  1,  128},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L815** `    {0, 0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L816** `    {0, 0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L817** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L818** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L819** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L820** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L821** `  return problem_shapes;`
+  - **EN**: Returns the computed value from the current function.
+  - **CN**: 从当前函数返回计算结果。
+- **L822** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L823** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L824** `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L825** `// Grouped Wgrad`
+  - **EN**: Comment explaining: Grouped Wgrad.
+  - **CN**: 说明性注释：Grouped Wgrad。
+
+### Lines 826-850 / 第826-850行
+
+- **L826** `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L827** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L828** `// Get problem size vectors for group conv problems`
+  - **EN**: Comment explaining: Get problem size vectors for group conv problems.
+  - **CN**: 说明性注释：Get problem size vectors for group conv problems。
+- **L829** `template<int SpatialDim, cutlass::conv::Operator ConvOp>`
+  - **EN**: Declares template parameters for the following type or function.
+  - **CN**: 为后续类型或函数声明模板参数。
+- **L830** `std::vector<cutlass::conv::ConvProblemShape<ConvOp, SpatialDim>>`
+  - **EN**: References the templated convolution problem-shape type.
+  - **CN**: 引用模板化的卷积问题形状类型。
+- **L831** `inline`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L832** `get_grouped_conv_problem_vector(int GroupsPerTile);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L833** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L834** `// Specialization for 3D wgrad problems`
+  - **EN**: Comment explaining: Specialization for 3D wgrad problems.
+  - **CN**: 说明性注释：Specialization for 3D wgrad problems。
+- **L835** `template<>`
+  - **EN**: Declares template parameters for the following type or function.
+  - **CN**: 为后续类型或函数声明模板参数。
+- **L836** `std::vector<cutlass::conv::ConvProblemShape<cutlass::conv::Operator::kWgrad, 3>> inline`
+  - **EN**: References the templated convolution problem-shape type.
+  - **CN**: 引用模板化的卷积问题形状类型。
+- **L837** `get_grouped_conv_problem_vector<3, cutlass::conv::Operator::kWgrad>(int GroupsPerTile) {`
+  - **EN**: Starts a constructor or function definition.
+  - **CN**: 开始定义一个构造函数或函数。
+- **L838** `  using ProblemShape = cutlass::conv::ConvProblemShape<cutlass::conv::Operator::kWgrad, 3>;`
+  - **EN**: Aliases the convolution problem-shape type consumed by the universal kernel.
+  - **CN**: 为通用卷积内核要消费的问题形状类型创建别名。
+- **L839** `  std::vector<ProblemShape> problem_shapes;`
+  - **EN**: Declares the vector that will collect convolution problem shapes for the test sweep.
+  - **CN**: 声明用于收集卷积问题形状、供测试遍历使用的向量。
+- **L840** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L841** `  if (GroupsPerTile == 1) {`
+  - **EN**: Begins a conditional branch.
+  - **CN**: 开始一个条件分支。
+- **L842** `    // channel_per_group == 64`
+  - **EN**: Comment explaining: channel_per_group == 64.
+  - **CN**: 说明性注释：channel_per_group == 64。
+- **L843** `    problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L844** `      cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L845** `      {1, 1, 16, 16, 2048}, // ndhwc`
+  - **EN**: Stores the tensor extents or strides labelled `ndhwc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `ndhwc` 的张量尺寸或步长。
+- **L846** `      {2048, 1, 3, 3, 64},  // ktrsc`
+  - **EN**: Stores the tensor extents or strides labelled `ktrsc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `ktrsc` 的张量尺寸或步长。
+- **L847** `      {0, 1, 1},            // padding lower (pad_d, pad_h, pad_w)`
+  - **EN**: Stores the lower-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在低侧的 padding 值。
+- **L848** `      {0, 1, 1},            // padding upper (pad_d, pad_h, pad_w)`
+  - **EN**: Stores the upper-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在高侧的 padding 值。
+- **L849** `      {1, 1, 1},            // stride (stride_d, stride_h, stride_w)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L850** `      {1, 1, 1},            // dilation (dilation_d, dilation_h, dilation_w)`
+  - **EN**: Stores the dilation values for this problem shape.
+  - **CN**: 记录该问题形状的 dilation 值。
+
+### Lines 851-875 / 第851-875行
+
+- **L851** `      32                    // groups`
+  - **EN**: Stores the convolution group count for this test problem.
+  - **CN**: 记录该测试问题的卷积分组数量。
+- **L852** `    });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L853** `  }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L854** `  else if (GroupsPerTile == 2) {`
+  - **EN**: Starts a constructor or function definition.
+  - **CN**: 开始定义一个构造函数或函数。
+- **L855** `    // channel_per_group == 32`
+  - **EN**: Comment explaining: channel_per_group == 32.
+  - **CN**: 说明性注释：channel_per_group == 32。
+- **L856** `    problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L857** `      cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L858** `      {1, 1, 16, 16, 1024}, // ndhwc`
+  - **EN**: Stores the tensor extents or strides labelled `ndhwc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `ndhwc` 的张量尺寸或步长。
+- **L859** `      {1024, 1, 3, 3, 32},  // ktrsc`
+  - **EN**: Stores the tensor extents or strides labelled `ktrsc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `ktrsc` 的张量尺寸或步长。
+- **L860** `      {0, 1, 1},            // padding lower (pad_d, pad_h, pad_w)`
+  - **EN**: Stores the lower-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在低侧的 padding 值。
+- **L861** `      {0, 1, 1},            // padding upper (pad_d, pad_h, pad_w)`
+  - **EN**: Stores the upper-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在高侧的 padding 值。
+- **L862** `      {1, 1, 1},            // stride (stride_d, stride_h, stride_w)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L863** `      {1, 1, 1},            // dilation (dilation_d, dilation_h, dilation_w)`
+  - **EN**: Stores the dilation values for this problem shape.
+  - **CN**: 记录该问题形状的 dilation 值。
+- **L864** `      32                    // groups`
+  - **EN**: Stores the convolution group count for this test problem.
+  - **CN**: 记录该测试问题的卷积分组数量。
+- **L865** `    });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L866** `  }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L867** `  else if (GroupsPerTile == 4) {`
+  - **EN**: Starts a constructor or function definition.
+  - **CN**: 开始定义一个构造函数或函数。
+- **L868** `    // channel_per_group == 16`
+  - **EN**: Comment explaining: channel_per_group == 16.
+  - **CN**: 说明性注释：channel_per_group == 16。
+- **L869** `    problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L870** `      cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L871** `      {1, 1, 16, 16, 512}, // ndhwc`
+  - **EN**: Stores the tensor extents or strides labelled `ndhwc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `ndhwc` 的张量尺寸或步长。
+- **L872** `      {512, 1, 3, 3, 16},  // ktrsc`
+  - **EN**: Stores the tensor extents or strides labelled `ktrsc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `ktrsc` 的张量尺寸或步长。
+- **L873** `      {0, 1, 1},           // padding lower (pad_d, pad_h, pad_w)`
+  - **EN**: Stores the lower-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在低侧的 padding 值。
+- **L874** `      {0, 1, 1},           // padding upper (pad_d, pad_h, pad_w)`
+  - **EN**: Stores the upper-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在高侧的 padding 值。
+- **L875** `      {1, 1, 1},           // stride (stride_d, stride_h, stride_w)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+
+### Lines 876-900 / 第876-900行
+
+- **L876** `      {1, 1, 1},           // dilation (dilation_d, dilation_h, dilation_w)`
+  - **EN**: Stores the dilation values for this problem shape.
+  - **CN**: 记录该问题形状的 dilation 值。
+- **L877** `      32                   // groups`
+  - **EN**: Stores the convolution group count for this test problem.
+  - **CN**: 记录该测试问题的卷积分组数量。
+- **L878** `    });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L879** `  }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L880** `  else if (GroupsPerTile == 8) {`
+  - **EN**: Starts a constructor or function definition.
+  - **CN**: 开始定义一个构造函数或函数。
+- **L881** `    // channel_per_group == 8`
+  - **EN**: Comment explaining: channel_per_group == 8.
+  - **CN**: 说明性注释：channel_per_group == 8。
+- **L882** `    problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L883** `      cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L884** `      {1, 1, 16, 16, 256},  // ndhwc`
+  - **EN**: Stores the tensor extents or strides labelled `ndhwc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `ndhwc` 的张量尺寸或步长。
+- **L885** `      {256, 1, 3, 3, 8},    // ktrsc`
+  - **EN**: Stores the tensor extents or strides labelled `ktrsc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `ktrsc` 的张量尺寸或步长。
+- **L886** `      {0, 1, 1},            // padding lower (pad_d, pad_h, pad_w)`
+  - **EN**: Stores the lower-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在低侧的 padding 值。
+- **L887** `      {0, 1, 1},            // padding upper (pad_d, pad_h, pad_w)`
+  - **EN**: Stores the upper-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在高侧的 padding 值。
+- **L888** `      {1, 1, 1},            // stride (stride_d, stride_h, stride_w)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L889** `      {1, 1, 1},            // dilation (dilation_d, dilation_h, dilation_w)`
+  - **EN**: Stores the dilation values for this problem shape.
+  - **CN**: 记录该问题形状的 dilation 值。
+- **L890** `      32                    // groups`
+  - **EN**: Stores the convolution group count for this test problem.
+  - **CN**: 记录该测试问题的卷积分组数量。
+- **L891** `    });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L892** `  }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L893** `  return problem_shapes;`
+  - **EN**: Returns the computed value from the current function.
+  - **CN**: 从当前函数返回计算结果。
+- **L894** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L895** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L896** `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L897** `// Unit Stride Dgrad`
+  - **EN**: Comment explaining: Unit Stride Dgrad.
+  - **CN**: 说明性注释：Unit Stride Dgrad。
+- **L898** `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L899** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L900** `// Specialization for 1D dgrad problems`
+  - **EN**: Comment explaining: Specialization for 1D dgrad problems.
+  - **CN**: 说明性注释：Specialization for 1D dgrad problems。
+
+### Lines 901-925 / 第901-925行
+
+- **L901** `template<>`
+  - **EN**: Declares template parameters for the following type or function.
+  - **CN**: 为后续类型或函数声明模板参数。
+- **L902** `std::vector<cutlass::conv::ConvProblemShape<cutlass::conv::Operator::kDgrad, 1>> inline`
+  - **EN**: References the templated convolution problem-shape type.
+  - **CN**: 引用模板化的卷积问题形状类型。
+- **L903** `get_conv_problem_vector<1, cutlass::conv::Operator::kDgrad, false>() {`
+  - **EN**: Starts a constructor or function definition.
+  - **CN**: 开始定义一个构造函数或函数。
+- **L904** `  using ProblemShape = cutlass::conv::ConvProblemShape<cutlass::conv::Operator::kDgrad, 1>;`
+  - **EN**: Aliases the convolution problem-shape type consumed by the universal kernel.
+  - **CN**: 为通用卷积内核要消费的问题形状类型创建别名。
+- **L905** `  std::vector<ProblemShape> problem_shapes;`
+  - **EN**: Declares the vector that will collect convolution problem shapes for the test sweep.
+  - **CN**: 声明用于收集卷积问题形状、供测试遍历使用的向量。
+- **L906** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L907** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L908** `    {1,  8, 64},  // nqk`
+  - **EN**: Stores the tensor extents or strides labelled `nqk` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `nqk` 的张量尺寸或步长。
+- **L909** `    {64, 1, 64},  // ksc`
+  - **EN**: Stores the tensor extents or strides labelled `ksc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `ksc` 的张量尺寸或步长。
+- **L910** `    {0},          // padding lower (pad_w)`
+  - **EN**: Stores the lower-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在低侧的 padding 值。
+- **L911** `    {0},          // padding upper (pad_w)`
+  - **EN**: Stores the upper-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在高侧的 padding 值。
+- **L912** `    {1},          // stride (stride_w)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L913** `    {1},          // dilation (dilation_w)`
+  - **EN**: Stores the dilation values for this problem shape.
+  - **CN**: 记录该问题形状的 dilation 值。
+- **L914** `    1             // group`
+  - **EN**: Stores the convolution group count for this test problem.
+  - **CN**: 记录该测试问题的卷积分组数量。
+- **L915** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L916** `  // non-packed input strides.`
+  - **EN**: Comment explaining: non-packed input strides..
+  - **CN**: 说明性注释：non-packed input strides.。
+- **L917** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L918** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L919** `    {1,   8,  64},  // nqk`
+  - **EN**: Stores the tensor extents or strides labelled `nqk` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `nqk` 的张量尺寸或步长。
+- **L920** `    {800, 80, 1},   // stride (nqk)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L921** `    {64,  1,  64},  // ksc`
+  - **EN**: Stores the tensor extents or strides labelled `ksc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `ksc` 的张量尺寸或步长。
+- **L922** `    {64,  64, 1},   // stride (ksc)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L923** `    {0},            // padding lower (pad_w)`
+  - **EN**: Stores the lower-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在低侧的 padding 值。
+- **L924** `    {0},            // padding upper (pad_w)`
+  - **EN**: Stores the upper-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在高侧的 padding 值。
+- **L925** `    {1},            // stride (stride_w)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+
+### Lines 926-950 / 第926-950行
+
+- **L926** `    {1},            // dilation (dilation_w)`
+  - **EN**: Stores the dilation values for this problem shape.
+  - **CN**: 记录该问题形状的 dilation 值。
+- **L927** `    1               // group`
+  - **EN**: Stores the convolution group count for this test problem.
+  - **CN**: 记录该测试问题的卷积分组数量。
+- **L928** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L929** `  // non-packed output strides.`
+  - **EN**: Comment explaining: non-packed output strides..
+  - **CN**: 说明性注释：non-packed output strides.。
+- **L930** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L931** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L932** `    {1,   8,  64},  // nqk`
+  - **EN**: Stores the tensor extents or strides labelled `nqk` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `nqk` 的张量尺寸或步长。
+- **L933** `    {512, 64, 1},   // stride (nqk)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L934** `    {64,  1,  64},  // ksc`
+  - **EN**: Stores the tensor extents or strides labelled `ksc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `ksc` 的张量尺寸或步长。
+- **L935** `    {64,  64, 1},   // stride (ksc)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L936** `    {800, 80, 1},   // stride (nwc)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L937** `    {0},            // padding lower (pad_w)`
+  - **EN**: Stores the lower-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在低侧的 padding 值。
+- **L938** `    {0},            // padding upper (pad_w)`
+  - **EN**: Stores the upper-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在高侧的 padding 值。
+- **L939** `    {1},            // stride (stride_w)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L940** `    {1},            // dilation (dilation_w)`
+  - **EN**: Stores the dilation values for this problem shape.
+  - **CN**: 记录该问题形状的 dilation 值。
+- **L941** `    1               // group`
+  - **EN**: Stores the convolution group count for this test problem.
+  - **CN**: 记录该测试问题的卷积分组数量。
+- **L942** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L943** `  // Filter-K = 16 for predication`
+  - **EN**: Comment explaining: Filter-K = 16 for predication.
+  - **CN**: 说明性注释：Filter-K = 16 for predication。
+- **L944** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L945** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L946** `    {1,  8, 16},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L947** `    {64, 1, 16},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L948** `    {0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L949** `    {0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L950** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+
+### Lines 951-975 / 第951-975行
+
+- **L951** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L952** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L953** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L954** `  // N = 2 and K = 128 for a larger grid`
+  - **EN**: Comment explaining: N = 2 and K = 128 for a larger grid.
+  - **CN**: 说明性注释：N = 2 and K = 128 for a larger grid。
+- **L955** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L956** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L957** `    {2,  8, 96},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L958** `    {64, 1, 96},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L959** `    {0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L960** `    {0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L961** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L962** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L963** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L964** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L965** `  // N = 7 and K = 256 for a even larger grid`
+  - **EN**: Comment explaining: N = 7 and K = 256 for a even larger grid.
+  - **CN**: 说明性注释：N = 7 and K = 256 for a even larger grid。
+- **L966** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L967** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L968** `    {7,  8, 256},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L969** `    {64, 1, 256},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L970** `    {0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L971** `    {0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L972** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L973** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L974** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L975** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+
+### Lines 976-1000 / 第976-1000行
+
+- **L976** `  // 3 filter, no padding`
+  - **EN**: Comment explaining: 3 filter, no padding.
+  - **CN**: 说明性注释：3 filter, no padding。
+- **L977** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L978** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L979** `    {2,  8, 256},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L980** `    {64, 3, 256},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L981** `    {0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L982** `    {0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L983** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L984** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L985** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L986** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L987** `  // 3 filter, symmetric padding with k % cta_k !=0`
+  - **EN**: Comment explaining: 3 filter, symmetric padding with k % cta_k !=0.
+  - **CN**: 说明性注释：3 filter, symmetric padding with k % cta_k !=0。
+- **L988** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L989** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L990** `    {2,  8, 256},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L991** `    {32, 3, 256},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L992** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L993** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L994** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L995** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L996** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L997** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L998** `  // 4 filter, asymmetric padding`
+  - **EN**: Comment explaining: 4 filter, asymmetric padding.
+  - **CN**: 说明性注释：4 filter, asymmetric padding。
+- **L999** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L1000** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+
+### Lines 1001-1025 / 第1001-1025行
+
+- **L1001** `    {2,  8, 256},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1002** `    {64, 4, 256},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1003** `    {0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1004** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1005** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1006** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1007** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1008** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L1009** `  // 3 filter, asymmetric padding and dilation of 2`
+  - **EN**: Comment explaining: 3 filter, asymmetric padding and dilation of 2.
+  - **CN**: 说明性注释：3 filter, asymmetric padding and dilation of 2。
+- **L1010** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L1011** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L1012** `    {2,   16, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1013** `    {256, 3,  64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1014** `    {0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1015** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1016** `    {1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1017** `    {2},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1018** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1019** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L1020** `  return problem_shapes;`
+  - **EN**: Returns the computed value from the current function.
+  - **CN**: 从当前函数返回计算结果。
+- **L1021** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L1022** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L1023** `// Specialization for 2D dgrad problems`
+  - **EN**: Comment explaining: Specialization for 2D dgrad problems.
+  - **CN**: 说明性注释：Specialization for 2D dgrad problems。
+- **L1024** `template<>`
+  - **EN**: Declares template parameters for the following type or function.
+  - **CN**: 为后续类型或函数声明模板参数。
+- **L1025** `std::vector<cutlass::conv::ConvProblemShape<cutlass::conv::Operator::kDgrad, 2>> inline`
+  - **EN**: References the templated convolution problem-shape type.
+  - **CN**: 引用模板化的卷积问题形状类型。
+
+### Lines 1026-1050 / 第1026-1050行
+
+- **L1026** `get_conv_problem_vector<2, cutlass::conv::Operator::kDgrad, false>() {`
+  - **EN**: Starts a constructor or function definition.
+  - **CN**: 开始定义一个构造函数或函数。
+- **L1027** `  using ProblemShape = cutlass::conv::ConvProblemShape<cutlass::conv::Operator::kDgrad, 2>;`
+  - **EN**: Aliases the convolution problem-shape type consumed by the universal kernel.
+  - **CN**: 为通用卷积内核要消费的问题形状类型创建别名。
+- **L1028** `  std::vector<ProblemShape> problem_shapes;`
+  - **EN**: Declares the vector that will collect convolution problem shapes for the test sweep.
+  - **CN**: 声明用于收集卷积问题形状、供测试遍历使用的向量。
+- **L1029** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L1030** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L1031** `    {1,  8, 8, 64},  // npqk`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1032** `    {64, 1, 1, 64},  // krsc`
+  - **EN**: Stores the tensor extents or strides labelled `krsc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `krsc` 的张量尺寸或步长。
+- **L1033** `    {0, 0},          // padding lower (pad_h, pad_w)`
+  - **EN**: Stores the lower-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在低侧的 padding 值。
+- **L1034** `    {0, 0},          // padding upper (pad_h, pad_w)`
+  - **EN**: Stores the upper-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在高侧的 padding 值。
+- **L1035** `    {1, 1},          // stride (stride_h, stride_w)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L1036** `    {1, 1},          // dilation (dilation_h, dilation_w)`
+  - **EN**: Stores the dilation values for this problem shape.
+  - **CN**: 记录该问题形状的 dilation 值。
+- **L1037** `    1                // group`
+  - **EN**: Stores the convolution group count for this test problem.
+  - **CN**: 记录该测试问题的卷积分组数量。
+- **L1038** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L1039** `  // non-packed input strides.`
+  - **EN**: Comment explaining: non-packed input strides..
+  - **CN**: 说明性注释：non-packed input strides.。
+- **L1040** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L1041** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L1042** `    {1,    8,   8,  64},  // npqk`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1043** `    {8000, 800, 80, 1},   // stride (npqk)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L1044** `    {64,   1,   1,  64},  // krsc`
+  - **EN**: Stores the tensor extents or strides labelled `krsc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `krsc` 的张量尺寸或步长。
+- **L1045** `    {64,   64,  64, 1},   // stride (krsc)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L1046** `    {0, 0},               // padding lower (pad_h, pad_w)`
+  - **EN**: Stores the lower-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在低侧的 padding 值。
+- **L1047** `    {0, 0},               // padding upper (pad_h, pad_w)`
+  - **EN**: Stores the upper-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在高侧的 padding 值。
+- **L1048** `    {1, 1},               // stride (stride_h, stride_w)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L1049** `    {1, 1},               // dilation (dilation_h, dilation_w)`
+  - **EN**: Stores the dilation values for this problem shape.
+  - **CN**: 记录该问题形状的 dilation 值。
+- **L1050** `    1                     // group`
+  - **EN**: Stores the convolution group count for this test problem.
+  - **CN**: 记录该测试问题的卷积分组数量。
+
+### Lines 1051-1075 / 第1051-1075行
+
+- **L1051** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L1052** `  // non-packed output strides.`
+  - **EN**: Comment explaining: non-packed output strides..
+  - **CN**: 说明性注释：non-packed output strides.。
+- **L1053** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L1054** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L1055** `    {1,    8,   8,  64},  // npqk`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1056** `    {4096, 512, 64, 1},   // stride (npqk)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L1057** `    {64,   1,   1,  64},  // krsc`
+  - **EN**: Stores the tensor extents or strides labelled `krsc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `krsc` 的张量尺寸或步长。
+- **L1058** `    {64,   64,  64, 1},   // stride (krsc)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L1059** `    {8000, 800, 80, 1},   // stride (nhwc)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L1060** `    {0, 0},               // padding lower (pad_h, pad_w)`
+  - **EN**: Stores the lower-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在低侧的 padding 值。
+- **L1061** `    {0, 0},               // padding upper (pad_h, pad_w)`
+  - **EN**: Stores the upper-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在高侧的 padding 值。
+- **L1062** `    {1, 1},               // stride (stride_h, stride_w)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L1063** `    {1, 1},               // dilation (dilation_h, dilation_w)`
+  - **EN**: Stores the dilation values for this problem shape.
+  - **CN**: 记录该问题形状的 dilation 值。
+- **L1064** `    1                     // group`
+  - **EN**: Stores the convolution group count for this test problem.
+  - **CN**: 记录该测试问题的卷积分组数量。
+- **L1065** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L1066** `  // Filter-K = 16 for predication`
+  - **EN**: Comment explaining: Filter-K = 16 for predication.
+  - **CN**: 说明性注释：Filter-K = 16 for predication。
+- **L1067** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L1068** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L1069** `    {1,  8, 8, 16},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1070** `    {64, 1, 1, 16},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1071** `    {0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1072** `    {0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1073** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1074** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1075** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+
+### Lines 1076-1100 / 第1076-1100行
+
+- **L1076** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L1077** `  // N = 2 and K = 128 for a larger grid`
+  - **EN**: Comment explaining: N = 2 and K = 128 for a larger grid.
+  - **CN**: 说明性注释：N = 2 and K = 128 for a larger grid。
+- **L1078** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L1079** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L1080** `    {2,  8, 8, 96},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1081** `    {64, 1, 1, 96},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1082** `    {0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1083** `    {0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1084** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1085** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1086** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1087** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L1088** `  // N = 7 and K = 256 for a even larger grid`
+  - **EN**: Comment explaining: N = 7 and K = 256 for a even larger grid.
+  - **CN**: 说明性注释：N = 7 and K = 256 for a even larger grid。
+- **L1089** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L1090** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L1091** `    {7,  8, 8, 256},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1092** `    {64, 1, 1, 256},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1093** `    {0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1094** `    {0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1095** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1096** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1097** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1098** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L1099** `  // 3x3 filter, no padding`
+  - **EN**: Comment explaining: 3x3 filter, no padding.
+  - **CN**: 说明性注释：3x3 filter, no padding。
+- **L1100** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+
+### Lines 1101-1125 / 第1101-1125行
+
+- **L1101** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L1102** `    {2,  8, 8, 256},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1103** `    {64, 3, 3, 256},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1104** `    {0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1105** `    {0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1106** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1107** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1108** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1109** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L1110** `  // 3x3 filter, symmetric padding with k % cta_k !=0`
+  - **EN**: Comment explaining: 3x3 filter, symmetric padding with k % cta_k !=0.
+  - **CN**: 说明性注释：3x3 filter, symmetric padding with k % cta_k !=0。
+- **L1111** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L1112** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L1113** `    {2,  8, 8, 256},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1114** `    {32, 3, 3, 256},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1115** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1116** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1117** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1118** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1119** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1120** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L1121** `  // 2x5 filter, asymmetric padding 1,0/1,0`
+  - **EN**: Comment explaining: 2x5 filter, asymmetric padding 1,0/1,0.
+  - **CN**: 说明性注释：2x5 filter, asymmetric padding 1,0/1,0。
+- **L1122** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L1123** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L1124** `    {2,  8, 8, 256},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1125** `    {64, 2, 5, 256},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+
+### Lines 1126-1150 / 第1126-1150行
+
+- **L1126** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1127** `    {0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1128** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1129** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1130** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1131** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L1132** `  // 2x5 filter, asymmetric padding 1,0/1,0, w/ dilation`
+  - **EN**: Comment explaining: 2x5 filter, asymmetric padding 1,0/1,0, w/ dilation.
+  - **CN**: 说明性注释：2x5 filter, asymmetric padding 1,0/1,0, w/ dilation。
+- **L1133** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L1134** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L1135** `    {2,   16, 16, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1136** `    {256, 2,  5,  64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1137** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1138** `    {0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1139** `    {1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1140** `    {2, 3},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1141** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1142** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L1143** `  return problem_shapes;`
+  - **EN**: Returns the computed value from the current function.
+  - **CN**: 从当前函数返回计算结果。
+- **L1144** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L1145** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L1146** `// Specialization for 3D dgrad problems`
+  - **EN**: Comment explaining: Specialization for 3D dgrad problems.
+  - **CN**: 说明性注释：Specialization for 3D dgrad problems。
+- **L1147** `template<>`
+  - **EN**: Declares template parameters for the following type or function.
+  - **CN**: 为后续类型或函数声明模板参数。
+- **L1148** `std::vector<cutlass::conv::ConvProblemShape<cutlass::conv::Operator::kDgrad, 3>> inline`
+  - **EN**: References the templated convolution problem-shape type.
+  - **CN**: 引用模板化的卷积问题形状类型。
+- **L1149** `get_conv_problem_vector<3, cutlass::conv::Operator::kDgrad, false>() {`
+  - **EN**: Starts a constructor or function definition.
+  - **CN**: 开始定义一个构造函数或函数。
+- **L1150** `  using ProblemShape = cutlass::conv::ConvProblemShape<cutlass::conv::Operator::kDgrad, 3>;`
+  - **EN**: Aliases the convolution problem-shape type consumed by the universal kernel.
+  - **CN**: 为通用卷积内核要消费的问题形状类型创建别名。
+
+### Lines 1151-1175 / 第1151-1175行
+
+- **L1151** `  std::vector<ProblemShape> problem_shapes;`
+  - **EN**: Declares the vector that will collect convolution problem shapes for the test sweep.
+  - **CN**: 声明用于收集卷积问题形状、供测试遍历使用的向量。
+- **L1152** `  // Filter-K = 16 for predication`
+  - **EN**: Comment explaining: Filter-K = 16 for predication.
+  - **CN**: 说明性注释：Filter-K = 16 for predication。
+- **L1153** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L1154** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L1155** `    {1,  1, 8, 8, 16},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1156** `    {64, 1, 1, 1, 16},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1157** `    {0, 0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1158** `    {0, 0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1159** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1160** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1161** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1162** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L1163** `  // non-packed input output strides.`
+  - **EN**: Comment explaining: non-packed input output strides..
+  - **CN**: 说明性注释：non-packed input output strides.。
+- **L1164** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L1165** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L1166** `    {1,    1,    8,   8,  64},  // nzpqk`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1167** `    {8000, 8000, 800, 80, 1},   // stride (nzpqk)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L1168** `    {64,   1,    1,   1,  64},  // ktrsc`
+  - **EN**: Stores the tensor extents or strides labelled `ktrsc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `ktrsc` 的张量尺寸或步长。
+- **L1169** `    {64,   64,   64,  64, 1},   // stride (ktrsc)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L1170** `    {8000, 8000, 800, 80, 1},   // stride (ndhwc)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L1171** `    {0, 0, 0},                  // padding lower (pad_d, pad_h, pad_w)`
+  - **EN**: Stores the lower-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在低侧的 padding 值。
+- **L1172** `    {0, 0, 0},                  // padding upper (pad_d, pad_h, pad_w)`
+  - **EN**: Stores the upper-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在高侧的 padding 值。
+- **L1173** `    {1, 1, 1},                  // stride (stride_d, stride_h, stride_w)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L1174** `    {1, 1, 1},                  // dilation (dilation_d, dilation_h, dilation_w)`
+  - **EN**: Stores the dilation values for this problem shape.
+  - **CN**: 记录该问题形状的 dilation 值。
+- **L1175** `    1                           // group`
+  - **EN**: Stores the convolution group count for this test problem.
+  - **CN**: 记录该测试问题的卷积分组数量。
+
+### Lines 1176-1200 / 第1176-1200行
+
+- **L1176** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L1177** `  // N = 7 and K = 256 for a larger grid`
+  - **EN**: Comment explaining: N = 7 and K = 256 for a larger grid.
+  - **CN**: 说明性注释：N = 7 and K = 256 for a larger grid。
+- **L1178** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L1179** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L1180** `    {2,  1, 8, 8, 96},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1181** `    {64, 1, 1, 1, 96},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1182** `    {0, 0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1183** `    {0, 0, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1184** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1185** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1186** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1187** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L1188** `  // Filter 3x4x5 + symmetric padding 111`
+  - **EN**: Comment explaining: Filter 3x4x5 + symmetric padding 111.
+  - **CN**: 说明性注释：Filter 3x4x5 + symmetric padding 111。
+- **L1189** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L1190** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L1191** `    {2,  3, 5, 8, 96},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1192** `    {64, 3, 4, 5, 96},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1193** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1194** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1195** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1196** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1197** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1198** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L1199** `  // Filter 3x4x5 + asymmetric padding 102/010`
+  - **EN**: Comment explaining: Filter 3x4x5 + asymmetric padding 102/010.
+  - **CN**: 说明性注释：Filter 3x4x5 + asymmetric padding 102/010。
+- **L1200** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+
+### Lines 1201-1225 / 第1201-1225行
+
+- **L1201** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L1202** `    {2,  3, 5, 8, 96},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1203** `    {64, 3, 4, 5, 96},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1204** `    {1, 0, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1205** `    {0, 2, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1206** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1207** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1208** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1209** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L1210** `  // Filter 3x4x5 + asymmetric padding 102/010, w/ dilation`
+  - **EN**: Comment explaining: Filter 3x4x5 + asymmetric padding 102/010, w/ dilation.
+  - **CN**: 说明性注释：Filter 3x4x5 + asymmetric padding 102/010, w/ dilation。
+- **L1211** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L1212** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L1213** `    {2,  16, 10, 16, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1214** `    {64, 3,  4,  5,  96},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1215** `    {1, 0, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1216** `    {0, 2, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1217** `    {1, 1, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1218** `    {2, 2, 3},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1219** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1220** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L1221** `  return problem_shapes;`
+  - **EN**: Returns the computed value from the current function.
+  - **CN**: 从当前函数返回计算结果。
+- **L1222** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L1223** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L1224** `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L1225** `// Strided Dgrad`
+  - **EN**: Comment explaining: Strided Dgrad.
+  - **CN**: 说明性注释：Strided Dgrad。
+
+### Lines 1226-1250 / 第1226-1250行
+
+- **L1226** `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L1227** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L1228** `// Specialization for 1D dgrad problems`
+  - **EN**: Comment explaining: Specialization for 1D dgrad problems.
+  - **CN**: 说明性注释：Specialization for 1D dgrad problems。
+- **L1229** `template<>`
+  - **EN**: Declares template parameters for the following type or function.
+  - **CN**: 为后续类型或函数声明模板参数。
+- **L1230** `std::vector<cutlass::conv::ConvProblemShape<cutlass::conv::Operator::kDgrad, 1>> inline`
+  - **EN**: References the templated convolution problem-shape type.
+  - **CN**: 引用模板化的卷积问题形状类型。
+- **L1231** `get_conv_problem_vector<1, cutlass::conv::Operator::kDgrad, true>() {`
+  - **EN**: Starts a constructor or function definition.
+  - **CN**: 开始定义一个构造函数或函数。
+- **L1232** `  using ProblemShape = cutlass::conv::ConvProblemShape<cutlass::conv::Operator::kDgrad, 1>;`
+  - **EN**: Aliases the convolution problem-shape type consumed by the universal kernel.
+  - **CN**: 为通用卷积内核要消费的问题形状类型创建别名。
+- **L1233** `  std::vector<ProblemShape> problem_shapes;`
+  - **EN**: Declares the vector that will collect convolution problem shapes for the test sweep.
+  - **CN**: 声明用于收集卷积问题形状、供测试遍历使用的向量。
+- **L1234** `  // Test TMA truncation`
+  - **EN**: Comment explaining: Test TMA truncation.
+  - **CN**: 说明性注释：Test TMA truncation。
+- **L1235** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L1236** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L1237** `    {1,  512, 64},  // nqk`
+  - **EN**: Stores the tensor extents or strides labelled `nqk` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `nqk` 的张量尺寸或步长。
+- **L1238** `    {64, 1, 64},  // ksc`
+  - **EN**: Stores the tensor extents or strides labelled `ksc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `ksc` 的张量尺寸或步长。
+- **L1239** `    {0},          // padding lower (pad_w)`
+  - **EN**: Stores the lower-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在低侧的 padding 值。
+- **L1240** `    {0},          // padding upper (pad_w)`
+  - **EN**: Stores the upper-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在高侧的 padding 值。
+- **L1241** `    {2},          // stride (stride_w)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L1242** `    {1},          // dilation (dilation_w)`
+  - **EN**: Stores the dilation values for this problem shape.
+  - **CN**: 记录该问题形状的 dilation 值。
+- **L1243** `    1             // group`
+  - **EN**: Stores the convolution group count for this test problem.
+  - **CN**: 记录该测试问题的卷积分组数量。
+- **L1244** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L1245** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L1246** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L1247** `    {1,  1024, 64},  // nqk`
+  - **EN**: Stores the tensor extents or strides labelled `nqk` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `nqk` 的张量尺寸或步长。
+- **L1248** `    {64, 1, 64},  // ksc`
+  - **EN**: Stores the tensor extents or strides labelled `ksc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `ksc` 的张量尺寸或步长。
+- **L1249** `    {0},          // padding lower (pad_w)`
+  - **EN**: Stores the lower-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在低侧的 padding 值。
+- **L1250** `    {0},          // padding upper (pad_w)`
+  - **EN**: Stores the upper-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在高侧的 padding 值。
+
+### Lines 1251-1275 / 第1251-1275行
+
+- **L1251** `    {4},          // stride (stride_w)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L1252** `    {1},          // dilation (dilation_w)`
+  - **EN**: Stores the dilation values for this problem shape.
+  - **CN**: 记录该问题形状的 dilation 值。
+- **L1253** `    1             // group`
+  - **EN**: Stores the convolution group count for this test problem.
+  - **CN**: 记录该测试问题的卷积分组数量。
+- **L1254** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L1255** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L1256** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L1257** `    {1,  2048, 64},  // nqk`
+  - **EN**: Stores the tensor extents or strides labelled `nqk` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `nqk` 的张量尺寸或步长。
+- **L1258** `    {64, 1, 64},  // ksc`
+  - **EN**: Stores the tensor extents or strides labelled `ksc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `ksc` 的张量尺寸或步长。
+- **L1259** `    {0},          // padding lower (pad_w)`
+  - **EN**: Stores the lower-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在低侧的 padding 值。
+- **L1260** `    {0},          // padding upper (pad_w)`
+  - **EN**: Stores the upper-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在高侧的 padding 值。
+- **L1261** `    {8},          // stride (stride_w)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L1262** `    {1},          // dilation (dilation_w)`
+  - **EN**: Stores the dilation values for this problem shape.
+  - **CN**: 记录该问题形状的 dilation 值。
+- **L1263** `    1             // group`
+  - **EN**: Stores the convolution group count for this test problem.
+  - **CN**: 记录该测试问题的卷积分组数量。
+- **L1264** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L1265** `  // non-packed input/output strides.`
+  - **EN**: Comment explaining: non-packed input/output strides..
+  - **CN**: 说明性注释：non-packed input/output strides.。
+- **L1266** `  // stride divides dilation`
+  - **EN**: Comment explaining: stride divides dilation.
+  - **CN**: 说明性注释：stride divides dilation。
+- **L1267** `  // asymmetric padding`
+  - **EN**: Comment explaining: asymmetric padding.
+  - **CN**: 说明性注释：asymmetric padding。
+- **L1268** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L1269** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L1270** `    {3,   8,  64},  // nqk`
+  - **EN**: Stores the tensor extents or strides labelled `nqk` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `nqk` 的张量尺寸或步长。
+- **L1271** `    {800, 80, 1},   // stride (nqk)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L1272** `    {64,  3,  64},  // ksc`
+  - **EN**: Stores the tensor extents or strides labelled `ksc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `ksc` 的张量尺寸或步长。
+- **L1273** `    {64,  64, 1},   // stride (ksc)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L1274** `    {800, 80, 1},   // stride (nwc)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L1275** `    {0},            // padding lower (pad_w)`
+  - **EN**: Stores the lower-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在低侧的 padding 值。
+
+### Lines 1276-1300 / 第1276-1300行
+
+- **L1276** `    {1},            // padding upper (pad_w)`
+  - **EN**: Stores the upper-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在高侧的 padding 值。
+- **L1277** `    {2},            // stride (stride_w)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L1278** `    {4},            // dilation (dilation_w)`
+  - **EN**: Stores the dilation values for this problem shape.
+  - **CN**: 记录该问题形状的 dilation 值。
+- **L1279** `    1               // group`
+  - **EN**: Stores the convolution group count for this test problem.
+  - **CN**: 记录该测试问题的卷积分组数量。
+- **L1280** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L1281** `  // non-packed input/output strides.`
+  - **EN**: Comment explaining: non-packed input/output strides..
+  - **CN**: 说明性注释：non-packed input/output strides.。
+- **L1282** `  // dilation divides stride`
+  - **EN**: Comment explaining: dilation divides stride.
+  - **CN**: 说明性注释：dilation divides stride。
+- **L1283** `  // asymmetric padding`
+  - **EN**: Comment explaining: asymmetric padding.
+  - **CN**: 说明性注释：asymmetric padding。
+- **L1284** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L1285** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L1286** `    {3,   8,  64},  // nqk`
+  - **EN**: Stores the tensor extents or strides labelled `nqk` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `nqk` 的张量尺寸或步长。
+- **L1287** `    {800, 80, 1},   // stride (nqk)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L1288** `    {64,  3,  64},  // ksc`
+  - **EN**: Stores the tensor extents or strides labelled `ksc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `ksc` 的张量尺寸或步长。
+- **L1289** `    {64,  64, 1},   // stride (ksc)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L1290** `    {800, 80, 1},   // stride (nwc)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L1291** `    {1},            // padding lower (pad_w)`
+  - **EN**: Stores the lower-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在低侧的 padding 值。
+- **L1292** `    {0},            // padding upper (pad_w)`
+  - **EN**: Stores the upper-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在高侧的 padding 值。
+- **L1293** `    {4},            // stride (stride_w)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L1294** `    {2},            // dilation (dilation_w)`
+  - **EN**: Stores the dilation values for this problem shape.
+  - **CN**: 记录该问题形状的 dilation 值。
+- **L1295** `    1               // group`
+  - **EN**: Stores the convolution group count for this test problem.
+  - **CN**: 记录该测试问题的卷积分组数量。
+- **L1296** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L1297** `  // non-packed input/output strides.`
+  - **EN**: Comment explaining: non-packed input/output strides..
+  - **CN**: 说明性注释：non-packed input/output strides.。
+- **L1298** `  // stride dilation dont divide`
+  - **EN**: Comment explaining: stride dilation dont divide.
+  - **CN**: 说明性注释：stride dilation dont divide。
+- **L1299** `  // asymmetric padding`
+  - **EN**: Comment explaining: asymmetric padding.
+  - **CN**: 说明性注释：asymmetric padding。
+- **L1300** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+
+### Lines 1301-1325 / 第1301-1325行
+
+- **L1301** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L1302** `    {3,   8,  64},  // nqk`
+  - **EN**: Stores the tensor extents or strides labelled `nqk` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `nqk` 的张量尺寸或步长。
+- **L1303** `    {800, 80, 1},   // stride (nqk)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L1304** `    {64,  3,  64},  // ksc`
+  - **EN**: Stores the tensor extents or strides labelled `ksc` for this problem shape.
+  - **CN**: 记录该问题形状中标记为 `ksc` 的张量尺寸或步长。
+- **L1305** `    {64,  64, 1},   // stride (ksc)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L1306** `    {800, 80, 1},   // stride (nwc)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L1307** `    {1},            // padding lower (pad_w)`
+  - **EN**: Stores the lower-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在低侧的 padding 值。
+- **L1308** `    {2},            // padding upper (pad_w)`
+  - **EN**: Stores the upper-side padding values for this problem shape.
+  - **CN**: 记录该问题形状在高侧的 padding 值。
+- **L1309** `    {2},            // stride (stride_w)`
+  - **EN**: Stores stride information for this problem shape.
+  - **CN**: 记录该问题形状的步幅信息。
+- **L1310** `    {3},            // dilation (dilation_w)`
+  - **EN**: Stores the dilation values for this problem shape.
+  - **CN**: 记录该问题形状的 dilation 值。
+- **L1311** `    1               // group`
+  - **EN**: Stores the convolution group count for this test problem.
+  - **CN**: 记录该测试问题的卷积分组数量。
+- **L1312** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L1313** `  return problem_shapes;`
+  - **EN**: Returns the computed value from the current function.
+  - **CN**: 从当前函数返回计算结果。
+- **L1314** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L1315** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L1316** `// Specialization for 2D dgrad problems`
+  - **EN**: Comment explaining: Specialization for 2D dgrad problems.
+  - **CN**: 说明性注释：Specialization for 2D dgrad problems。
+- **L1317** `template<>`
+  - **EN**: Declares template parameters for the following type or function.
+  - **CN**: 为后续类型或函数声明模板参数。
+- **L1318** `std::vector<cutlass::conv::ConvProblemShape<cutlass::conv::Operator::kDgrad, 2>> inline`
+  - **EN**: References the templated convolution problem-shape type.
+  - **CN**: 引用模板化的卷积问题形状类型。
+- **L1319** `get_conv_problem_vector<2, cutlass::conv::Operator::kDgrad, true>() {`
+  - **EN**: Starts a constructor or function definition.
+  - **CN**: 开始定义一个构造函数或函数。
+- **L1320** `  using ProblemShape = cutlass::conv::ConvProblemShape<cutlass::conv::Operator::kDgrad, 2>;`
+  - **EN**: Aliases the convolution problem-shape type consumed by the universal kernel.
+  - **CN**: 为通用卷积内核要消费的问题形状类型创建别名。
+- **L1321** `  std::vector<ProblemShape> problem_shapes;`
+  - **EN**: Declares the vector that will collect convolution problem shapes for the test sweep.
+  - **CN**: 声明用于收集卷积问题形状、供测试遍历使用的向量。
+- **L1322** `  // 2x5 filter, asymmetric padding 1,0/1,0, w/ dilation`
+  - **EN**: Comment explaining: 2x5 filter, asymmetric padding 1,0/1,0, w/ dilation.
+  - **CN**: 说明性注释：2x5 filter, asymmetric padding 1,0/1,0, w/ dilation。
+- **L1323** `  // mode 0 stride divides dilation`
+  - **EN**: Comment explaining: mode 0 stride divides dilation.
+  - **CN**: 说明性注释：mode 0 stride divides dilation。
+- **L1324** `  // mode 1 dilation divides stride`
+  - **EN**: Comment explaining: mode 1 dilation divides stride.
+  - **CN**: 说明性注释：mode 1 dilation divides stride。
+- **L1325** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+
+### Lines 1326-1350 / 第1326-1350行
+
+- **L1326** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L1327** `    {3,   16, 16, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1328** `    {256, 2, 5, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1329** `    {1, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1330** `    {0, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1331** `    {2, 4},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1332** `    {4, 2},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1333** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1334** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L1335** `  // 2x5 filter, asymmetric padding 1,0/1,0, w/ dilation`
+  - **EN**: Comment explaining: 2x5 filter, asymmetric padding 1,0/1,0, w/ dilation.
+  - **CN**: 说明性注释：2x5 filter, asymmetric padding 1,0/1,0, w/ dilation。
+- **L1336** `  // mode 0 dilation divides stride`
+  - **EN**: Comment explaining: mode 0 dilation divides stride.
+  - **CN**: 说明性注释：mode 0 dilation divides stride。
+- **L1337** `  // mode 1 stride divides dilation`
+  - **EN**: Comment explaining: mode 1 stride divides dilation.
+  - **CN**: 说明性注释：mode 1 stride divides dilation。
+- **L1338** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L1339** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L1340** `    {3,   16, 16, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1341** `    {256, 2, 5, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1342** `    {1, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1343** `    {0, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1344** `    {4, 2},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1345** `    {2, 4},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1346** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1347** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L1348** `  // 2x5 filter, asymmetric padding 1,0/1,0, w/ dilation`
+  - **EN**: Comment explaining: 2x5 filter, asymmetric padding 1,0/1,0, w/ dilation.
+  - **CN**: 说明性注释：2x5 filter, asymmetric padding 1,0/1,0, w/ dilation。
+- **L1349** `  // stride dilation dont divide`
+  - **EN**: Comment explaining: stride dilation dont divide.
+  - **CN**: 说明性注释：stride dilation dont divide。
+- **L1350** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+
+### Lines 1351-1375 / 第1351-1375行
+
+- **L1351** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L1352** `    {3,   16, 16, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1353** `    {256, 2, 5, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1354** `    {1, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1355** `    {0, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1356** `    {3, 2},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1357** `    {2, 3},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1358** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1359** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L1360** `  return problem_shapes;`
+  - **EN**: Returns the computed value from the current function.
+  - **CN**: 从当前函数返回计算结果。
+- **L1361** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L1362** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L1363** `// Specialization for 3D dgrad problems`
+  - **EN**: Comment explaining: Specialization for 3D dgrad problems.
+  - **CN**: 说明性注释：Specialization for 3D dgrad problems。
+- **L1364** `template<>`
+  - **EN**: Declares template parameters for the following type or function.
+  - **CN**: 为后续类型或函数声明模板参数。
+- **L1365** `std::vector<cutlass::conv::ConvProblemShape<cutlass::conv::Operator::kDgrad, 3>> inline`
+  - **EN**: References the templated convolution problem-shape type.
+  - **CN**: 引用模板化的卷积问题形状类型。
+- **L1366** `get_conv_problem_vector<3, cutlass::conv::Operator::kDgrad, true>() {`
+  - **EN**: Starts a constructor or function definition.
+  - **CN**: 开始定义一个构造函数或函数。
+- **L1367** `  using ProblemShape = cutlass::conv::ConvProblemShape<cutlass::conv::Operator::kDgrad, 3>;`
+  - **EN**: Aliases the convolution problem-shape type consumed by the universal kernel.
+  - **CN**: 为通用卷积内核要消费的问题形状类型创建别名。
+- **L1368** `  std::vector<ProblemShape> problem_shapes;`
+  - **EN**: Declares the vector that will collect convolution problem shapes for the test sweep.
+  - **CN**: 声明用于收集卷积问题形状、供测试遍历使用的向量。
+- **L1369** `  // Filter 3x4x5 + asymmetric padding 102/010, w/ dilation`
+  - **EN**: Comment explaining: Filter 3x4x5 + asymmetric padding 102/010, w/ dilation.
+  - **CN**: 说明性注释：Filter 3x4x5 + asymmetric padding 102/010, w/ dilation。
+- **L1370** `  problem_shapes.push_back({`
+  - **EN**: Starts appending a new convolution problem-shape instance to the vector.
+  - **CN**: 开始向向量追加一个新的卷积问题形状实例。
+- **L1371** `    cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Sets the convolution mode for this test problem to cross-correlation.
+  - **CN**: 将该测试问题的卷积模式设为互相关。
+- **L1372** `    {2,  16, 10, 16, 64},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1373** `    {64, 3, 4, 5, 96},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1374** `    {1, 0, 1},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1375** `    {0, 2, 0},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+
+### Lines 1376-1385 / 第1376-1385行
+
+- **L1376** `    {2, 1, 2},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1377** `    {4, 2, 3},`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1378** `    1`
+  - **EN**: Adds another field to the current problem-shape initializer.
+  - **CN**: 为当前问题形状初始化继续补充一个字段。
+- **L1379** `  });`
+  - **EN**: Closes the current problem-shape initializer and appends it to the vector.
+  - **CN**: 结束当前问题形状初始化并将其追加到向量中。
+- **L1380** `  return problem_shapes;`
+  - **EN**: Returns the computed value from the current function.
+  - **CN**: 从当前函数返回计算结果。
+- **L1381** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L1382** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L1383** `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L1384** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L1385** `} // namespace cutlass::test`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+
+## Key Concepts / 关键概念
+- Problem-shape objects encode tensor extents, padding, stride, dilation, and grouping for each convolution scenario. / 问题形状对象编码了每个卷积场景的张量尺寸、padding、步幅、膨胀和分组信息。
+## Dependencies / 依赖项
+- `cutlass/conv/convnd_problem_shape.hpp` — ConvNd problem-shape data structure used to describe tensor extents, padding, stride, and dilation. / 用于描述张量尺寸、padding、步幅和膨胀的 ConvNd 问题形状数据结构。
+- `vector` — Dynamic array container used throughout the examples. / 示例中广泛使用的动态数组容器。

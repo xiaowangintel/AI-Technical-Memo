@@ -1,0 +1,159 @@
+# algorithm.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/cute/experimental/algorithm.py`
+
+## Purpose / 作用
+- EN: Defines 3 functions (simt_auto_vec_copy, partition, partition_and_copy) in `CuTeDSL.cutlass.cute.experimental.algorithm`.
+- CN: 该模块 `CuTeDSL.cutlass.cute.experimental.algorithm` 定义了 3 个函数（simt_auto_vec_copy, partition, partition_and_copy）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `from typing import Optional` — **EN:** Imports Optional from `typing`. **CN:** 从 `typing` 导入 Optional。
+- **L13** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L14** `from cutlass import cute` — **EN:** Imports cute from `cutlass`. **CN:** 从 `cutlass` 导入 cute。
+- **L15** `from cutlass.cutlass_dsl import dsl_user_op` — **EN:** Imports dsl_user_op from `cutlass.cutlass_dsl`. **CN:** 从 `cutlass.cutlass_dsl` 导入 dsl_user_op。
+- **L16** `from cutlass._mlir import ir` — **EN:** Imports ir from `cutlass._mlir`. **CN:** 从 `cutlass._mlir` 导入 ir。
+- **L17** `from cutlass._mlir.dialects import lir as cutlass_lir` — **EN:** Imports lir as cutlass_lir from `cutlass._mlir.dialects`. **CN:** 从 `cutlass._mlir.dialects` 导入 lir as cutlass_lir。
+- **L18** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L19** `from .memory import copy` — **EN:** Imports copy from `.memory`. **CN:** 从 `.memory` 导入 copy。
+- **L20** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L21** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L22** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L23** `def simt_auto_vec_copy(` — **EN:** Defines function `simt_auto_vec_copy`. **CN:** 定义函数 `simt_auto_vec_copy`。
+- **L24** `    src: cute.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L25** `    dst: cute.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L26** `    async_op: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L27** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L28** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L29** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L30** `    """` — **EN:** Starts the docstring for the function `simt_auto_vec_copy`. **CN:** 开始说明 function `simt_auto_vec_copy` 的文档字符串。
+- **L31** `    Copies a tensor between two cute.memref buffers with single thread` — **EN:** Continues the docstring for the function `simt_auto_vec_copy`. **CN:** 继续说明 function `simt_auto_vec_copy` 的文档字符串。
+- **L32** `    """` — **EN:** Ends the docstring for the function `simt_auto_vec_copy`. **CN:** 结束说明 function `simt_auto_vec_copy` 的文档字符串。
+- **L33** `    if async_op:` — **EN:** Starts a conditional branch guarded by `async_op`. **CN:** 开始一个由 `async_op` 控制的条件分支。
+- **L34** `        cutlass_lir.SimtAutoVecCopyOp(` — **EN:** Invokes `cutlass_lir.SimtAutoVecCopyOp` as a standalone call. **CN:** 以独立语句方式调用 `cutlass_lir.SimtAutoVecCopyOp`。
+- **L35** `            src.value, dst.value, async_=True, cache="always", loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L36** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L37** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L38** `        cutlass_lir.SimtAutoVecCopyOp(src.value, dst.value, loc=loc, ip=ip)` — **EN:** Invokes `cutlass_lir.SimtAutoVecCopyOp` as a standalone call. **CN:** 以独立语句方式调用 `cutlass_lir.SimtAutoVecCopyOp`。
+- **L39** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L40** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L41** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L42** `def partition(` — **EN:** Defines function `partition`. **CN:** 定义函数 `partition`。
+- **L43** `    buffer: cute.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L44** `    agent_id: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L45** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L46** `    layout_tv: cute.Layout,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L47** `    tiler: cute.Layout,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L48** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L49** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L50** `) -> cute.Tensor:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L51** `    """` — **EN:** Starts the docstring for the function `partition`. **CN:** 开始说明 function `partition` 的文档字符串。
+- **L52** `    Partition a buffer into a given layout and tiler.` — **EN:** Continues the docstring for the function `partition`. **CN:** 继续说明 function `partition` 的文档字符串。
+- **L53** `    """` — **EN:** Ends the docstring for the function `partition`. **CN:** 结束说明 function `partition` 的文档字符串。
+- **L54** `    assert isinstance(agent_id, cute.Int32), (` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L55** `        f"Expected agent_id to be cute.Int32, got {type(agent_id)}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L56** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L57** `    partition_op = cutlass_lir.PartitionOp(` — **EN:** Assigns a value to partition_op. **CN:** 将一个值赋给 partition_op。
+- **L58** `        buffer.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L59** `        agent_id.ir_value(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L60** `        layout_tv=layout_tv.type.attribute,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L61** `        tiler=tiler.type.attribute,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L62** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L63** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L64** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L65** `    return partition_op.result` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L66** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L67** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L68** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L69** `def partition_and_copy(` — **EN:** Defines function `partition_and_copy`. **CN:** 定义函数 `partition_and_copy`。
+- **L70** `    tiled_copy: cute.core.ThrCopy,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L71** `    src: cute.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L72** `    dst: cute.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L73** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L74** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L75** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L76** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L77** `    """` — **EN:** Starts the docstring for the function `partition_and_copy`. **CN:** 开始说明 function `partition_and_copy` 的文档字符串。
+- **L78** `    Copies a tensor between two cute.memref buffer` — **EN:** Continues the docstring for the function `partition_and_copy`. **CN:** 继续说明 function `partition_and_copy` 的文档字符串。
+- **L79** `    """` — **EN:** Ends the docstring for the function `partition_and_copy`. **CN:** 结束说明 function `partition_and_copy` 的文档字符串。
+- **L80** `    src_partitioned = src` — **EN:** Assigns a value to src_partitioned. **CN:** 将一个值赋给 src_partitioned。
+- **L81** `    dst_partitioned = dst` — **EN:** Assigns a value to dst_partitioned. **CN:** 将一个值赋给 dst_partitioned。
+- **L82** `    tid_x = tiled_copy.thr_idx` — **EN:** Assigns a value to tid_x. **CN:** 将一个值赋给 tid_x。
+- **L83** `    if src.memspace != cute.AddressSpace.rmem:` — **EN:** Starts a conditional branch guarded by `src.memspace != cute.AddressSpace.rmem`. **CN:** 开始一个由 `src.memspace != cute.AddressSpace.rmem` 控制的条件分支。
+- **L84** `        src_partitioned = partition(` — **EN:** Assigns a value to src_partitioned. **CN:** 将一个值赋给 src_partitioned。
+- **L85** `            src,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L86** `            tid_x,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L87** `            layout_tv=tiled_copy.layout_src_tv_tiled,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L88** `            tiler=cute.core._pack_tile(tiled_copy.tiler_mn),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L89** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L90** `    if dst.memspace != cute.AddressSpace.rmem:` — **EN:** Starts a conditional branch guarded by `dst.memspace != cute.AddressSpace.rmem`. **CN:** 开始一个由 `dst.memspace != cute.AddressSpace.rmem` 控制的条件分支。
+- **L91** `        dst_partitioned = partition(` — **EN:** Assigns a value to dst_partitioned. **CN:** 将一个值赋给 dst_partitioned。
+- **L92** `            dst,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L93** `            tid_x,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L94** `            layout_tv=tiled_copy.layout_dst_tv_tiled,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L95** `            tiler=cute.core._pack_tile(tiled_copy.tiler_mn),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L96** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L97** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L98** `    # Handle copy where copy atom is used for both partition and copy during smem to rmem and rmem to smem copies` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L99** `    if type(tiled_copy.op) in [` — **EN:** Starts a conditional branch guarded by `type(tiled_copy.op) in [cute.nvgpu.warp.LdMatrix8x8x16bOp...`. **CN:** 开始一个由 `type(tiled_copy.op) in [cute.nvgpu.warp.LdMatrix8x8x16bOp...` 控制的条件分支。
+- **L100** `        cute.nvgpu.warp.LdMatrix8x8x16bOp,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L101** `        cute.nvgpu.warp.LdMatrix16x16x8bOp,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L102** `        cute.nvgpu.warp.StMatrix8x8x16bOp,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L103** `        cute.nvgpu.warp.StMatrix16x8x8bOp,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L104** `    ]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L105** `        copy(` — **EN:** Invokes `copy` as a standalone call. **CN:** 以独立语句方式调用 `copy`。
+- **L106** `            src_partitioned,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L107** `            dst_partitioned,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L108** `            copy_atom=tiled_copy,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L109** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L110** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L111** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L112** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L113** `    # The rest handles copy where copy atom is used for partition` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L114** `    elif (` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L115** `        src.memspace,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L116** `        dst.memspace,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L117** `    ) in [` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L118** `        (cute.AddressSpace.rmem, cute.AddressSpace.smem),` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L119** `        (cute.AddressSpace.smem, cute.AddressSpace.rmem),` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L120** `        (cute.AddressSpace.rmem, cute.AddressSpace.gmem),` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L121** `        (cute.AddressSpace.gmem, cute.AddressSpace.rmem),` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L122** `    ]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L123** `        simt_auto_vec_copy(src_partitioned, dst_partitioned, loc=loc, ip=ip)` — **EN:** Invokes `simt_auto_vec_copy` as a standalone call. **CN:** 以独立语句方式调用 `simt_auto_vec_copy`。
+- **L124** `    elif (` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L125** `        src.memspace == cute.AddressSpace.gmem` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L126** `        and dst.memspace == cute.AddressSpace.smem` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L127** `    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L128** `        simt_auto_vec_copy(` — **EN:** Invokes `simt_auto_vec_copy` as a standalone call. **CN:** 以独立语句方式调用 `simt_auto_vec_copy`。
+- **L129** `            src_partitioned, dst_partitioned, async_op=True, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L130** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L131** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L132** `    # Handle copy where copy atom is used for partition and copy` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L133** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L134** `        copy(` — **EN:** Invokes `copy` as a standalone call. **CN:** 以独立语句方式调用 `copy`。
+- **L135** `            src_partitioned,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L136** `            dst_partitioned,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L137** `            copy_atom=cute.make_copy_atom(tiled_copy.op, src.element_type),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L138** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L139** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L140** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.cute.experimental.algorithm`. CN: 模块名为 `CuTeDSL.cutlass.cute.experimental.algorithm`。
+- EN: Top-level functions: simt_auto_vec_copy, partition, partition_and_copy CN: 顶层函数包括：simt_auto_vec_copy, partition, partition_and_copy
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass:cute, cutlass.cutlass_dsl:dsl_user_op, cutlass._mlir:ir, cutlass._mlir.dialects:lir, .memory:copy CN: 内部依赖：cutlass:cute, cutlass.cutlass_dsl:dsl_user_op, cutlass._mlir:ir, cutlass._mlir.dialects:lir, .memory:copy
+- EN: External or standard-library dependencies: typing:Optional CN: 外部或标准库依赖：typing:Optional

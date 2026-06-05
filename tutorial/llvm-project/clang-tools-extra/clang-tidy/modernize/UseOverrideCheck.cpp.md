@@ -1,0 +1,444 @@
+# UseOverrideCheck.cpp — Code Analysis / 代码分析
+
+## Source / 来源
+- **File / 文件**: `clang-tools-extra/clang-tidy/modernize/UseOverrideCheck.cpp`
+- **Repository / 仓库**: `llvm-project` (`/root/xw/llvm-project`)
+- **Purpose (EN)**: Implements the `UseOverrideCheck` clang-tidy check in the `modernize` module around use override diagnostics and fixes.
+- **Purpose (CN)**: 实现 `modernize` 模块中的 `UseOverrideCheck` clang-tidy 检查，围绕 Use Override 相关诊断与修复展开。
+
+## Line-by-Line Analysis / 逐行分析
+
+### Lines 1-14 / 第 1-14 行
+
+```cpp
+   1: //===----------------------------------------------------------------------===//
+   2: //
+   3: // Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+   4: // See https://llvm.org/LICENSE.txt for license information.
+   5: // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+   6: //
+   7: //===----------------------------------------------------------------------===//
+   8: 
+   9: #include "UseOverrideCheck.h"
+  10: #include "../utils/LexerUtils.h"
+  11: #include "clang/AST/ASTContext.h"
+  12: #include "clang/ASTMatchers/ASTMatchFinder.h"
+  13: #include "clang/Lex/Lexer.h"
+  14: 
+```
+- **Line 1 / 第 1 行**: EN: Banner comment marking a file or section boundary. CN: 横幅注释，用于标记文件或章节边界。
+- **Line 2 / 第 2 行**: EN: Separator comment used for visual grouping. CN: 用于视觉分组的分隔注释。
+- **Line 3 / 第 3 行**: EN: Comment describing intent, behavior, or metadata: `Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.`. CN: 用于说明意图、行为或元数据的注释：`Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.`。
+- **Line 4 / 第 4 行**: EN: Comment describing intent, behavior, or metadata: `See https://llvm.org/LICENSE.txt for license information.`. CN: 用于说明意图、行为或元数据的注释：`See https://llvm.org/LICENSE.txt for license information.`。
+- **Line 5 / 第 5 行**: EN: Comment describing intent, behavior, or metadata: `SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception`. CN: 用于说明意图、行为或元数据的注释：`SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception`。
+- **Line 6 / 第 6 行**: EN: Separator comment used for visual grouping. CN: 用于视觉分组的分隔注释。
+- **Line 7 / 第 7 行**: EN: Banner comment marking a file or section boundary. CN: 横幅注释，用于标记文件或章节边界。
+- **Line 8 / 第 8 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 9 / 第 9 行**: EN: Includes "UseOverrideCheck.h" so this file can use local declarations that pair with this file. CN: 包含 "UseOverrideCheck.h"，以便当前文件使用与该文件配套的本地声明。
+- **Line 10 / 第 10 行**: EN: Includes "../utils/LexerUtils.h" so this file can use local declarations that pair with this file. CN: 包含 "../utils/LexerUtils.h"，以便当前文件使用与该文件配套的本地声明。
+- **Line 11 / 第 11 行**: EN: Includes "clang/AST/ASTContext.h" so this file can use Clang AST data structures and traversal APIs. CN: 包含 "clang/AST/ASTContext.h"，以便当前文件使用Clang AST 数据结构与遍历 API。
+- **Line 12 / 第 12 行**: EN: Includes "clang/ASTMatchers/ASTMatchFinder.h" so this file can use Clang AST matcher infrastructure. CN: 包含 "clang/ASTMatchers/ASTMatchFinder.h"，以便当前文件使用Clang AST Matcher 基础设施。
+- **Line 13 / 第 13 行**: EN: Includes "clang/Lex/Lexer.h" so this file can use Clang lexer and preprocessor facilities. CN: 包含 "clang/Lex/Lexer.h"，以便当前文件使用Clang 词法分析与预处理设施。
+- **Line 14 / 第 14 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+
+### Lines 15-28 / 第 15-28 行
+
+```cpp
+  15: using namespace clang::ast_matchers;
+  16: 
+  17: namespace clang::tidy::modernize {
+  18: 
+  19: UseOverrideCheck::UseOverrideCheck(StringRef Name, ClangTidyContext *Context)
+  20:     : ClangTidyCheck(Name, Context),
+  21:       IgnoreDestructors(Options.get("IgnoreDestructors", false)),
+  22:       IgnoreTemplateInstantiations(
+  23:           Options.get("IgnoreTemplateInstantiations", false)),
+  24:       AllowOverrideAndFinal(Options.get("AllowOverrideAndFinal", false)),
+  25:       OverrideSpelling(Options.get("OverrideSpelling", "override")),
+  26:       FinalSpelling(Options.get("FinalSpelling", "final")) {}
+  27: 
+  28: void UseOverrideCheck::storeOptions(ClangTidyOptions::OptionMap &Opts) {
+```
+- **Line 15 / 第 15 行**: EN: Brings namespace `clang::ast_matchers` into the local scope. CN: 将命名空间 `clang::ast_matchers` 引入当前作用域。
+- **Line 16 / 第 16 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 17 / 第 17 行**: EN: Opens namespace `clang::tidy::modernize` to scope related declarations. CN: 打开命名空间 `clang::tidy::modernize`，为相关声明建立作用域。
+- **Line 18 / 第 18 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 19 / 第 19 行**: EN: Continues logic associated with callable symbol `UseOverrideCheck`. CN: 继续与可调用符号 `UseOverrideCheck` 相关的逻辑。
+- **Line 20 / 第 20 行**: EN: Continues a multi-line declaration, call, or initializer. CN: 继续一个跨多行的声明、调用或初始化。
+- **Line 21 / 第 21 行**: EN: Reads a configured option that influences check behavior. CN: 读取一个会影响检查行为的配置项。
+- **Line 22 / 第 22 行**: EN: Continues logic associated with callable symbol `IgnoreTemplateInstantiations`. CN: 继续与可调用符号 `IgnoreTemplateInstantiations` 相关的逻辑。
+- **Line 23 / 第 23 行**: EN: Reads a configured option that influences check behavior. CN: 读取一个会影响检查行为的配置项。
+- **Line 24 / 第 24 行**: EN: Reads a configured option that influences check behavior. CN: 读取一个会影响检查行为的配置项。
+- **Line 25 / 第 25 行**: EN: Reads a configured option that influences check behavior. CN: 读取一个会影响检查行为的配置项。
+- **Line 26 / 第 26 行**: EN: Reads a configured option that influences check behavior. CN: 读取一个会影响检查行为的配置项。
+- **Line 27 / 第 27 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 28 / 第 28 行**: EN: Stores configurable options so the check can round-trip its settings. CN: 存储可配置选项，以便该检查能够往返保存设置。
+
+### Lines 29-42 / 第 29-42 行
+
+```cpp
+  29:   Options.store(Opts, "IgnoreDestructors", IgnoreDestructors);
+  30:   Options.store(Opts, "IgnoreTemplateInstantiations",
+  31:                 IgnoreTemplateInstantiations);
+  32:   Options.store(Opts, "AllowOverrideAndFinal", AllowOverrideAndFinal);
+  33:   Options.store(Opts, "OverrideSpelling", OverrideSpelling);
+  34:   Options.store(Opts, "FinalSpelling", FinalSpelling);
+  35: }
+  36: 
+  37: void UseOverrideCheck::registerMatchers(MatchFinder *Finder) {
+  38:   auto IgnoreDestructorMatcher =
+  39:       IgnoreDestructors ? cxxMethodDecl(unless(cxxDestructorDecl()))
+  40:                         : cxxMethodDecl();
+  41:   auto IgnoreTemplateInstantiationsMatcher =
+  42:       IgnoreTemplateInstantiations
+```
+- **Line 29 / 第 29 行**: EN: Stores configurable options so the check can round-trip its settings. CN: 存储可配置选项，以便该检查能够往返保存设置。
+- **Line 30 / 第 30 行**: EN: Stores configurable options so the check can round-trip its settings. CN: 存储可配置选项，以便该检查能够往返保存设置。
+- **Line 31 / 第 31 行**: EN: Performs a small step in the surrounding implementation. CN: 在周围实现中执行一个小步骤。
+- **Line 32 / 第 32 行**: EN: Stores configurable options so the check can round-trip its settings. CN: 存储可配置选项，以便该检查能够往返保存设置。
+- **Line 33 / 第 33 行**: EN: Stores configurable options so the check can round-trip its settings. CN: 存储可配置选项，以便该检查能够往返保存设置。
+- **Line 34 / 第 34 行**: EN: Stores configurable options so the check can round-trip its settings. CN: 存储可配置选项，以便该检查能够往返保存设置。
+- **Line 35 / 第 35 行**: EN: Closes the current scope or block. CN: 关闭当前作用域或代码块。
+- **Line 36 / 第 36 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 37 / 第 37 行**: EN: Starts or references matcher-registration logic for this check. CN: 开始或引用该检查的 Matcher 注册逻辑。
+- **Line 38 / 第 38 行**: EN: Continues the surrounding expression or declaration. CN: 继续构造周围的表达式或声明。
+- **Line 39 / 第 39 行**: EN: Continues logic associated with callable symbol `cxxMethodDecl`. CN: 继续与可调用符号 `cxxMethodDecl` 相关的逻辑。
+- **Line 40 / 第 40 行**: EN: Calls a helper routine or method to advance the implementation. CN: 调用辅助例程或方法以推进实现逻辑。
+- **Line 41 / 第 41 行**: EN: Continues the surrounding expression or declaration. CN: 继续构造周围的表达式或声明。
+- **Line 42 / 第 42 行**: EN: Continues the surrounding expression or declaration. CN: 继续构造周围的表达式或声明。
+
+### Lines 43-56 / 第 43-56 行
+
+```cpp
+  43:           ? cxxMethodDecl(unless(ast_matchers::isTemplateInstantiation()))
+  44:           : cxxMethodDecl();
+  45:   Finder->addMatcher(cxxMethodDecl(isOverride(),
+  46:                                    IgnoreTemplateInstantiationsMatcher,
+  47:                                    IgnoreDestructorMatcher)
+  48:                          .bind("method"),
+  49:                      this);
+  50: }
+  51: 
+  52: // Re-lex the tokens to get precise locations to insert 'override' and remove
+  53: // 'virtual'.
+  54: static SmallVector<Token, 16>
+  55: parseTokens(CharSourceRange Range, const MatchFinder::MatchResult &Result) {
+  56:   const SourceManager &Sources = *Result.SourceManager;
+```
+- **Line 43 / 第 43 行**: EN: Continues logic associated with callable symbol `cxxMethodDecl`. CN: 继续与可调用符号 `cxxMethodDecl` 相关的逻辑。
+- **Line 44 / 第 44 行**: EN: Calls a helper routine or method to advance the implementation. CN: 调用辅助例程或方法以推进实现逻辑。
+- **Line 45 / 第 45 行**: EN: Registers an AST matcher that will trigger this check on matching nodes. CN: 注册一个 AST Matcher，使该检查在节点匹配时被触发。
+- **Line 46 / 第 46 行**: EN: Continues a multi-line declaration, call, or initializer. CN: 继续一个跨多行的声明、调用或初始化。
+- **Line 47 / 第 47 行**: EN: Continues the surrounding expression or declaration. CN: 继续构造周围的表达式或声明。
+- **Line 48 / 第 48 行**: EN: Continues a multi-line declaration, call, or initializer. CN: 继续一个跨多行的声明、调用或初始化。
+- **Line 49 / 第 49 行**: EN: Performs a small step in the surrounding implementation. CN: 在周围实现中执行一个小步骤。
+- **Line 50 / 第 50 行**: EN: Closes the current scope or block. CN: 关闭当前作用域或代码块。
+- **Line 51 / 第 51 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 52 / 第 52 行**: EN: Comment describing intent, behavior, or metadata: `Re-lex the tokens to get precise locations to insert 'override' and remove`. CN: 用于说明意图、行为或元数据的注释：`Re-lex the tokens to get precise locations to insert 'override' and remove`。
+- **Line 53 / 第 53 行**: EN: Comment describing intent, behavior, or metadata: `'virtual'.`. CN: 用于说明意图、行为或元数据的注释：`'virtual'.`。
+- **Line 54 / 第 54 行**: EN: Continues the surrounding expression or declaration. CN: 继续构造周围的表达式或声明。
+- **Line 55 / 第 55 行**: EN: Defines function or method `parseTokens`. CN: 定义函数或方法 `parseTokens`。
+- **Line 56 / 第 56 行**: EN: Performs a small step in the surrounding implementation. CN: 在周围实现中执行一个小步骤。
+
+### Lines 57-70 / 第 57-70 行
+
+```cpp
+  57:   const std::pair<FileID, unsigned> LocInfo =
+  58:       Sources.getDecomposedLoc(Range.getBegin());
+  59:   const StringRef File = Sources.getBufferData(LocInfo.first);
+  60:   const char *TokenBegin = File.data() + LocInfo.second;
+  61:   Lexer RawLexer(Sources.getLocForStartOfFile(LocInfo.first),
+  62:                  Result.Context->getLangOpts(), File.begin(), TokenBegin,
+  63:                  File.end());
+  64:   SmallVector<Token, 16> Tokens;
+  65:   Token Tok;
+  66:   int NestedParens = 0;
+  67:   while (!RawLexer.LexFromRawLexer(Tok)) {
+  68:     if ((Tok.is(tok::semi) || Tok.is(tok::l_brace)) && NestedParens == 0)
+  69:       break;
+  70:     if (Sources.isBeforeInTranslationUnit(Range.getEnd(), Tok.getLocation()))
+```
+- **Line 57 / 第 57 行**: EN: Continues the surrounding expression or declaration. CN: 继续构造周围的表达式或声明。
+- **Line 58 / 第 58 行**: EN: Calls a helper routine or method to advance the implementation. CN: 调用辅助例程或方法以推进实现逻辑。
+- **Line 59 / 第 59 行**: EN: Assigns or initializes state used by later logic. CN: 赋值或初始化后续逻辑要使用的状态。
+- **Line 60 / 第 60 行**: EN: Calls a helper routine or method to advance the implementation. CN: 调用辅助例程或方法以推进实现逻辑。
+- **Line 61 / 第 61 行**: EN: Continues a multi-line declaration, call, or initializer. CN: 继续一个跨多行的声明、调用或初始化。
+- **Line 62 / 第 62 行**: EN: Continues a multi-line declaration, call, or initializer. CN: 继续一个跨多行的声明、调用或初始化。
+- **Line 63 / 第 63 行**: EN: Calls a helper routine or method to advance the implementation. CN: 调用辅助例程或方法以推进实现逻辑。
+- **Line 64 / 第 64 行**: EN: Performs a small step in the surrounding implementation. CN: 在周围实现中执行一个小步骤。
+- **Line 65 / 第 65 行**: EN: Performs a small step in the surrounding implementation. CN: 在周围实现中执行一个小步骤。
+- **Line 66 / 第 66 行**: EN: Assigns or initializes state used by later logic. CN: 赋值或初始化后续逻辑要使用的状态。
+- **Line 67 / 第 67 行**: EN: Starts a loop that continues while the condition holds. CN: 开始一个在条件满足时持续执行的循环。
+- **Line 68 / 第 68 行**: EN: Checks a condition before executing the guarded branch. CN: 先检查条件，再执行受保护的分支。
+- **Line 69 / 第 69 行**: EN: Exits the nearest loop or switch statement. CN: 退出最近的循环或 switch 语句。
+- **Line 70 / 第 70 行**: EN: Checks a condition before executing the guarded branch. CN: 先检查条件，再执行受保护的分支。
+
+### Lines 71-84 / 第 71-84 行
+
+```cpp
+  71:       break;
+  72:     if (Tok.is(tok::l_paren))
+  73:       ++NestedParens;
+  74:     else if (Tok.is(tok::r_paren))
+  75:       --NestedParens;
+  76:     if (Tok.is(tok::raw_identifier)) {
+  77:       IdentifierInfo &Info = Result.Context->Idents.get(StringRef(
+  78:           Sources.getCharacterData(Tok.getLocation()), Tok.getLength()));
+  79:       Tok.setIdentifierInfo(&Info);
+  80:       Tok.setKind(Info.getTokenID());
+  81:     }
+  82:     Tokens.push_back(Tok);
+  83:   }
+  84:   return Tokens;
+```
+- **Line 71 / 第 71 行**: EN: Exits the nearest loop or switch statement. CN: 退出最近的循环或 switch 语句。
+- **Line 72 / 第 72 行**: EN: Checks a condition before executing the guarded branch. CN: 先检查条件，再执行受保护的分支。
+- **Line 73 / 第 73 行**: EN: Performs a small step in the surrounding implementation. CN: 在周围实现中执行一个小步骤。
+- **Line 74 / 第 74 行**: EN: Begins the fallback branch of a preceding conditional. CN: 开始前置条件语句的后备分支。
+- **Line 75 / 第 75 行**: EN: Performs a small step in the surrounding implementation. CN: 在周围实现中执行一个小步骤。
+- **Line 76 / 第 76 行**: EN: Checks a condition before executing the guarded branch. CN: 先检查条件，再执行受保护的分支。
+- **Line 77 / 第 77 行**: EN: Continues logic associated with callable symbol `get`. CN: 继续与可调用符号 `get` 相关的逻辑。
+- **Line 78 / 第 78 行**: EN: Calls a helper routine or method to advance the implementation. CN: 调用辅助例程或方法以推进实现逻辑。
+- **Line 79 / 第 79 行**: EN: Calls a helper routine or method to advance the implementation. CN: 调用辅助例程或方法以推进实现逻辑。
+- **Line 80 / 第 80 行**: EN: Calls a helper routine or method to advance the implementation. CN: 调用辅助例程或方法以推进实现逻辑。
+- **Line 81 / 第 81 行**: EN: Closes the current scope or block. CN: 关闭当前作用域或代码块。
+- **Line 82 / 第 82 行**: EN: Calls a helper routine or method to advance the implementation. CN: 调用辅助例程或方法以推进实现逻辑。
+- **Line 83 / 第 83 行**: EN: Closes the current scope or block. CN: 关闭当前作用域或代码块。
+- **Line 84 / 第 84 行**: EN: Returns a value or transfers control to the caller with `Tokens`. CN: 返回一个值，或以 `Tokens` 将控制权交还给调用者。
+
+### Lines 85-98 / 第 85-98 行
+
+```cpp
+  85: }
+  86: 
+  87: void UseOverrideCheck::check(const MatchFinder::MatchResult &Result) {
+  88:   const auto *Method = Result.Nodes.getNodeAs<FunctionDecl>("method");
+  89:   const SourceManager &Sources = *Result.SourceManager;
+  90: 
+  91:   ASTContext &Context = *Result.Context;
+  92: 
+  93:   assert(Method != nullptr);
+  94:   if (Method->getInstantiatedFromMemberFunction() != nullptr)
+  95:     Method = Method->getInstantiatedFromMemberFunction();
+  96: 
+  97:   if (Method->isImplicit() || Method->getLocation().isMacroID() ||
+  98:       Method->isOutOfLine())
+```
+- **Line 85 / 第 85 行**: EN: Closes the current scope or block. CN: 关闭当前作用域或代码块。
+- **Line 86 / 第 86 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 87 / 第 87 行**: EN: Defines function or method `check`. CN: 定义函数或方法 `check`。
+- **Line 88 / 第 88 行**: EN: Calls a helper routine or method to advance the implementation. CN: 调用辅助例程或方法以推进实现逻辑。
+- **Line 89 / 第 89 行**: EN: Performs a small step in the surrounding implementation. CN: 在周围实现中执行一个小步骤。
+- **Line 90 / 第 90 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 91 / 第 91 行**: EN: Performs a small step in the surrounding implementation. CN: 在周围实现中执行一个小步骤。
+- **Line 92 / 第 92 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 93 / 第 93 行**: EN: Checks an internal invariant in debug builds. CN: 在调试构建中检查内部不变式。
+- **Line 94 / 第 94 行**: EN: Checks a condition before executing the guarded branch. CN: 先检查条件，再执行受保护的分支。
+- **Line 95 / 第 95 行**: EN: Calls a helper routine or method to advance the implementation. CN: 调用辅助例程或方法以推进实现逻辑。
+- **Line 96 / 第 96 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 97 / 第 97 行**: EN: Checks a condition before executing the guarded branch. CN: 先检查条件，再执行受保护的分支。
+- **Line 98 / 第 98 行**: EN: Continues logic associated with callable symbol `isOutOfLine`. CN: 继续与可调用符号 `isOutOfLine` 相关的逻辑。
+
+### Lines 99-112 / 第 99-112 行
+
+```cpp
+  99:     return;
+ 100: 
+ 101:   const bool HasVirtual = Method->isVirtualAsWritten();
+ 102:   const bool HasOverride = Method->getAttr<OverrideAttr>();
+ 103:   const bool HasFinal = Method->getAttr<FinalAttr>();
+ 104: 
+ 105:   const bool OnlyVirtualSpecified = HasVirtual && !HasOverride && !HasFinal;
+ 106:   const unsigned KeywordCount = HasVirtual + HasOverride + HasFinal;
+ 107: 
+ 108:   if ((!OnlyVirtualSpecified && KeywordCount == 1) ||
+ 109:       (!HasVirtual && HasOverride && HasFinal && AllowOverrideAndFinal))
+ 110:     return; // Nothing to do.
+ 111: 
+ 112:   std::string Message;
+```
+- **Line 99 / 第 99 行**: EN: Returns a value or transfers control to the caller with `void`. CN: 返回一个值，或以 `void` 将控制权交还给调用者。
+- **Line 100 / 第 100 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 101 / 第 101 行**: EN: Assigns or initializes state used by later logic. CN: 赋值或初始化后续逻辑要使用的状态。
+- **Line 102 / 第 102 行**: EN: Assigns or initializes state used by later logic. CN: 赋值或初始化后续逻辑要使用的状态。
+- **Line 103 / 第 103 行**: EN: Assigns or initializes state used by later logic. CN: 赋值或初始化后续逻辑要使用的状态。
+- **Line 104 / 第 104 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 105 / 第 105 行**: EN: Assigns or initializes state used by later logic. CN: 赋值或初始化后续逻辑要使用的状态。
+- **Line 106 / 第 106 行**: EN: Assigns or initializes state used by later logic. CN: 赋值或初始化后续逻辑要使用的状态。
+- **Line 107 / 第 107 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 108 / 第 108 行**: EN: Checks a condition before executing the guarded branch. CN: 先检查条件，再执行受保护的分支。
+- **Line 109 / 第 109 行**: EN: Continues the surrounding expression or declaration. CN: 继续构造周围的表达式或声明。
+- **Line 110 / 第 110 行**: EN: Returns a value or transfers control to the caller with `; // Nothing to do.`. CN: 返回一个值，或以 `; // Nothing to do.` 将控制权交还给调用者。
+- **Line 111 / 第 111 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 112 / 第 112 行**: EN: Performs a small step in the surrounding implementation. CN: 在周围实现中执行一个小步骤。
+
+### Lines 113-126 / 第 113-126 行
+
+```cpp
+ 113:   if (OnlyVirtualSpecified) {
+ 114:     Message = "prefer using '%0' or (rarely) '%1' instead of 'virtual'";
+ 115:   } else if (KeywordCount == 0) {
+ 116:     Message = "annotate this function with '%0' or (rarely) '%1'";
+ 117:   } else {
+ 118:     const StringRef Redundant =
+ 119:         HasVirtual ? (HasOverride && HasFinal && !AllowOverrideAndFinal
+ 120:                           ? "'virtual' and '%0' are"
+ 121:                           : "'virtual' is")
+ 122:                    : "'%0' is";
+ 123:     const StringRef Correct = HasFinal ? "'%1'" : "'%0'";
+ 124: 
+ 125:     Message = (llvm::Twine(Redundant) +
+ 126:                " redundant since the function is already declared " + Correct)
+```
+- **Line 113 / 第 113 行**: EN: Checks a condition before executing the guarded branch. CN: 先检查条件，再执行受保护的分支。
+- **Line 114 / 第 114 行**: EN: Calls a helper routine or method to advance the implementation. CN: 调用辅助例程或方法以推进实现逻辑。
+- **Line 115 / 第 115 行**: EN: Defines function or method `if`. CN: 定义函数或方法 `if`。
+- **Line 116 / 第 116 行**: EN: Calls a helper routine or method to advance the implementation. CN: 调用辅助例程或方法以推进实现逻辑。
+- **Line 117 / 第 117 行**: EN: Continues the surrounding expression or declaration. CN: 继续构造周围的表达式或声明。
+- **Line 118 / 第 118 行**: EN: Continues the surrounding expression or declaration. CN: 继续构造周围的表达式或声明。
+- **Line 119 / 第 119 行**: EN: Continues the surrounding expression or declaration. CN: 继续构造周围的表达式或声明。
+- **Line 120 / 第 120 行**: EN: Continues the surrounding expression or declaration. CN: 继续构造周围的表达式或声明。
+- **Line 121 / 第 121 行**: EN: Continues the surrounding expression or declaration. CN: 继续构造周围的表达式或声明。
+- **Line 122 / 第 122 行**: EN: Performs a small step in the surrounding implementation. CN: 在周围实现中执行一个小步骤。
+- **Line 123 / 第 123 行**: EN: Assigns or initializes state used by later logic. CN: 赋值或初始化后续逻辑要使用的状态。
+- **Line 124 / 第 124 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 125 / 第 125 行**: EN: Continues logic associated with callable symbol `Twine`. CN: 继续与可调用符号 `Twine` 相关的逻辑。
+- **Line 126 / 第 126 行**: EN: Continues the surrounding expression or declaration. CN: 继续构造周围的表达式或声明。
+
+### Lines 127-140 / 第 127-140 行
+
+```cpp
+ 127:                   .str();
+ 128:   }
+ 129: 
+ 130:   auto Diag = diag(Method->getLocation(), Message)
+ 131:               << OverrideSpelling << FinalSpelling;
+ 132: 
+ 133:   const CharSourceRange FileRange = Lexer::makeFileCharRange(
+ 134:       CharSourceRange::getTokenRange(Method->getSourceRange()), Sources,
+ 135:       getLangOpts());
+ 136: 
+ 137:   if (!FileRange.isValid())
+ 138:     return;
+ 139: 
+ 140:   // FIXME: Instead of re-lexing and looking for the 'virtual' token,
+```
+- **Line 127 / 第 127 行**: EN: Calls a helper routine or method to advance the implementation. CN: 调用辅助例程或方法以推进实现逻辑。
+- **Line 128 / 第 128 行**: EN: Closes the current scope or block. CN: 关闭当前作用域或代码块。
+- **Line 129 / 第 129 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 130 / 第 130 行**: EN: Continues logic associated with callable symbol `diag`. CN: 继续与可调用符号 `diag` 相关的逻辑。
+- **Line 131 / 第 131 行**: EN: Performs a small step in the surrounding implementation. CN: 在周围实现中执行一个小步骤。
+- **Line 132 / 第 132 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 133 / 第 133 行**: EN: Continues logic associated with callable symbol `makeFileCharRange`. CN: 继续与可调用符号 `makeFileCharRange` 相关的逻辑。
+- **Line 134 / 第 134 行**: EN: Continues a multi-line declaration, call, or initializer. CN: 继续一个跨多行的声明、调用或初始化。
+- **Line 135 / 第 135 行**: EN: Calls a helper routine or method to advance the implementation. CN: 调用辅助例程或方法以推进实现逻辑。
+- **Line 136 / 第 136 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 137 / 第 137 行**: EN: Checks a condition before executing the guarded branch. CN: 先检查条件，再执行受保护的分支。
+- **Line 138 / 第 138 行**: EN: Returns a value or transfers control to the caller with `void`. CN: 返回一个值，或以 `void` 将控制权交还给调用者。
+- **Line 139 / 第 139 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 140 / 第 140 行**: EN: Comment records a pending task or caution: `FIXME: Instead of re-lexing and looking for the 'virtual' token,`. CN: 注释记录了待办事项或注意点：`FIXME: Instead of re-lexing and looking for the 'virtual' token,`。
+
+### Lines 141-154 / 第 141-154 行
+
+```cpp
+ 141:   // store the location of 'virtual' in each FunctionDecl.
+ 142:   const SmallVector<Token, 16> Tokens = parseTokens(FileRange, Result);
+ 143: 
+ 144:   // Add 'override' on inline declarations that don't already have it.
+ 145:   if (!HasFinal && !HasOverride) {
+ 146:     // If the override macro has been specified just ensure it exists,
+ 147:     // if not don't apply a fixit but keep the warning.
+ 148:     if (OverrideSpelling != "override" &&
+ 149:         !Context.Idents.get(OverrideSpelling).hasMacroDefinition())
+ 150:       return;
+ 151: 
+ 152:     Diag << FixItHint::CreateInsertion(
+ 153:         Lexer::getLocForEndOfToken(
+ 154:             Method->getTypeSourceInfo()->getTypeLoc().getEndLoc(), 0, Sources,
+```
+- **Line 141 / 第 141 行**: EN: Comment describing intent, behavior, or metadata: `store the location of 'virtual' in each FunctionDecl.`. CN: 用于说明意图、行为或元数据的注释：`store the location of 'virtual' in each FunctionDecl.`。
+- **Line 142 / 第 142 行**: EN: Assigns or initializes state used by later logic. CN: 赋值或初始化后续逻辑要使用的状态。
+- **Line 143 / 第 143 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 144 / 第 144 行**: EN: Comment describing intent, behavior, or metadata: `Add 'override' on inline declarations that don't already have it.`. CN: 用于说明意图、行为或元数据的注释：`Add 'override' on inline declarations that don't already have it.`。
+- **Line 145 / 第 145 行**: EN: Checks a condition before executing the guarded branch. CN: 先检查条件，再执行受保护的分支。
+- **Line 146 / 第 146 行**: EN: Comment describing intent, behavior, or metadata: `If the override macro has been specified just ensure it exists,`. CN: 用于说明意图、行为或元数据的注释：`If the override macro has been specified just ensure it exists,`。
+- **Line 147 / 第 147 行**: EN: Comment describing intent, behavior, or metadata: `if not don't apply a fixit but keep the warning.`. CN: 用于说明意图、行为或元数据的注释：`if not don't apply a fixit but keep the warning.`。
+- **Line 148 / 第 148 行**: EN: Checks a condition before executing the guarded branch. CN: 先检查条件，再执行受保护的分支。
+- **Line 149 / 第 149 行**: EN: Continues logic associated with callable symbol `get`. CN: 继续与可调用符号 `get` 相关的逻辑。
+- **Line 150 / 第 150 行**: EN: Returns a value or transfers control to the caller with `void`. CN: 返回一个值，或以 `void` 将控制权交还给调用者。
+- **Line 151 / 第 151 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 152 / 第 152 行**: EN: Constructs a fix-it hint describing an automatic source edit. CN: 构造一个 fix-it 提示，用于描述自动源码编辑。
+- **Line 153 / 第 153 行**: EN: Continues logic associated with callable symbol `getLocForEndOfToken`. CN: 继续与可调用符号 `getLocForEndOfToken` 相关的逻辑。
+- **Line 154 / 第 154 行**: EN: Continues a multi-line declaration, call, or initializer. CN: 继续一个跨多行的声明、调用或初始化。
+
+### Lines 155-168 / 第 155-168 行
+
+```cpp
+ 155:             getLangOpts()),
+ 156:         (" " + OverrideSpelling).str());
+ 157:   }
+ 158: 
+ 159:   if (HasFinal && HasOverride && !AllowOverrideAndFinal)
+ 160:     Diag << FixItHint::CreateRemoval(
+ 161:         Method->getAttr<OverrideAttr>()->getLocation());
+ 162: 
+ 163:   if (HasVirtual) {
+ 164:     for (const Token Tok : Tokens) {
+ 165:       if (Tok.is(tok::kw_virtual)) {
+ 166:         std::optional<Token> NextToken =
+ 167:             utils::lexer::findNextTokenIncludingComments(
+ 168:                 Tok.getEndLoc(), Sources, getLangOpts());
+```
+- **Line 155 / 第 155 行**: EN: Continues a multi-line declaration, call, or initializer. CN: 继续一个跨多行的声明、调用或初始化。
+- **Line 156 / 第 156 行**: EN: Calls a helper routine or method to advance the implementation. CN: 调用辅助例程或方法以推进实现逻辑。
+- **Line 157 / 第 157 行**: EN: Closes the current scope or block. CN: 关闭当前作用域或代码块。
+- **Line 158 / 第 158 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 159 / 第 159 行**: EN: Checks a condition before executing the guarded branch. CN: 先检查条件，再执行受保护的分支。
+- **Line 160 / 第 160 行**: EN: Constructs a fix-it hint describing an automatic source edit. CN: 构造一个 fix-it 提示，用于描述自动源码编辑。
+- **Line 161 / 第 161 行**: EN: Calls a helper routine or method to advance the implementation. CN: 调用辅助例程或方法以推进实现逻辑。
+- **Line 162 / 第 162 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 163 / 第 163 行**: EN: Checks a condition before executing the guarded branch. CN: 先检查条件，再执行受保护的分支。
+- **Line 164 / 第 164 行**: EN: Starts a loop that iterates over a range, container, or index sequence. CN: 开始一个循环，用于遍历范围、容器或索引序列。
+- **Line 165 / 第 165 行**: EN: Checks a condition before executing the guarded branch. CN: 先检查条件，再执行受保护的分支。
+- **Line 166 / 第 166 行**: EN: Continues the surrounding expression or declaration. CN: 继续构造周围的表达式或声明。
+- **Line 167 / 第 167 行**: EN: Continues logic associated with callable symbol `findNextTokenIncludingComments`. CN: 继续与可调用符号 `findNextTokenIncludingComments` 相关的逻辑。
+- **Line 168 / 第 168 行**: EN: Calls a helper routine or method to advance the implementation. CN: 调用辅助例程或方法以推进实现逻辑。
+
+### Lines 169-179 / 第 169-179 行
+
+```cpp
+ 169:         if (NextToken.has_value()) {
+ 170:           Diag << FixItHint::CreateRemoval(CharSourceRange::getCharRange(
+ 171:               Tok.getLocation(), NextToken->getLocation()));
+ 172:           break;
+ 173:         }
+ 174:       }
+ 175:     }
+ 176:   }
+ 177: }
+ 178: 
+ 179: } // namespace clang::tidy::modernize
+```
+- **Line 169 / 第 169 行**: EN: Checks a condition before executing the guarded branch. CN: 先检查条件，再执行受保护的分支。
+- **Line 170 / 第 170 行**: EN: Constructs a fix-it hint describing an automatic source edit. CN: 构造一个 fix-it 提示，用于描述自动源码编辑。
+- **Line 171 / 第 171 行**: EN: Calls a helper routine or method to advance the implementation. CN: 调用辅助例程或方法以推进实现逻辑。
+- **Line 172 / 第 172 行**: EN: Exits the nearest loop or switch statement. CN: 退出最近的循环或 switch 语句。
+- **Line 173 / 第 173 行**: EN: Closes the current scope or block. CN: 关闭当前作用域或代码块。
+- **Line 174 / 第 174 行**: EN: Closes the current scope or block. CN: 关闭当前作用域或代码块。
+- **Line 175 / 第 175 行**: EN: Closes the current scope or block. CN: 关闭当前作用域或代码块。
+- **Line 176 / 第 176 行**: EN: Closes the current scope or block. CN: 关闭当前作用域或代码块。
+- **Line 177 / 第 177 行**: EN: Closes the current scope or block. CN: 关闭当前作用域或代码块。
+- **Line 178 / 第 178 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 179 / 第 179 行**: EN: Closes a namespace scope and documents which namespace ended. CN: 结束一个命名空间作用域，并说明被关闭的命名空间。
+
+## Key Concepts / 关键概念
+- **Clang-Tidy framework / Clang-Tidy 框架**: Participates in the clang-tidy architecture that wires checks, options, and diagnostics together. / 参与 clang-tidy 架构，把检查、选项和诊断连接在一起。
+- **modernize module focus / modernize 模块关注点**: This file belongs to the `modernize` module, which concentrates on modern C++ migration checks. / 该文件属于 `modernize` 模块，重点关注现代 C++ 迁移检查。
+- **Clang-Tidy check lifecycle / Clang-Tidy 检查生命周期**: Defines or uses the standard hook points of a clang-tidy check. / 定义或使用 clang-tidy 检查的标准钩子。
+- **Shared analysis context / 共享分析上下文**: Carries options, diagnostics, language mode, and per-run shared state. / 承载选项、诊断、语言模式以及每次运行的共享状态。
+- **Configurable check options / 可配置检查选项**: Reads, stores, or merges user-visible configuration knobs. / 读取、存储或合并面向用户的配置项。
+- **AST matcher registration / AST Matcher 注册**: Connects declarative AST matchers to callback-based diagnostics. / 把声明式 AST Matcher 连接到基于回调的诊断逻辑。
+
+## Dependencies / 依赖关系
+- **Clang/LLVM and local headers / Clang/LLVM 与本地头文件**: `UseOverrideCheck.h`, `../utils/LexerUtils.h`, `clang/AST/ASTContext.h`, `clang/ASTMatchers/ASTMatchFinder.h`, `clang/Lex/Lexer.h`
+- **Standard library headers / 标准库头文件**: None / 无

@@ -1,0 +1,621 @@
+# leaf_utils.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/base_dsl/leaf_utils.py`
+
+## Purpose / 作用
+- EN: Defines 2 classes (LeafInfo, TraversableLeafMixin) and 10 functions (is_frozen_dataclass, _is_dynamic_expression, _is_assignable_leaf, _flatten_to_ir_values, ... (+6 more)) in `CuTeDSL.cutlass.base_dsl.leaf_utils`.
+- CN: 该模块 `CuTeDSL.cutlass.base_dsl.leaf_utils` 定义了 2 个类（LeafInfo, TraversableLeafMixin） 和 10 个函数（is_frozen_dataclass, _is_dynamic_expression, _is_assignable_leaf, _flatten_to_ir_values, ... (+6 more)）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `import dataclasses` — **EN:** Imports dataclasses for later use. **CN:** 导入 dataclasses 供后续使用。
+- **L13** `from types import SimpleNamespace` — **EN:** Imports SimpleNamespace from `types`. **CN:** 从 `types` 导入 SimpleNamespace。
+- **L14** `from typing import Any` — **EN:** Imports Any from `typing`. **CN:** 从 `typing` 导入 Any。
+- **L15** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L16** `from cutlass._mlir import ir` — **EN:** Imports ir from `cutlass._mlir`. **CN:** 从 `cutlass._mlir` 导入 ir。
+- **L17** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L18** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L19** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L20** `# Helper functions` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L21** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L23** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L24** `def is_frozen_dataclass(obj_or_cls: Any) -> bool:` — **EN:** Defines function `is_frozen_dataclass`. **CN:** 定义函数 `is_frozen_dataclass`。
+- **L25** `    """Check if an object or class is a frozen dataclass."""` — **EN:** Docstring line documenting the function `is_frozen_dataclass`. **CN:** 文档字符串行，用于说明 function `is_frozen_dataclass`。
+- **L26** `    cls = obj_or_cls if isinstance(obj_or_cls, type) else type(obj_or_cls)` — **EN:** Assigns a value to cls. **CN:** 将一个值赋给 cls。
+- **L27** `    if not dataclasses.is_dataclass(cls):` — **EN:** Starts a conditional branch guarded by `not dataclasses.is_dataclass(cls)`. **CN:** 开始一个由 `not dataclasses.is_dataclass(cls)` 控制的条件分支。
+- **L28** `        return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L29** `    params = getattr(cls, "__dataclass_params__", None)` — **EN:** Assigns a value to params. **CN:** 将一个值赋给 params。
+- **L30** `    if params is not None:` — **EN:** Starts a conditional branch guarded by `params is not None`. **CN:** 开始一个由 `params is not None` 控制的条件分支。
+- **L31** `        return getattr(params, "frozen", False)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L32** `    return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L33** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L34** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L35** `def _is_dynamic_expression(obj: Any) -> bool:` — **EN:** Defines function `_is_dynamic_expression`. **CN:** 定义函数 `_is_dynamic_expression`。
+- **L36** `    """Check if object implements the DynamicExpression protocol."""` — **EN:** Docstring line documenting the function `_is_dynamic_expression`. **CN:** 文档字符串行，用于说明 function `_is_dynamic_expression`。
+- **L37** `    if isinstance(obj, type):` — **EN:** Starts a conditional branch guarded by `isinstance(obj, type)`. **CN:** 开始一个由 `isinstance(obj, type)` 控制的条件分支。
+- **L38** `        return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L39** `    return hasattr(obj, "__extract_mlir_values__") and hasattr(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L40** `        obj, "__new_from_mlir_values__"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L41** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L42** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L43** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L44** `def _is_assignable_leaf(obj: Any) -> bool:` — **EN:** Defines function `_is_assignable_leaf`. **CN:** 定义函数 `_is_assignable_leaf`。
+- **L45** `    """` — **EN:** Starts the docstring for the function `_is_assignable_leaf`. **CN:** 开始说明 function `_is_assignable_leaf` 的文档字符串。
+- **L46** `    Check if object is an assignable leaf.` — **EN:** Continues the docstring for the function `_is_assignable_leaf`. **CN:** 继续说明 function `_is_assignable_leaf` 的文档字符串。
+- **L47** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L48** `    Assignable leaves are things the language allows us to assign to:` — **EN:** Continues the docstring for the function `_is_assignable_leaf`. **CN:** 继续说明 function `_is_assignable_leaf` 的文档字符串。
+- **L49** `    - ir.Value: directly assignable` — **EN:** Continues the docstring for the function `_is_assignable_leaf`. **CN:** 继续说明 function `_is_assignable_leaf` 的文档字符串。
+- **L50** `    - DynamicExpression: use __extract_mlir_values__ / __new_from_mlir_values__` — **EN:** Continues the docstring for the function `_is_assignable_leaf`. **CN:** 继续说明 function `_is_assignable_leaf` 的文档字符串。
+- **L51** `    - DSL types with .value that is ir.Value: can update .value` — **EN:** Continues the docstring for the function `_is_assignable_leaf`. **CN:** 继续说明 function `_is_assignable_leaf` 的文档字符串。
+- **L52** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L53** `    Objects whose class sets __cls_traversable_dict__ = True are always` — **EN:** Continues the docstring for the function `_is_assignable_leaf`. **CN:** 继续说明 function `_is_assignable_leaf` 的文档字符串。
+- **L54** `    treated as containers (not leaves), even if they implement the` — **EN:** Continues the docstring for the function `_is_assignable_leaf`. **CN:** 继续说明 function `_is_assignable_leaf` 的文档字符串。
+- **L55** `    DynamicExpression protocol.  This allows gather_leaves to recurse` — **EN:** Continues the docstring for the function `_is_assignable_leaf`. **CN:** 继续说明 function `_is_assignable_leaf` 的文档字符串。
+- **L56** `    into their __dict__ while the class still provides` — **EN:** Continues the docstring for the function `_is_assignable_leaf`. **CN:** 继续说明 function `_is_assignable_leaf` 的文档字符串。
+- **L57** `    __extract_mlir_values__ / __new_from_mlir_values__ to the framework.` — **EN:** Continues the docstring for the function `_is_assignable_leaf`. **CN:** 继续说明 function `_is_assignable_leaf` 的文档字符串。
+- **L58** `    """` — **EN:** Ends the docstring for the function `_is_assignable_leaf`. **CN:** 结束说明 function `_is_assignable_leaf` 的文档字符串。
+- **L59** `    # If the class declares itself as dict-traversable, treat as container, not leaf` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L60** `    if getattr(type(obj), "__cls_traversable_dict__", False):` — **EN:** Starts a conditional branch guarded by `getattr(type(obj), '__cls_traversable_dict__', False)`. **CN:** 开始一个由 `getattr(type(obj), '__cls_traversable_dict__', False)` 控制的条件分支。
+- **L61** `        return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L62** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L63** `    if isinstance(obj, ir.Value):` — **EN:** Starts a conditional branch guarded by `isinstance(obj, ir.Value)`. **CN:** 开始一个由 `isinstance(obj, ir.Value)` 控制的条件分支。
+- **L64** `        return True` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L65** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L66** `    if _is_dynamic_expression(obj):` — **EN:** Starts a conditional branch guarded by `_is_dynamic_expression(obj)`. **CN:** 开始一个由 `_is_dynamic_expression(obj)` 控制的条件分支。
+- **L67** `        return True` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L68** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L69** `    if hasattr(obj, "value") and isinstance(getattr(obj, "value", None), ir.Value):` — **EN:** Starts a conditional branch guarded by `hasattr(obj, 'value') and isinstance(getattr(obj, 'value'...`. **CN:** 开始一个由 `hasattr(obj, 'value') and isinstance(getattr(obj, 'value'...` 控制的条件分支。
+- **L70** `        return True` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L71** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L72** `    return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L73** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L74** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L75** `def _flatten_to_ir_values(values_dict: Any) -> list[ir.Value]:` — **EN:** Defines function `_flatten_to_ir_values`. **CN:** 定义函数 `_flatten_to_ir_values`。
+- **L76** `    """Flatten a values_dict from __extract_mlir_values__ to list of ir.Values."""` — **EN:** Docstring line documenting the function `_flatten_to_ir_values`. **CN:** 文档字符串行，用于说明 function `_flatten_to_ir_values`。
+- **L77** `    result = []` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L78** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L79** `    if isinstance(values_dict, ir.Value):` — **EN:** Starts a conditional branch guarded by `isinstance(values_dict, ir.Value)`. **CN:** 开始一个由 `isinstance(values_dict, ir.Value)` 控制的条件分支。
+- **L80** `        result.append(values_dict)` — **EN:** Invokes `result.append` as a standalone call. **CN:** 以独立语句方式调用 `result.append`。
+- **L81** `    elif isinstance(values_dict, dict):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L82** `        for v in values_dict.values():` — **EN:** Starts a loop assigning items from `values_dict.values()` to `v`. **CN:** 开始一个循环，将 `values_dict.values()` 的元素赋给 `v`。
+- **L83** `            result.extend(_flatten_to_ir_values(v))` — **EN:** Invokes `result.extend` as a standalone call. **CN:** 以独立语句方式调用 `result.extend`。
+- **L84** `    elif isinstance(values_dict, (list, tuple)):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L85** `        for v in values_dict:` — **EN:** Starts a loop assigning items from `values_dict` to `v`. **CN:** 开始一个循环，将 `values_dict` 的元素赋给 `v`。
+- **L86** `            result.extend(_flatten_to_ir_values(v))` — **EN:** Invokes `result.extend` as a standalone call. **CN:** 以独立语句方式调用 `result.extend`。
+- **L87** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L88** `    return result` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L89** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L90** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L91** `def _unflatten_ir_values(` — **EN:** Defines function `_unflatten_ir_values`. **CN:** 定义函数 `_unflatten_ir_values`。
+- **L92** `    template: Any, values: list[ir.Value], idx: list[int] | None = None` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L93** `) -> Any:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L94** `    """Unflatten ir.Values back into a values_dict structure matching template."""` — **EN:** Docstring line documenting the function `_unflatten_ir_values`. **CN:** 文档字符串行，用于说明 function `_unflatten_ir_values`。
+- **L95** `    if idx is None:` — **EN:** Starts a conditional branch guarded by `idx is None`. **CN:** 开始一个由 `idx is None` 控制的条件分支。
+- **L96** `        idx = [0]` — **EN:** Assigns a value to idx. **CN:** 将一个值赋给 idx。
+- **L97** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L98** `    if isinstance(template, ir.Value):` — **EN:** Starts a conditional branch guarded by `isinstance(template, ir.Value)`. **CN:** 开始一个由 `isinstance(template, ir.Value)` 控制的条件分支。
+- **L99** `        result = values[idx[0]] if idx[0] < len(values) else template` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L100** `        idx[0] += 1` — **EN:** Updates idx[0] in place. **CN:** 原地更新 idx[0]。
+- **L101** `        return result` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L102** `    elif isinstance(template, dict):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L103** `        return {k: _unflatten_ir_values(v, values, idx) for k, v in template.items()}` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L104** `    elif isinstance(template, list):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L105** `        return [_unflatten_ir_values(v, values, idx) for v in template]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L106** `    elif isinstance(template, tuple):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L107** `        return tuple(_unflatten_ir_values(v, values, idx) for v in template)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L108** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L109** `        return template` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L110** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L111** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L112** `def _get_all_attrs(obj: Any) -> dict[str, Any]:` — **EN:** Defines function `_get_all_attrs`. **CN:** 定义函数 `_get_all_attrs`。
+- **L113** `    """Get all attributes from an object via __dict__ and __slots__."""` — **EN:** Docstring line documenting the function `_get_all_attrs`. **CN:** 文档字符串行，用于说明 function `_get_all_attrs`。
+- **L114** `    attrs = {}` — **EN:** Assigns a value to attrs. **CN:** 将一个值赋给 attrs。
+- **L115** `    if hasattr(obj, "__dict__"):` — **EN:** Starts a conditional branch guarded by `hasattr(obj, '__dict__')`. **CN:** 开始一个由 `hasattr(obj, '__dict__')` 控制的条件分支。
+- **L116** `        attrs.update(obj.__dict__)` — **EN:** Invokes `attrs.update` as a standalone call. **CN:** 以独立语句方式调用 `attrs.update`。
+- **L117** `    for cls in type(obj).__mro__:` — **EN:** Starts a loop assigning items from `type(obj).__mro__` to `cls`. **CN:** 开始一个循环，将 `type(obj).__mro__` 的元素赋给 `cls`。
+- **L118** `        if hasattr(cls, "__slots__"):` — **EN:** Starts a conditional branch guarded by `hasattr(cls, '__slots__')`. **CN:** 开始一个由 `hasattr(cls, '__slots__')` 控制的条件分支。
+- **L119** `            for slot in cls.__slots__:` — **EN:** Starts a loop assigning items from `cls.__slots__` to `slot`. **CN:** 开始一个循环，将 `cls.__slots__` 的元素赋给 `slot`。
+- **L120** `                if hasattr(obj, slot) and slot not in attrs:` — **EN:** Starts a conditional branch guarded by `hasattr(obj, slot) and slot not in attrs`. **CN:** 开始一个由 `hasattr(obj, slot) and slot not in attrs` 控制的条件分支。
+- **L121** `                    try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L122** `                        attrs[slot] = getattr(obj, slot)` — **EN:** Assigns a value to attrs[slot]. **CN:** 将一个值赋给 attrs[slot]。
+- **L123** `                    except AttributeError:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L124** `                        pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L125** `    return attrs` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L126** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L127** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L128** `def _unwrap_ir_value(val: Any) -> ir.Value | None:` — **EN:** Defines function `_unwrap_ir_value`. **CN:** 定义函数 `_unwrap_ir_value`。
+- **L129** `    """` — **EN:** Starts the docstring for the function `_unwrap_ir_value`. **CN:** 开始说明 function `_unwrap_ir_value` 的文档字符串。
+- **L130** `    Extract the ir.Value from a value, handling value casters.` — **EN:** Continues the docstring for the function `_unwrap_ir_value`. **CN:** 继续说明 function `_unwrap_ir_value` 的文档字符串。
+- **L131** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L132** `    MLIR Python bindings auto-cast certain types (like PtrType -> _Pointer).` — **EN:** Continues the docstring for the function `_unwrap_ir_value`. **CN:** 继续说明 function `_unwrap_ir_value` 的文档字符串。
+- **L133** `    These wrapped types store the ir.Value in .value attribute.` — **EN:** Continues the docstring for the function `_unwrap_ir_value`. **CN:** 继续说明 function `_unwrap_ir_value` 的文档字符串。
+- **L134** `    """` — **EN:** Ends the docstring for the function `_unwrap_ir_value`. **CN:** 结束说明 function `_unwrap_ir_value` 的文档字符串。
+- **L135** `    if isinstance(val, ir.Value):` — **EN:** Starts a conditional branch guarded by `isinstance(val, ir.Value)`. **CN:** 开始一个由 `isinstance(val, ir.Value)` 控制的条件分支。
+- **L136** `        return val` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L137** `    if hasattr(val, "value") and isinstance(val.value, ir.Value):` — **EN:** Starts a conditional branch guarded by `hasattr(val, 'value') and isinstance(val.value, ir.Value)`. **CN:** 开始一个由 `hasattr(val, 'value') and isinstance(val.value, ir.Value)` 控制的条件分支。
+- **L138** `        return val.value` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L139** `    return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L140** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L141** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L142** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L143** `# LeafInfo` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L144** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L145** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L146** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L147** `class LeafInfo:` — **EN:** Defines class `LeafInfo`. **CN:** 定义类 `LeafInfo`。
+- **L148** `    """` — **EN:** Starts the docstring for the class `LeafInfo`. **CN:** 开始说明 class `LeafInfo` 的文档字符串。
+- **L149** `    Information about an assignable leaf and its location.` — **EN:** Continues the docstring for the class `LeafInfo`. **CN:** 继续说明 class `LeafInfo` 的文档字符串。
+- **L150** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L151** `    A "leaf" is something the language allows us to assign to:` — **EN:** Continues the docstring for the class `LeafInfo`. **CN:** 继续说明 class `LeafInfo` 的文档字符串。
+- **L152** `    - ir.Value: can be replaced in parent container` — **EN:** Continues the docstring for the class `LeafInfo`. **CN:** 继续说明 class `LeafInfo` 的文档字符串。
+- **L153** `    - DynamicExpression: use __extract_mlir_values__ / __new_from_mlir_values__` — **EN:** Continues the docstring for the class `LeafInfo`. **CN:** 继续说明 class `LeafInfo` 的文档字符串。
+- **L154** `    - DSL types with .value (Int32, _Pointer, etc.): can update .value` — **EN:** Continues the docstring for the class `LeafInfo`. **CN:** 继续说明 class `LeafInfo` 的文档字符串。
+- **L155** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L156** `    We track where each leaf lives so we can update it after a loop/branch.` — **EN:** Continues the docstring for the class `LeafInfo`. **CN:** 继续说明 class `LeafInfo` 的文档字符串。
+- **L157** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L158** `    Attributes:` — **EN:** Continues the docstring for the class `LeafInfo`. **CN:** 继续说明 class `LeafInfo` 的文档字符串。
+- **L159** `        obj: The leaf object itself (DSL type or ir.Value)` — **EN:** Continues the docstring for the class `LeafInfo`. **CN:** 继续说明 class `LeafInfo` 的文档字符串。
+- **L160** `        parent: The parent object containing this leaf (can be None for DSL types)` — **EN:** Continues the docstring for the class `LeafInfo`. **CN:** 继续说明 class `LeafInfo` 的文档字符串。
+- **L161** `        key: The field name or index to access this leaf from parent` — **EN:** Continues the docstring for the class `LeafInfo`. **CN:** 继续说明 class `LeafInfo` 的文档字符串。
+- **L162** `        key_type: 'attr', 'list', 'dict', 'root'` — **EN:** Continues the docstring for the class `LeafInfo`. **CN:** 继续说明 class `LeafInfo` 的文档字符串。
+- **L163** `        path: Human-readable path from root (for debugging)` — **EN:** Continues the docstring for the class `LeafInfo`. **CN:** 继续说明 class `LeafInfo` 的文档字符串。
+- **L164** `    """` — **EN:** Ends the docstring for the class `LeafInfo`. **CN:** 结束说明 class `LeafInfo` 的文档字符串。
+- **L165** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L166** `    def __init__(self, obj: Any, parent: Any, key: Any, key_type: str, path: str):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L167** `        self.obj = obj` — **EN:** Assigns a value to self.obj. **CN:** 将一个值赋给 self.obj。
+- **L168** `        self.parent = parent` — **EN:** Assigns a value to self.parent. **CN:** 将一个值赋给 self.parent。
+- **L169** `        self.key = key` — **EN:** Assigns a value to self.key. **CN:** 将一个值赋给 self.key。
+- **L170** `        self.key_type = key_type` — **EN:** Assigns a value to self.key_type. **CN:** 将一个值赋给 self.key_type。
+- **L171** `        self.path = path` — **EN:** Assigns a value to self.path. **CN:** 将一个值赋给 self.path。
+- **L172** `        self._extracted_values = None` — **EN:** Assigns a value to self._extracted_values. **CN:** 将一个值赋给 self._extracted_values。
+- **L173** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L174** `    def get_ir_values(self) -> list[ir.Value]:` — **EN:** Defines function `get_ir_values`. **CN:** 定义函数 `get_ir_values`。
+- **L175** `        """Get all ir.Values from this leaf (may be multiple for DynamicExpression)."""` — **EN:** Docstring line documenting the function `get_ir_values`. **CN:** 文档字符串行，用于说明 function `get_ir_values`。
+- **L176** `        if isinstance(self.obj, ir.Value):` — **EN:** Starts a conditional branch guarded by `isinstance(self.obj, ir.Value)`. **CN:** 开始一个由 `isinstance(self.obj, ir.Value)` 控制的条件分支。
+- **L177** `            return [self.obj]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L178** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L179** `        if _is_dynamic_expression(self.obj):` — **EN:** Starts a conditional branch guarded by `_is_dynamic_expression(self.obj)`. **CN:** 开始一个由 `_is_dynamic_expression(self.obj)` 控制的条件分支。
+- **L180** `            values_dict = self.obj.__extract_mlir_values__()` — **EN:** Assigns a value to values_dict. **CN:** 将一个值赋给 values_dict。
+- **L181** `            return _flatten_to_ir_values(values_dict)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L182** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L183** `        if hasattr(self.obj, "value") and isinstance(self.obj.value, ir.Value):` — **EN:** Starts a conditional branch guarded by `hasattr(self.obj, 'value') and isinstance(self.obj.value,...`. **CN:** 开始一个由 `hasattr(self.obj, 'value') and isinstance(self.obj.value,...` 控制的条件分支。
+- **L184** `            return [self.obj.value]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L185** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L186** `        return []` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L187** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L188** `    def get_ir_value(self) -> ir.Value | None:` — **EN:** Defines function `get_ir_value`. **CN:** 定义函数 `get_ir_value`。
+- **L189** `        """Get single ir.Value (for backward compat - returns first value)."""` — **EN:** Docstring line documenting the function `get_ir_value`. **CN:** 文档字符串行，用于说明 function `get_ir_value`。
+- **L190** `        values = self.get_ir_values()` — **EN:** Assigns a value to values. **CN:** 将一个值赋给 values。
+- **L191** `        return values[0] if values else None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L192** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L193** `    def set_ir_values(self, new_vals: list[ir.Value]) -> None:` — **EN:** Defines function `set_ir_values`. **CN:** 定义函数 `set_ir_values`。
+- **L194** `        """Set ir.Values at this location (may be multiple for DynamicExpression).` — **EN:** Starts the docstring for the function `set_ir_values`. **CN:** 开始说明 function `set_ir_values` 的文档字符串。
+- **L195** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L196** `        With the mutable proxy pattern, the parent is always mutable (the capture` — **EN:** Continues the docstring for the function `set_ir_values`. **CN:** 继续说明 function `set_ir_values` 的文档字符串。
+- **L197** `        list, a proxy list for tuples, or a proxy SimpleNamespace for frozen DCs).` — **EN:** Continues the docstring for the function `set_ir_values`. **CN:** 继续说明 function `set_ir_values` 的文档字符串。
+- **L198** `        So replacement in parent always succeeds for leaves.` — **EN:** Continues the docstring for the function `set_ir_values`. **CN:** 继续说明 function `set_ir_values` 的文档字符串。
+- **L199** `        """` — **EN:** Ends the docstring for the function `set_ir_values`. **CN:** 结束说明 function `set_ir_values` 的文档字符串。
+- **L200** `        # Case 1: DynamicExpression -> use protocol to reconstruct and replace` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L201** `        if _is_dynamic_expression(self.obj):` — **EN:** Starts a conditional branch guarded by `_is_dynamic_expression(self.obj)`. **CN:** 开始一个由 `_is_dynamic_expression(self.obj)` 控制的条件分支。
+- **L202** `            old_values_dict = self.obj.__extract_mlir_values__()` — **EN:** Assigns a value to old_values_dict. **CN:** 将一个值赋给 old_values_dict。
+- **L203** `            new_values_dict = _unflatten_ir_values(old_values_dict, new_vals)` — **EN:** Assigns a value to new_values_dict. **CN:** 将一个值赋给 new_values_dict。
+- **L204** `            new_obj = self.obj.__new_from_mlir_values__(new_values_dict)` — **EN:** Assigns a value to new_obj. **CN:** 将一个值赋给 new_obj。
+- **L205** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L206** `            replaced = False` — **EN:** Assigns a value to replaced. **CN:** 将一个值赋给 replaced。
+- **L207** `            if self.parent is not None:` — **EN:** Starts a conditional branch guarded by `self.parent is not None`. **CN:** 开始一个由 `self.parent is not None` 控制的条件分支。
+- **L208** `                if self.key_type == "attr":` — **EN:** Starts a conditional branch guarded by `self.key_type == 'attr'`. **CN:** 开始一个由 `self.key_type == 'attr'` 控制的条件分支。
+- **L209** `                    setattr(self.parent, self.key, new_obj)` — **EN:** Invokes `setattr` as a standalone call. **CN:** 以独立语句方式调用 `setattr`。
+- **L210** `                    replaced = True` — **EN:** Assigns a value to replaced. **CN:** 将一个值赋给 replaced。
+- **L211** `                elif self.key_type == "list" or self.key_type == "dict":` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L212** `                    self.parent[self.key] = new_obj` — **EN:** Assigns a value to self.parent[self.key]. **CN:** 将一个值赋给 self.parent[self.key]。
+- **L213** `                    replaced = True` — **EN:** Assigns a value to replaced. **CN:** 将一个值赋给 replaced。
+- **L214** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L215** `            if replaced:` — **EN:** Starts a conditional branch guarded by `replaced`. **CN:** 开始一个由 `replaced` 控制的条件分支。
+- **L216** `                self.obj = new_obj` — **EN:** Assigns a value to self.obj. **CN:** 将一个值赋给 self.obj。
+- **L217** `                return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L218** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L219** `            # Fallback: try in-place update` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L220** `            if hasattr(self.obj, "__dict__") and hasattr(new_obj, "__dict__"):` — **EN:** Starts a conditional branch guarded by `hasattr(self.obj, '__dict__') and hasattr(new_obj, '__dic...`. **CN:** 开始一个由 `hasattr(self.obj, '__dict__') and hasattr(new_obj, '__dic...` 控制的条件分支。
+- **L221** `                self.obj.__dict__.update(new_obj.__dict__)` — **EN:** Invokes `self.obj.__dict__.update` as a standalone call. **CN:** 以独立语句方式调用 `self.obj.__dict__.update`。
+- **L222** `                return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L223** `            if hasattr(self.obj, "value") and len(new_vals) >= 1:` — **EN:** Starts a conditional branch guarded by `hasattr(self.obj, 'value') and len(new_vals) >= 1`. **CN:** 开始一个由 `hasattr(self.obj, 'value') and len(new_vals) >= 1` 控制的条件分支。
+- **L224** `                self.obj.value = new_vals[0]` — **EN:** Assigns a value to self.obj.value. **CN:** 将一个值赋给 self.obj.value。
+- **L225** `                return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L226** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L227** `            raise RuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L228** `                f"Cannot update DynamicExpression at '{self.path}'.\n"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L229** `                f"  Object type: {type(self.obj).__name__}\n"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L230** `                f"  Parent type: {type(self.parent).__name__ if self.parent else 'None'}\n"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L231** `                f"  Key type: {self.key_type}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L232** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L233** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L234** `        # Case 2: Simple .value attribute (Int32, Float32, Pointer wrappers)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L235** `        if hasattr(self.obj, "value") and isinstance(` — **EN:** Starts a conditional branch guarded by `hasattr(self.obj, 'value') and isinstance(getattr(self.ob...`. **CN:** 开始一个由 `hasattr(self.obj, 'value') and isinstance(getattr(self.ob...` 控制的条件分支。
+- **L236** `            getattr(self.obj, "value", None), ir.Value` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L237** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L238** `            if len(new_vals) >= 1:` — **EN:** Starts a conditional branch guarded by `len(new_vals) >= 1`. **CN:** 开始一个由 `len(new_vals) >= 1` 控制的条件分支。
+- **L239** `                self.obj.value = new_vals[0]` — **EN:** Assigns a value to self.obj.value. **CN:** 将一个值赋给 self.obj.value。
+- **L240** `            return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L241** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L242** `        # Case 3: raw ir.Value (including subclasses like ArithValue, ctm.Pointer)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L243** `        if isinstance(self.obj, ir.Value):` — **EN:** Starts a conditional branch guarded by `isinstance(self.obj, ir.Value)`. **CN:** 开始一个由 `isinstance(self.obj, ir.Value)` 控制的条件分支。
+- **L244** `            if len(new_vals) >= 1:` — **EN:** Starts a conditional branch guarded by `len(new_vals) >= 1`. **CN:** 开始一个由 `len(new_vals) >= 1` 控制的条件分支。
+- **L245** `                self._replace_in_parent(new_vals[0])` — **EN:** Invokes `self._replace_in_parent` as a standalone call. **CN:** 以独立语句方式调用 `self._replace_in_parent`。
+- **L246** `            return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L247** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L248** `        print(` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L249** `            f"WARNING: Cannot set ir.Values at {self.path}: "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L250** `            f"got {type(self.obj).__name__}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L251** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L252** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L253** `    def set_ir_value(self, new_val: ir.Value) -> None:` — **EN:** Defines function `set_ir_value`. **CN:** 定义函数 `set_ir_value`。
+- **L254** `        """Set single ir.Value (for backward compat)."""` — **EN:** Docstring line documenting the function `set_ir_value`. **CN:** 文档字符串行，用于说明 function `set_ir_value`。
+- **L255** `        self.set_ir_values([new_val])` — **EN:** Invokes `self.set_ir_values` as a standalone call. **CN:** 以独立语句方式调用 `self.set_ir_values`。
+- **L256** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L257** `    def _replace_in_parent(self, new_val: ir.Value) -> None:` — **EN:** Defines function `_replace_in_parent`. **CN:** 定义函数 `_replace_in_parent`。
+- **L258** `        """Replace this object in its parent container."""` — **EN:** Docstring line documenting the function `_replace_in_parent`. **CN:** 文档字符串行，用于说明 function `_replace_in_parent`。
+- **L259** `        if self.parent is None:` — **EN:** Starts a conditional branch guarded by `self.parent is None`. **CN:** 开始一个由 `self.parent is None` 控制的条件分支。
+- **L260** `            print(f"WARNING: Cannot replace root-level ir.Value at {self.path}")` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L261** `            return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L262** `        if self.key_type == "attr":` — **EN:** Starts a conditional branch guarded by `self.key_type == 'attr'`. **CN:** 开始一个由 `self.key_type == 'attr'` 控制的条件分支。
+- **L263** `            setattr(self.parent, self.key, new_val)` — **EN:** Invokes `setattr` as a standalone call. **CN:** 以独立语句方式调用 `setattr`。
+- **L264** `        elif self.key_type == "list" or self.key_type == "dict":` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L265** `            self.parent[self.key] = new_val` — **EN:** Assigns a value to self.parent[self.key]. **CN:** 将一个值赋给 self.parent[self.key]。
+- **L266** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L267** `    def __repr__(self) -> str:` — **EN:** Defines function `__repr__`. **CN:** 定义函数 `__repr__`。
+- **L268** `        return f"LeafInfo({self.path}, {type(self.obj).__name__})"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L269** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L270** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L271** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L272** `# gather_leaves` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L273** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L274** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L275** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L276** `def gather_leaves(` — **EN:** Defines function `gather_leaves`. **CN:** 定义函数 `gather_leaves`。
+- **L277** `    objects: list[Any],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L278** `) -> tuple[list[ir.Value], list[LeafInfo], list[tuple[Any, ...]]]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L279** `    """` — **EN:** Starts the docstring for the function `gather_leaves`. **CN:** 开始说明 function `gather_leaves` 的文档字符串。
+- **L280** `    Recursively traverse the object graph and gather assignable leaves.` — **EN:** Continues the docstring for the function `gather_leaves`. **CN:** 继续说明 function `gather_leaves` 的文档字符串。
+- **L281** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L282** `    Leaves are atomic values (ir.Value, Int32, DynamicExpression, etc.) that` — **EN:** Continues the docstring for the function `gather_leaves`. **CN:** 继续说明 function `gather_leaves` 的文档字符串。
+- **L283** `    carry ir.Values. Containers (list, dict, class, tuple, frozen dataclass)` — **EN:** Continues the docstring for the function `gather_leaves`. **CN:** 继续说明 function `gather_leaves` 的文档字符串。
+- **L284** `    hold leaves and other containers -- we recurse into them.` — **EN:** Continues the docstring for the function `gather_leaves`. **CN:** 继续说明 function `gather_leaves` 的文档字符串。
+- **L285** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L286** `    The \`objects\` list itself serves as the root mutable parent, so every leaf` — **EN:** Continues the docstring for the function `gather_leaves`. **CN:** 继续说明 function `gather_leaves` 的文档字符串。
+- **L287** `    is always addressable via its parent container. For immutable containers` — **EN:** Continues the docstring for the function `gather_leaves`. **CN:** 继续说明 function `gather_leaves` 的文档字符串。
+- **L288** `    (tuples, frozen dataclasses), we create mutable proxies during gather and` — **EN:** Continues the docstring for the function `gather_leaves`. **CN:** 继续说明 function `gather_leaves` 的文档字符串。
+- **L289** `    reconstruct the immutables during inject_leaves.` — **EN:** Continues the docstring for the function `gather_leaves`. **CN:** 继续说明 function `gather_leaves` 的文档字符串。
+- **L290** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L291** `    Args:` — **EN:** Continues the docstring for the function `gather_leaves`. **CN:** 继续说明 function `gather_leaves` 的文档字符串。
+- **L292** `        objects: List of Python objects to traverse (the capture container)` — **EN:** Continues the docstring for the function `gather_leaves`. **CN:** 继续说明 function `gather_leaves` 的文档字符串。
+- **L293** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L294** `    Returns:` — **EN:** Continues the docstring for the function `gather_leaves`. **CN:** 继续说明 function `gather_leaves` 的文档字符串。
+- **L295** `        Tuple of:` — **EN:** Continues the docstring for the function `gather_leaves`. **CN:** 继续说明 function `gather_leaves` 的文档字符串。
+- **L296** `        - ir_values: Flat list of ir.Values from leaves` — **EN:** Continues the docstring for the function `gather_leaves`. **CN:** 继续说明 function `gather_leaves` 的文档字符串。
+- **L297** `        - leaf_infos: List of LeafInfo describing each leaf's location` — **EN:** Continues the docstring for the function `gather_leaves`. **CN:** 继续说明 function `gather_leaves` 的文档字符串。
+- **L298** `        - immutable_proxies: List of (original_obj, proxy, parent, key, key_type)` — **EN:** Continues the docstring for the function `gather_leaves`. **CN:** 继续说明 function `gather_leaves` 的文档字符串。
+- **L299** `          for each immutable container encountered, in DFS order.` — **EN:** Continues the docstring for the function `gather_leaves`. **CN:** 继续说明 function `gather_leaves` 的文档字符串。
+- **L300** `          Used by inject_leaves for bottom-up reconstruction.` — **EN:** Continues the docstring for the function `gather_leaves`. **CN:** 继续说明 function `gather_leaves` 的文档字符串。
+- **L301** `    """` — **EN:** Ends the docstring for the function `gather_leaves`. **CN:** 结束说明 function `gather_leaves` 的文档字符串。
+- **L302** `    ir_values: list[ir.Value] = []` — **EN:** Assigns a typed value to ir_values. **CN:** 为 ir_values 赋予带类型标注的值。
+- **L303** `    leaf_infos: list[LeafInfo] = []` — **EN:** Assigns a typed value to leaf_infos. **CN:** 为 leaf_infos 赋予带类型标注的值。
+- **L304** `    immutable_proxies: list[tuple[Any, ...]] = []` — **EN:** Assigns a typed value to immutable_proxies. **CN:** 为 immutable_proxies 赋予带类型标注的值。
+- **L305** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L306** `    visited = set()` — **EN:** Assigns a value to visited. **CN:** 将一个值赋给 visited。
+- **L307** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L308** `    def _gather_recursive(` — **EN:** Defines function `_gather_recursive`. **CN:** 定义函数 `_gather_recursive`。
+- **L309** `        obj: Any, parent: Any, key: Any, key_type: str, path: str` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L310** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L311** `        """Recursively find assignable leaves."""` — **EN:** Docstring line documenting the function `_gather_recursive`. **CN:** 文档字符串行，用于说明 function `_gather_recursive`。
+- **L312** `        if obj is None:` — **EN:** Starts a conditional branch guarded by `obj is None`. **CN:** 开始一个由 `obj is None` 控制的条件分支。
+- **L313** `            return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L314** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L315** `        obj_id = id(obj)` — **EN:** Assigns a value to obj_id. **CN:** 将一个值赋给 obj_id。
+- **L316** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L317** `        # Check if this is an assignable leaf` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L318** `        if _is_assignable_leaf(obj):` — **EN:** Starts a conditional branch guarded by `_is_assignable_leaf(obj)`. **CN:** 开始一个由 `_is_assignable_leaf(obj)` 控制的条件分支。
+- **L319** `            info = LeafInfo(obj, parent, key, key_type, path)` — **EN:** Assigns a value to info. **CN:** 将一个值赋给 info。
+- **L320** `            leaf_infos.append(info)` — **EN:** Invokes `leaf_infos.append` as a standalone call. **CN:** 以独立语句方式调用 `leaf_infos.append`。
+- **L321** `            leaf_values = info.get_ir_values()` — **EN:** Assigns a value to leaf_values. **CN:** 将一个值赋给 leaf_values。
+- **L322** `            ir_values.extend(leaf_values)` — **EN:** Invokes `ir_values.extend` as a standalone call. **CN:** 以独立语句方式调用 `ir_values.extend`。
+- **L323** `            return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L324** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L325** `        # Not a leaf - recurse into containers` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L326** `        if obj_id in visited:` — **EN:** Starts a conditional branch guarded by `obj_id in visited`. **CN:** 开始一个由 `obj_id in visited` 控制的条件分支。
+- **L327** `            return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L328** `        visited.add(obj_id)` — **EN:** Invokes `visited.add` as a standalone call. **CN:** 以独立语句方式调用 `visited.add`。
+- **L329** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L330** `        # List (mutable container)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L331** `        if isinstance(obj, list):` — **EN:** Starts a conditional branch guarded by `isinstance(obj, list)`. **CN:** 开始一个由 `isinstance(obj, list)` 控制的条件分支。
+- **L332** `            for i, item in enumerate(obj):` — **EN:** Starts a loop assigning items from `enumerate(obj)` to `(i, item)`. **CN:** 开始一个循环，将 `enumerate(obj)` 的元素赋给 `(i, item)`。
+- **L333** `                item_path = f"{path}[{i}]" if path else f"[{i}]"` — **EN:** Assigns a value to item_path. **CN:** 将一个值赋给 item_path。
+- **L334** `                _gather_recursive(item, obj, i, "list", item_path)` — **EN:** Invokes `_gather_recursive` as a standalone call. **CN:** 以独立语句方式调用 `_gather_recursive`。
+- **L335** `            return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L336** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L337** `        # Dict (mutable container)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L338** `        if isinstance(obj, dict):` — **EN:** Starts a conditional branch guarded by `isinstance(obj, dict)`. **CN:** 开始一个由 `isinstance(obj, dict)` 控制的条件分支。
+- **L339** `            for k, v in obj.items():` — **EN:** Starts a loop assigning items from `obj.items()` to `(k, v)`. **CN:** 开始一个循环，将 `obj.items()` 的元素赋给 `(k, v)`。
+- **L340** `                key_str = repr(k) if not isinstance(k, str) else k` — **EN:** Assigns a value to key_str. **CN:** 将一个值赋给 key_str。
+- **L341** `                item_path = f"{path}[{key_str}]" if path else f"[{key_str}]"` — **EN:** Assigns a value to item_path. **CN:** 将一个值赋给 item_path。
+- **L342** `                _gather_recursive(v, obj, k, "dict", item_path)` — **EN:** Invokes `_gather_recursive` as a standalone call. **CN:** 以独立语句方式调用 `_gather_recursive`。
+- **L343** `            return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L344** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L345** `        # Tuple (IMMUTABLE container -- create mutable proxy list)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L346** `        if isinstance(obj, tuple):` — **EN:** Starts a conditional branch guarded by `isinstance(obj, tuple)`. **CN:** 开始一个由 `isinstance(obj, tuple)` 控制的条件分支。
+- **L347** `            proxy_list = list(obj)` — **EN:** Assigns a value to proxy_list. **CN:** 将一个值赋给 proxy_list。
+- **L348** `            immutable_proxies.append((obj, proxy_list, parent, key, key_type))` — **EN:** Invokes `immutable_proxies.append` as a standalone call. **CN:** 以独立语句方式调用 `immutable_proxies.append`。
+- **L349** `            if parent is not None:` — **EN:** Starts a conditional branch guarded by `parent is not None`. **CN:** 开始一个由 `parent is not None` 控制的条件分支。
+- **L350** `                if key_type == "list" or key_type == "dict":` — **EN:** Starts a conditional branch guarded by `key_type == 'list' or key_type == 'dict'`. **CN:** 开始一个由 `key_type == 'list' or key_type == 'dict'` 控制的条件分支。
+- **L351** `                    parent[key] = proxy_list` — **EN:** Assigns a value to parent[key]. **CN:** 将一个值赋给 parent[key]。
+- **L352** `                elif key_type == "attr":` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L353** `                    setattr(parent, key, proxy_list)` — **EN:** Invokes `setattr` as a standalone call. **CN:** 以独立语句方式调用 `setattr`。
+- **L354** `            for i, item in enumerate(proxy_list):` — **EN:** Starts a loop assigning items from `enumerate(proxy_list)` to `(i, item)`. **CN:** 开始一个循环，将 `enumerate(proxy_list)` 的元素赋给 `(i, item)`。
+- **L355** `                item_path = f"{path}({i})" if path else f"({i})"` — **EN:** Assigns a value to item_path. **CN:** 将一个值赋给 item_path。
+- **L356** `                _gather_recursive(item, proxy_list, i, "list", item_path)` — **EN:** Invokes `_gather_recursive` as a standalone call. **CN:** 以独立语句方式调用 `_gather_recursive`。
+- **L357** `            return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L358** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L359** `        # Frozen dataclass (IMMUTABLE container -- create mutable proxy)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L360** `        if is_frozen_dataclass(obj):` — **EN:** Starts a conditional branch guarded by `is_frozen_dataclass(obj)`. **CN:** 开始一个由 `is_frozen_dataclass(obj)` 控制的条件分支。
+- **L361** `            fields = dataclasses.fields(obj)` — **EN:** Assigns a value to fields. **CN:** 将一个值赋给 fields。
+- **L362** `            proxy = SimpleNamespace(**{f.name: getattr(obj, f.name) for f in fields})` — **EN:** Assigns a value to proxy. **CN:** 将一个值赋给 proxy。
+- **L363** `            immutable_proxies.append((obj, proxy, parent, key, key_type))` — **EN:** Invokes `immutable_proxies.append` as a standalone call. **CN:** 以独立语句方式调用 `immutable_proxies.append`。
+- **L364** `            if parent is not None:` — **EN:** Starts a conditional branch guarded by `parent is not None`. **CN:** 开始一个由 `parent is not None` 控制的条件分支。
+- **L365** `                if key_type == "list" or key_type == "dict":` — **EN:** Starts a conditional branch guarded by `key_type == 'list' or key_type == 'dict'`. **CN:** 开始一个由 `key_type == 'list' or key_type == 'dict'` 控制的条件分支。
+- **L366** `                    parent[key] = proxy` — **EN:** Assigns a value to parent[key]. **CN:** 将一个值赋给 parent[key]。
+- **L367** `                elif key_type == "attr":` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L368** `                    setattr(parent, key, proxy)` — **EN:** Invokes `setattr` as a standalone call. **CN:** 以独立语句方式调用 `setattr`。
+- **L369** `            for f in fields:` — **EN:** Starts a loop assigning items from `fields` to `f`. **CN:** 开始一个循环，将 `fields` 的元素赋给 `f`。
+- **L370** `                attr_val = getattr(proxy, f.name)` — **EN:** Assigns a value to attr_val. **CN:** 将一个值赋给 attr_val。
+- **L371** `                if f.name.startswith("__") or callable(attr_val):` — **EN:** Starts a conditional branch guarded by `f.name.startswith('__') or callable(attr_val)`. **CN:** 开始一个由 `f.name.startswith('__') or callable(attr_val)` 控制的条件分支。
+- **L372** `                    continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L373** `                attr_path = f"{path}.{f.name}" if path else f.name` — **EN:** Assigns a value to attr_path. **CN:** 将一个值赋给 attr_path。
+- **L374** `                _gather_recursive(attr_val, proxy, f.name, "attr", attr_path)` — **EN:** Invokes `_gather_recursive` as a standalone call. **CN:** 以独立语句方式调用 `_gather_recursive`。
+- **L375** `            return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L376** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L377** `        # Object with __dict__ or __slots__ (mutable container)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L378** `        if hasattr(obj, "__dict__") or hasattr(type(obj), "__slots__"):` — **EN:** Starts a conditional branch guarded by `hasattr(obj, '__dict__') or hasattr(type(obj), '__slots__')`. **CN:** 开始一个由 `hasattr(obj, '__dict__') or hasattr(type(obj), '__slots__')` 控制的条件分支。
+- **L379** `            attrs = _get_all_attrs(obj)` — **EN:** Assigns a value to attrs. **CN:** 将一个值赋给 attrs。
+- **L380** `            for attr_name, attr_val in attrs.items():` — **EN:** Starts a loop assigning items from `attrs.items()` to `(attr_name, attr_val)`. **CN:** 开始一个循环，将 `attrs.items()` 的元素赋给 `(attr_name, attr_val)`。
+- **L381** `                if attr_name.startswith("__") or callable(attr_val):` — **EN:** Starts a conditional branch guarded by `attr_name.startswith('__') or callable(attr_val)`. **CN:** 开始一个由 `attr_name.startswith('__') or callable(attr_val)` 控制的条件分支。
+- **L382** `                    continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L383** `                attr_path = f"{path}.{attr_name}" if path else attr_name` — **EN:** Assigns a value to attr_path. **CN:** 将一个值赋给 attr_path。
+- **L384** `                _gather_recursive(attr_val, obj, attr_name, "attr", attr_path)` — **EN:** Invokes `_gather_recursive` as a standalone call. **CN:** 以独立语句方式调用 `_gather_recursive`。
+- **L385** `            return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L386** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L387** `    # Process each top-level object` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L388** `    for i, obj in enumerate(objects):` — **EN:** Starts a loop assigning items from `enumerate(objects)` to `(i, obj)`. **CN:** 开始一个循环，将 `enumerate(objects)` 的元素赋给 `(i, obj)`。
+- **L389** `        root_path = f"arg{i}"` — **EN:** Assigns a value to root_path. **CN:** 将一个值赋给 root_path。
+- **L390** `        _gather_recursive(obj, objects, i, "list", root_path)` — **EN:** Invokes `_gather_recursive` as a standalone call. **CN:** 以独立语句方式调用 `_gather_recursive`。
+- **L391** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L392** `    return ir_values, leaf_infos, immutable_proxies` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L393** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L394** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L395** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L396** `# inject_leaves` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L397** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L398** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L399** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L400** `def inject_leaves(` — **EN:** Defines function `inject_leaves`. **CN:** 定义函数 `inject_leaves`。
+- **L401** `    leaf_infos: list[LeafInfo],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L402** `    new_values: list[Any],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L403** `    immutable_proxies: list[tuple[Any, ...]] | None = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L404** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L405** `    """` — **EN:** Starts the docstring for the function `inject_leaves`. **CN:** 开始说明 function `inject_leaves` 的文档字符串。
+- **L406** `    Inject new ir.Values into the leaves, then reconstruct immutable containers.` — **EN:** Continues the docstring for the function `inject_leaves`. **CN:** 继续说明 function `inject_leaves` 的文档字符串。
+- **L407** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L408** `    Two-phase injection:` — **EN:** Continues the docstring for the function `inject_leaves`. **CN:** 继续说明 function `inject_leaves` 的文档字符串。
+- **L409** `      Phase 1: Direct mutations into leaf parents (which are always mutable --` — **EN:** Continues the docstring for the function `inject_leaves`. **CN:** 继续说明 function `inject_leaves` 的文档字符串。
+- **L410** `               either a real mutable container or a proxy list/SimpleNamespace).` — **EN:** Continues the docstring for the function `inject_leaves`. **CN:** 继续说明 function `inject_leaves` 的文档字符串。
+- **L411** `      Phase 2: Bottom-up reconstruction of immutable containers (tuples, frozen` — **EN:** Continues the docstring for the function `inject_leaves`. **CN:** 继续说明 function `inject_leaves` 的文档字符串。
+- **L412** `               dataclasses) from their proxies, replacing the proxy in its parent.` — **EN:** Continues the docstring for the function `inject_leaves`. **CN:** 继续说明 function `inject_leaves` 的文档字符串。
+- **L413** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L414** `    Args:` — **EN:** Continues the docstring for the function `inject_leaves`. **CN:** 继续说明 function `inject_leaves` 的文档字符串。
+- **L415** `        leaf_infos: List of LeafInfo from gather_leaves` — **EN:** Continues the docstring for the function `inject_leaves`. **CN:** 继续说明 function `inject_leaves` 的文档字符串。
+- **L416** `        new_values: New values to inject (ir.Value or wrapped types)` — **EN:** Continues the docstring for the function `inject_leaves`. **CN:** 继续说明 function `inject_leaves` 的文档字符串。
+- **L417** `        immutable_proxies: List of (original_obj, proxy, parent, key, key_type)` — **EN:** Continues the docstring for the function `inject_leaves`. **CN:** 继续说明 function `inject_leaves` 的文档字符串。
+- **L418** `            from gather_leaves. If None, skip Phase 2 (backward compat).` — **EN:** Continues the docstring for the function `inject_leaves`. **CN:** 继续说明 function `inject_leaves` 的文档字符串。
+- **L419** `    """` — **EN:** Ends the docstring for the function `inject_leaves`. **CN:** 结束说明 function `inject_leaves` 的文档字符串。
+- **L420** `    # Calculate expected total values` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L421** `    expected_count = sum(len(info.get_ir_values()) for info in leaf_infos)` — **EN:** Assigns a value to expected_count. **CN:** 将一个值赋给 expected_count。
+- **L422** `    if len(new_values) != expected_count:` — **EN:** Starts a conditional branch guarded by `len(new_values) != expected_count`. **CN:** 开始一个由 `len(new_values) != expected_count` 控制的条件分支。
+- **L423** `        print(` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L424** `            f"WARNING: inject_leaves: value count mismatch - "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L425** `            f"expected {expected_count}, got {len(new_values)}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L426** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L427** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L428** `    # Unwrap all values first` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L429** `    unwrapped = []` — **EN:** Assigns a value to unwrapped. **CN:** 将一个值赋给 unwrapped。
+- **L430** `    for v in new_values:` — **EN:** Starts a loop assigning items from `new_values` to `v`. **CN:** 开始一个循环，将 `new_values` 的元素赋给 `v`。
+- **L431** `        ir_val = _unwrap_ir_value(v)` — **EN:** Assigns a value to ir_val. **CN:** 将一个值赋给 ir_val。
+- **L432** `        if ir_val is not None:` — **EN:** Starts a conditional branch guarded by `ir_val is not None`. **CN:** 开始一个由 `ir_val is not None` 控制的条件分支。
+- **L433** `            unwrapped.append(ir_val)` — **EN:** Invokes `unwrapped.append` as a standalone call. **CN:** 以独立语句方式调用 `unwrapped.append`。
+- **L434** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L435** `            print(f"WARNING: inject_leaves: cannot unwrap {type(v).__name__}")` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L436** `            unwrapped.append(v)` — **EN:** Invokes `unwrapped.append` as a standalone call. **CN:** 以独立语句方式调用 `unwrapped.append`。
+- **L437** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L438** `    # Phase 1: Inject values into each leaf` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L439** `    idx = 0` — **EN:** Assigns a value to idx. **CN:** 将一个值赋给 idx。
+- **L440** `    for info in leaf_infos:` — **EN:** Starts a loop assigning items from `leaf_infos` to `info`. **CN:** 开始一个循环，将 `leaf_infos` 的元素赋给 `info`。
+- **L441** `        num_values = len(info.get_ir_values())` — **EN:** Assigns a value to num_values. **CN:** 将一个值赋给 num_values。
+- **L442** `        if num_values == 0:` — **EN:** Starts a conditional branch guarded by `num_values == 0`. **CN:** 开始一个由 `num_values == 0` 控制的条件分支。
+- **L443** `            continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L444** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L445** `        leaf_values = unwrapped[idx : idx + num_values]` — **EN:** Assigns a value to leaf_values. **CN:** 将一个值赋给 leaf_values。
+- **L446** `        idx += num_values` — **EN:** Updates idx in place. **CN:** 原地更新 idx。
+- **L447** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L448** `        if len(leaf_values) != num_values:` — **EN:** Starts a conditional branch guarded by `len(leaf_values) != num_values`. **CN:** 开始一个由 `len(leaf_values) != num_values` 控制的条件分支。
+- **L449** `            print(` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L450** `                f"ERROR: inject_leaves: not enough values for {info.path} "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L451** `                f"(need {num_values}, have {len(leaf_values)})"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L452** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L453** `            continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L454** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L455** `        info.set_ir_values(leaf_values)` — **EN:** Invokes `info.set_ir_values` as a standalone call. **CN:** 以独立语句方式调用 `info.set_ir_values`。
+- **L456** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L457** `    # Phase 2: Reconstruct immutable containers bottom-up` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L458** `    if immutable_proxies:` — **EN:** Starts a conditional branch guarded by `immutable_proxies`. **CN:** 开始一个由 `immutable_proxies` 控制的条件分支。
+- **L459** `        for original_obj, proxy, parent, key, key_type in reversed(immutable_proxies):` — **EN:** Starts a loop assigning items from `reversed(immutable_proxies)` to `(original_obj, proxy, parent, key, ke...`. **CN:** 开始一个循环，将 `reversed(immutable_proxies)` 的元素赋给 `(original_obj, proxy, parent, key, ke...`。
+- **L460** `            new_obj: Any` — **EN:** Assigns a typed value to new_obj. **CN:** 为 new_obj 赋予带类型标注的值。
+- **L461** `            if isinstance(original_obj, tuple):` — **EN:** Starts a conditional branch guarded by `isinstance(original_obj, tuple)`. **CN:** 开始一个由 `isinstance(original_obj, tuple)` 控制的条件分支。
+- **L462** `                new_obj = type(original_obj)(proxy)` — **EN:** Assigns a value to new_obj. **CN:** 将一个值赋给 new_obj。
+- **L463** `            elif dataclasses.is_dataclass(original_obj) and not isinstance(` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L464** `                original_obj, type` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L465** `            ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L466** `                fields = dataclasses.fields(original_obj)` — **EN:** Assigns a value to fields. **CN:** 将一个值赋给 fields。
+- **L467** `                field_vals = {f.name: getattr(proxy, f.name) for f in fields}` — **EN:** Assigns a value to field_vals. **CN:** 将一个值赋给 field_vals。
+- **L468** `                new_obj = type(original_obj)(**field_vals)` — **EN:** Assigns a value to new_obj. **CN:** 将一个值赋给 new_obj。
+- **L469** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L470** `                continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L471** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L472** `            if parent is not None:` — **EN:** Starts a conditional branch guarded by `parent is not None`. **CN:** 开始一个由 `parent is not None` 控制的条件分支。
+- **L473** `                if key_type == "list" or key_type == "dict":` — **EN:** Starts a conditional branch guarded by `key_type == 'list' or key_type == 'dict'`. **CN:** 开始一个由 `key_type == 'list' or key_type == 'dict'` 控制的条件分支。
+- **L474** `                    parent[key] = new_obj` — **EN:** Assigns a value to parent[key]. **CN:** 将一个值赋给 parent[key]。
+- **L475** `                elif key_type == "attr":` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L476** `                    setattr(parent, key, new_obj)` — **EN:** Invokes `setattr` as a standalone call. **CN:** 以独立语句方式调用 `setattr`。
+- **L477** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L478** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L479** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L480** `# Debug utility` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L481** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L482** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L483** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L484** `def print_leaves_debug(` — **EN:** Defines function `print_leaves_debug`. **CN:** 定义函数 `print_leaves_debug`。
+- **L485** `    leaf_infos: list[LeafInfo], label: str = "", prefix: str = "CUTE_DSL"` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L486** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L487** `    """` — **EN:** Starts the docstring for the function `print_leaves_debug`. **CN:** 开始说明 function `print_leaves_debug` 的文档字符串。
+- **L488** `    Print debug info about gathered assignable leaves.` — **EN:** Continues the docstring for the function `print_leaves_debug`. **CN:** 继续说明 function `print_leaves_debug` 的文档字符串。
+- **L489** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L490** `    Enable with environment variable: {prefix}_DEBUG_LEAVES=1` — **EN:** Continues the docstring for the function `print_leaves_debug`. **CN:** 继续说明 function `print_leaves_debug` 的文档字符串。
+- **L491** `    (e.g. CUTE_DSL_DEBUG_LEAVES=1 for the CuTe DSL)` — **EN:** Continues the docstring for the function `print_leaves_debug`. **CN:** 继续说明 function `print_leaves_debug` 的文档字符串。
+- **L492** `    """` — **EN:** Ends the docstring for the function `print_leaves_debug`. **CN:** 结束说明 function `print_leaves_debug` 的文档字符串。
+- **L493** `    import os` — **EN:** Imports os for later use. **CN:** 导入 os 供后续使用。
+- **L494** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L495** `    if os.environ.get(f"{prefix}_DEBUG_LEAVES", "0") != "1":` — **EN:** Starts a conditional branch guarded by `os.environ.get(f'{prefix}_DEBUG_LEAVES', '0') != '1'`. **CN:** 开始一个由 `os.environ.get(f'{prefix}_DEBUG_LEAVES', '0') != '1'` 控制的条件分支。
+- **L496** `        return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L497** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L498** `    print(f"\n{'=' * 80}")` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L499** `    print(f"LEAVES: {label}")` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L500** `    print(f"{'=' * 80}")` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L501** `    print(f"{'#':<5} {'TYPE':<20} {'#V':<4} {'IR_TYPES':<25} {'PATH'}")` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L502** `    print(f"{'-' * 5} {'-' * 20} {'-' * 4} {'-' * 25} {'-' * 40}")` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L503** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L504** `    total_values = 0` — **EN:** Assigns a value to total_values. **CN:** 将一个值赋给 total_values。
+- **L505** `    for i, info in enumerate(leaf_infos):` — **EN:** Starts a loop assigning items from `enumerate(leaf_infos)` to `(i, info)`. **CN:** 开始一个循环，将 `enumerate(leaf_infos)` 的元素赋给 `(i, info)`。
+- **L506** `        obj_type = type(info.obj).__name__` — **EN:** Assigns a value to obj_type. **CN:** 将一个值赋给 obj_type。
+- **L507** `        ir_vals = info.get_ir_values()` — **EN:** Assigns a value to ir_vals. **CN:** 将一个值赋给 ir_vals。
+- **L508** `        num_vals = len(ir_vals)` — **EN:** Assigns a value to num_vals. **CN:** 将一个值赋给 num_vals。
+- **L509** `        total_values += num_vals` — **EN:** Updates total_values in place. **CN:** 原地更新 total_values。
+- **L510** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L511** `        if num_vals == 0:` — **EN:** Starts a conditional branch guarded by `num_vals == 0`. **CN:** 开始一个由 `num_vals == 0` 控制的条件分支。
+- **L512** `            ir_types_str = "None"` — **EN:** Assigns a value to ir_types_str. **CN:** 将一个值赋给 ir_types_str。
+- **L513** `        elif num_vals == 1:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L514** `            ir_types_str = str(ir_vals[0].type)[:23]` — **EN:** Assigns a value to ir_types_str. **CN:** 将一个值赋给 ir_types_str。
+- **L515** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L516** `            ir_types_str = f"{str(ir_vals[0].type)[:15]}..({num_vals})"` — **EN:** Assigns a value to ir_types_str. **CN:** 将一个值赋给 ir_types_str。
+- **L517** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L518** `        print(f"{i:<5} {obj_type:<20} {num_vals:<4} {ir_types_str:<25} {info.path}")` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L519** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L520** `    print(f"{'=' * 80}")` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L521** `    print(f"Total: {len(leaf_infos)} leaves, {total_values} ir.Values")` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L522** `    print(f"{'=' * 80}\n")` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L523** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L524** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L525** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L526** `# TraversableLeafMixin – generic DynamicExpression via gather/inject leaves` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L527** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L528** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L529** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L530** `class TraversableLeafMixin:` — **EN:** Defines class `TraversableLeafMixin`. **CN:** 定义类 `TraversableLeafMixin`。
+- **L531** `    """` — **EN:** Starts the docstring for the class `TraversableLeafMixin`. **CN:** 开始说明 class `TraversableLeafMixin` 的文档字符串。
+- **L532** `    Mixin that auto-implements the DynamicExpression protocol` — **EN:** Continues the docstring for the class `TraversableLeafMixin`. **CN:** 继续说明 class `TraversableLeafMixin` 的文档字符串。
+- **L533** `    (__extract_mlir_values__ / __new_from_mlir_values__) using` — **EN:** Continues the docstring for the class `TraversableLeafMixin`. **CN:** 继续说明 class `TraversableLeafMixin` 的文档字符串。
+- **L534** `    gather_leaves / inject_leaves.` — **EN:** Continues the docstring for the class `TraversableLeafMixin`. **CN:** 继续说明 class `TraversableLeafMixin` 的文档字符串。
+- **L535** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L536** `    When gather_leaves encounters an object whose class has` — **EN:** Continues the docstring for the class `TraversableLeafMixin`. **CN:** 继续说明 class `TraversableLeafMixin` 的文档字符串。
+- **L537** `    \`\`__cls_traversable_dict__ = True\`\`, it treats the object as a` — **EN:** Continues the docstring for the class `TraversableLeafMixin`. **CN:** 继续说明 class `TraversableLeafMixin` 的文档字符串。
+- **L538** `    **container** (recurses into \`\`__dict__\`\`) rather than as a` — **EN:** Continues the docstring for the class `TraversableLeafMixin`. **CN:** 继续说明 class `TraversableLeafMixin` 的文档字符串。
+- **L539** `    DynamicExpression leaf — even if \`\`__extract_mlir_values__\`\` is` — **EN:** Continues the docstring for the class `TraversableLeafMixin`. **CN:** 继续说明 class `TraversableLeafMixin` 的文档字符串。
+- **L540** `    present.  This eliminates the need to manually implement the` — **EN:** Continues the docstring for the class `TraversableLeafMixin`. **CN:** 继续说明 class `TraversableLeafMixin` 的文档字符串。
+- **L541** `    extract/new protocol for classes that simply need all their` — **EN:** Continues the docstring for the class `TraversableLeafMixin`. **CN:** 继续说明 class `TraversableLeafMixin` 的文档字符串。
+- **L542** `    \`\`ir.Values\`\` gathered and injected.` — **EN:** Continues the docstring for the class `TraversableLeafMixin`. **CN:** 继续说明 class `TraversableLeafMixin` 的文档字符串。
+- **L543** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L544** `    The gather state is stored on the instance under dunder keys` — **EN:** Continues the docstring for the class `TraversableLeafMixin`. **CN:** 继续说明 class `TraversableLeafMixin` 的文档字符串。
+- **L545** `    (\`\`__gather_infos\`\`, \`\`__gather_proxies\`\`) which \`\`gather_leaves\`\`` — **EN:** Continues the docstring for the class `TraversableLeafMixin`. **CN:** 继续说明 class `TraversableLeafMixin` 的文档字符串。
+- **L546** `    automatically skips (it ignores \`\`__\`\`-prefixed attributes).` — **EN:** Continues the docstring for the class `TraversableLeafMixin`. **CN:** 继续说明 class `TraversableLeafMixin` 的文档字符串。
+- **L547** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L548** `    Usage — zero boilerplate::` — **EN:** Continues the docstring for the class `TraversableLeafMixin`. **CN:** 继续说明 class `TraversableLeafMixin` 的文档字符串。
+- **L549** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L550** `        @dataclass` — **EN:** Continues the docstring for the class `TraversableLeafMixin`. **CN:** 继续说明 class `TraversableLeafMixin` 的文档字符串。
+- **L551** `        class MyTask(TraversableLeafMixin):` — **EN:** Continues the docstring for the class `TraversableLeafMixin`. **CN:** 继续说明 class `TraversableLeafMixin` 的文档字符串。
+- **L552** `            src_resources: List[MemoryResource]` — **EN:** Continues the docstring for the class `TraversableLeafMixin`. **CN:** 继续说明 class `TraversableLeafMixin` 的文档字符串。
+- **L553** `            dst_resources: List[MemoryResource]` — **EN:** Continues the docstring for the class `TraversableLeafMixin`. **CN:** 继续说明 class `TraversableLeafMixin` 的文档字符串。
+- **L554** `            # No manual __extract_mlir_values__ needed!` — **EN:** Continues the docstring for the class `TraversableLeafMixin`. **CN:** 继续说明 class `TraversableLeafMixin` 的文档字符串。
+- **L555** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L556** `    If extra fixups are needed after inject (e.g. re-aliasing)::` — **EN:** Continues the docstring for the class `TraversableLeafMixin`. **CN:** 继续说明 class `TraversableLeafMixin` 的文档字符串。
+- **L557** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L558** `        class MyTask(TraversableLeafMixin):` — **EN:** Continues the docstring for the class `TraversableLeafMixin`. **CN:** 继续说明 class `TraversableLeafMixin` 的文档字符串。
+- **L559** `            ...` — **EN:** Continues the docstring for the class `TraversableLeafMixin`. **CN:** 继续说明 class `TraversableLeafMixin` 的文档字符串。
+- **L560** `            def __new_from_mlir_values__(self, values):` — **EN:** Continues the docstring for the class `TraversableLeafMixin`. **CN:** 继续说明 class `TraversableLeafMixin` 的文档字符串。
+- **L561** `                super().__new_from_mlir_values__(values)` — **EN:** Continues the docstring for the class `TraversableLeafMixin`. **CN:** 继续说明 class `TraversableLeafMixin` 的文档字符串。
+- **L562** `                # custom fixup` — **EN:** Continues the docstring for the class `TraversableLeafMixin`. **CN:** 继续说明 class `TraversableLeafMixin` 的文档字符串。
+- **L563** `                self.work_queue = self.src_resources[self.work_queue_idx]` — **EN:** Continues the docstring for the class `TraversableLeafMixin`. **CN:** 继续说明 class `TraversableLeafMixin` 的文档字符串。
+- **L564** `                return self` — **EN:** Continues the docstring for the class `TraversableLeafMixin`. **CN:** 继续说明 class `TraversableLeafMixin` 的文档字符串。
+- **L565** `    """` — **EN:** Ends the docstring for the class `TraversableLeafMixin`. **CN:** 结束说明 class `TraversableLeafMixin` 的文档字符串。
+- **L566** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L567** `    __cls_traversable_dict__ = True` — **EN:** Assigns a value to __cls_traversable_dict__. **CN:** 将一个值赋给 __cls_traversable_dict__。
+- **L568** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L569** `    def __extract_mlir_values__(self) -> dict:` — **EN:** Defines function `__extract_mlir_values__`. **CN:** 定义函数 `__extract_mlir_values__`。
+- **L570** `        ir_vals, infos, proxies = gather_leaves([self])` — **EN:** Assigns a value to (ir_vals, infos, proxies). **CN:** 将一个值赋给 (ir_vals, infos, proxies)。
+- **L571** `        # Store with __ prefix so gather_leaves skips them on next call` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L572** `        self.__dict__["__gather_infos"] = infos` — **EN:** Assigns a value to self.__dict__['__gather_infos']. **CN:** 将一个值赋给 self.__dict__['__gather_infos']。
+- **L573** `        self.__dict__["__gather_proxies"] = proxies` — **EN:** Assigns a value to self.__dict__['__gather_proxies']. **CN:** 将一个值赋给 self.__dict__['__gather_proxies']。
+- **L574** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L575** `        # Return a flat dict keyed by the full leaf path.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L576** `        # This makes framework error messages immediately show which` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L577** `        # attribute changed structure, e.g.:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L578** `        #   "src_resources[0].buf"  -> i32` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L579** `        #   "dst_resources[0].ptr"  -> !llvm.ptr` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L580** `        # Multi-value leaves (DynamicExpression) get indexed sub-keys.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L581** `        result = {}` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L582** `        val_idx = 0` — **EN:** Assigns a value to val_idx. **CN:** 将一个值赋给 val_idx。
+- **L583** `        for info in infos:` — **EN:** Starts a loop assigning items from `infos` to `info`. **CN:** 开始一个循环，将 `infos` 的元素赋给 `info`。
+- **L584** `            n_vals = len(info.get_ir_values())` — **EN:** Assigns a value to n_vals. **CN:** 将一个值赋给 n_vals。
+- **L585** `            if n_vals == 1:` — **EN:** Starts a conditional branch guarded by `n_vals == 1`. **CN:** 开始一个由 `n_vals == 1` 控制的条件分支。
+- **L586** `                result[info.path] = ir_vals[val_idx]` — **EN:** Assigns a value to result[info.path]. **CN:** 将一个值赋给 result[info.path]。
+- **L587** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L588** `                for i in range(n_vals):` — **EN:** Starts a loop assigning items from `range(n_vals)` to `i`. **CN:** 开始一个循环，将 `range(n_vals)` 的元素赋给 `i`。
+- **L589** `                    result[f"{info.path}#{i}"] = ir_vals[val_idx + i]` — **EN:** Assigns a value to result[f'{info.path}#{i}']. **CN:** 将一个值赋给 result[f'{info.path}#{i}']。
+- **L590** `            val_idx += n_vals` — **EN:** Updates val_idx in place. **CN:** 原地更新 val_idx。
+- **L591** `        return result` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L592** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L593** `    def __new_from_mlir_values__(` — **EN:** Defines function `__new_from_mlir_values__`. **CN:** 定义函数 `__new_from_mlir_values__`。
+- **L594** `        self, values: dict[str, Any]` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L595** `    ) -> "TraversableLeafMixin":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L596** `        infos = self.__dict__.pop("__gather_infos")` — **EN:** Assigns a value to infos. **CN:** 将一个值赋给 infos。
+- **L597** `        proxies = self.__dict__.pop("__gather_proxies")` — **EN:** Assigns a value to proxies. **CN:** 将一个值赋给 proxies。
+- **L598** `        # values is a flat {path: ir.Value} dict; just take values in order` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L599** `        new_vals = list(values.values())` — **EN:** Assigns a value to new_vals. **CN:** 将一个值赋给 new_vals。
+- **L600** `        inject_leaves(infos, new_vals, proxies)` — **EN:** Invokes `inject_leaves` as a standalone call. **CN:** 以独立语句方式调用 `inject_leaves`。
+- **L601** `        return self` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.base_dsl.leaf_utils`. CN: 模块名为 `CuTeDSL.cutlass.base_dsl.leaf_utils`。
+- EN: Top-level classes: LeafInfo, TraversableLeafMixin CN: 顶层类包括：LeafInfo, TraversableLeafMixin
+- EN: Top-level functions: is_frozen_dataclass, _is_dynamic_expression, _is_assignable_leaf, _flatten_to_ir_values, _unflatten_ir_values, _get_all_attrs, _unwrap_ir_value, gather_leaves, inject_leaves, print_leaves_debug CN: 顶层函数包括：is_frozen_dataclass, _is_dynamic_expression, _is_assignable_leaf, _flatten_to_ir_values, _unflatten_ir_values, _get_all_attrs, _unwrap_ir_value, gather_leaves, inject_leaves, print_leaves_debug
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass._mlir:ir CN: 内部依赖：cutlass._mlir:ir
+- EN: External or standard-library dependencies: dataclasses, types:SimpleNamespace, typing:Any, os CN: 外部或标准库依赖：dataclasses, types:SimpleNamespace, typing:Any, os

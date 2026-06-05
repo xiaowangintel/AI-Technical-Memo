@@ -1,0 +1,135 @@
+# sm100_emitter.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/backend/evt/backend/sm100_emitter.py`
+
+## Purpose / 作用
+- EN: Emitter for Sm100 Epilogue Visitor
+- CN: 该模块的文档字符串将其描述为：Emitter for Sm100 Epilogue Visitor
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L34** `Emitter for Sm100 Epilogue Visitor` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L35** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `from cutlass_library import DataType, DataTypeTag, EpilogueScheduleTag, OpcodeClassTag` — **EN:** Imports DataType, DataTypeTag, EpilogueScheduleTag, OpcodeClassTag from `cutlass_library`. **CN:** 从 `cutlass_library` 导入 DataType, DataTypeTag, EpilogueScheduleTag, OpcodeClassTag。
+- **L38** `from cutlass_cppgen.backend.library import to_blackwell_threadblock_shape` — **EN:** Imports to_blackwell_threadblock_shape from `cutlass_cppgen.backend.library`. **CN:** 从 `cutlass_cppgen.backend.library` 导入 to_blackwell_threadblock_shape。
+- **L39** `from cutlass_cppgen.backend import GemmOperationUniversal` — **EN:** Imports GemmOperationUniversal from `cutlass_cppgen.backend`. **CN:** 从 `cutlass_cppgen.backend` 导入 GemmOperationUniversal。
+- **L40** `from cutlass_cppgen.backend.evt.backend.emitter_base import FusionCallbacks` — **EN:** Imports FusionCallbacks from `cutlass_cppgen.backend.evt.backend.emitter_base`. **CN:** 从 `cutlass_cppgen.backend.evt.backend.emitter_base` 导入 FusionCallbacks。
+- **L41** `from cutlass_cppgen.backend.evt.ir.node import TupleEmitter` — **EN:** Imports TupleEmitter from `cutlass_cppgen.backend.evt.ir.node`. **CN:** 从 `cutlass_cppgen.backend.evt.ir.node` 导入 TupleEmitter。
+- **L42** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L43** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L44** `class Sm100CollectiveEpilogue:` — **EN:** Defines class `Sm100CollectiveEpilogue`. **CN:** 定义类 `Sm100CollectiveEpilogue`。
+- **L45** `    def __init__(self, tile_description,` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L46** `                 kernel_schedule,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L47** `                 epilogue_schedule,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L48** `                 element_accumulator,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L49** `                 element_d,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L50** `                 fusion_callbacks) -> None:` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L51** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L52** `        self.cta_tile_mnk, _ = to_blackwell_threadblock_shape(tile_description, tile_description.cluster_shape, kernel_schedule)` — **EN:** Assigns a value to (self.cta_tile_mnk, _). **CN:** 将一个值赋给 (self.cta_tile_mnk, _)。
+- **L53** `        self.element_accumulator = element_accumulator` — **EN:** Assigns a value to self.element_accumulator. **CN:** 将一个值赋给 self.element_accumulator。
+- **L54** `        if fusion_callbacks.dag_ir.has_node("C"):` — **EN:** Starts a conditional branch guarded by `fusion_callbacks.dag_ir.has_node('C')`. **CN:** 开始一个由 `fusion_callbacks.dag_ir.has_node('C')` 控制的条件分支。
+- **L55** `            self.element_c = fusion_callbacks.dag_ir.get_node_meta("C").element` — **EN:** Assigns a value to self.element_c. **CN:** 将一个值赋给 self.element_c。
+- **L56** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L57** `            self.element_c = DataType.void` — **EN:** Assigns a value to self.element_c. **CN:** 将一个值赋给 self.element_c。
+- **L58** `        self.element_d = element_d` — **EN:** Assigns a value to self.element_d. **CN:** 将一个值赋给 self.element_d。
+- **L59** `        self.schedule = epilogue_schedule` — **EN:** Assigns a value to self.schedule. **CN:** 将一个值赋给 self.schedule。
+- **L60** `        self.fusion_callbacks = fusion_callbacks` — **EN:** Assigns a value to self.fusion_callbacks. **CN:** 将一个值赋给 self.fusion_callbacks。
+- **L61** `        self.opclass = tile_description.math_instruction.opcode_class` — **EN:** Assigns a value to self.opclass. **CN:** 将一个值赋给 self.opclass。
+- **L62** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L63** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L64** `    def CtaTileMNK(self) -> str:` — **EN:** Defines function `CtaTileMNK`. **CN:** 定义函数 `CtaTileMNK`。
+- **L65** `        """` — **EN:** Starts the docstring for the function `CtaTileMNK`. **CN:** 开始说明 function `CtaTileMNK` 的文档字符串。
+- **L66** `        The threadblock shape` — **EN:** Continues the docstring for the function `CtaTileMNK`. **CN:** 继续说明 function `CtaTileMNK` 的文档字符串。
+- **L67** `        """` — **EN:** Ends the docstring for the function `CtaTileMNK`. **CN:** 结束说明 function `CtaTileMNK` 的文档字符串。
+- **L68** `        return f"cute::Shape<_{self.cta_tile_mnk[0]}, _{self.cta_tile_mnk[1]}, _{self.cta_tile_mnk[2]}>"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L69** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L70** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L71** `    def EpilogueTileType(self) -> str:` — **EN:** Defines function `EpilogueTileType`. **CN:** 定义函数 `EpilogueTileType`。
+- **L72** `        """` — **EN:** Starts the docstring for the function `EpilogueTileType`. **CN:** 开始说明 function `EpilogueTileType` 的文档字符串。
+- **L73** `        The epilogue tile type` — **EN:** Continues the docstring for the function `EpilogueTileType`. **CN:** 继续说明 function `EpilogueTileType` 的文档字符串。
+- **L74** `        """` — **EN:** Ends the docstring for the function `EpilogueTileType`. **CN:** 结束说明 function `EpilogueTileType` 的文档字符串。
+- **L75** `        return "cutlass::epilogue::collective::EpilogueTileAuto"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L76** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L77** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L78** `    def Schedule(self) -> str:` — **EN:** Defines function `Schedule`. **CN:** 定义函数 `Schedule`。
+- **L79** `        return EpilogueScheduleTag[self.schedule]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L80** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L81** `    def emit(self):` — **EN:** Defines function `emit`. **CN:** 定义函数 `emit`。
+- **L82** `        tuple_emitter = TupleEmitter("int64_t")` — **EN:** Assigns a value to tuple_emitter. **CN:** 将一个值赋给 tuple_emitter。
+- **L83** `        stride_D_str = self.fusion_callbacks.dag_ir.get_node_meta("D").underlying_impl.stride_mnl` — **EN:** Assigns a value to stride_D_str. **CN:** 将一个值赋给 stride_D_str。
+- **L84** `        stride_C_str = stride_D_str` — **EN:** Assigns a value to stride_C_str. **CN:** 将一个值赋给 stride_C_str。
+- **L85** `        if self.fusion_callbacks.dag_ir.has_node("C"):` — **EN:** Starts a conditional branch guarded by `self.fusion_callbacks.dag_ir.has_node('C')`. **CN:** 开始一个由 `self.fusion_callbacks.dag_ir.has_node('C')` 控制的条件分支。
+- **L86** `            stride_C_str = self.fusion_callbacks.dag_ir.get_node_meta("C").underlying_impl.stride_mnl` — **EN:** Assigns a value to stride_C_str. **CN:** 将一个值赋给 stride_C_str。
+- **L87** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L88** `        callback_decl, callback_name = self.fusion_callbacks.emit()` — **EN:** Assigns a value to (callback_decl, callback_name). **CN:** 将一个值赋给 (callback_decl, callback_name)。
+- **L89** `        return callback_name, f"""` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L90** `using EpilogueDescriptor = cutlass::epilogue::collective::detail::Sm100EpilogueDescriptor<` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L91** `  {OpcodeClassTag[self.opclass]},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L92** `  {self.CtaTileMNK}, {self.EpilogueTileType},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L93** `  {DataTypeTag[self.element_accumulator]}, {DataTypeTag[self.element_c]}, {DataTypeTag[self.element_d]},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L94** `  {self.Schedule}, {stride_C_str}, {stride_D_str},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L95** `  false /* IsPerColScaleSupported */,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L96** `  false /* IsBlockScaleSupported */` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L97** `>;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L98** `{callback_decl}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L99** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L100** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L101** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L102** `class Sm100Emitter:` — **EN:** Defines class `Sm100Emitter`. **CN:** 定义类 `Sm100Emitter`。
+- **L103** `    def __init__(self, operation: GemmOperationUniversal, graph) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L104** `        fusion_callbacks = FusionCallbacks(graph, cc=100, emit_CD=False)` — **EN:** Assigns a value to fusion_callbacks. **CN:** 将一个值赋给 fusion_callbacks。
+- **L105** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L106** `        self.collective_epilogue = Sm100CollectiveEpilogue(` — **EN:** Assigns a value to self.collective_epilogue. **CN:** 将一个值赋给 self.collective_epilogue。
+- **L107** `            tile_description=operation.tile_description,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L108** `            kernel_schedule=operation.tile_description.kernel_schedule,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L109** `            epilogue_schedule=operation.tile_description.epilogue_schedule,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L110** `            element_accumulator=operation.tile_description.math_instruction.element_accumulator,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L111** `            element_d=fusion_callbacks.dag_ir.get_node_meta("D").element,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L112** `            fusion_callbacks=fusion_callbacks` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L113** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L114** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L115** `    def emit(self):` — **EN:** Defines function `emit`. **CN:** 定义函数 `emit`。
+- **L116** `        return self.collective_epilogue.emit()` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.backend.evt.backend.sm100_emitter`. CN: 模块名为 `cutlass_cppgen.backend.evt.backend.sm100_emitter`。
+- EN: Module docstring summary: Emitter for Sm100 Epilogue Visitor CN: 模块文档摘要为：Emitter for Sm100 Epilogue Visitor
+- EN: Top-level classes: Sm100CollectiveEpilogue, Sm100Emitter CN: 顶层类包括：Sm100CollectiveEpilogue, Sm100Emitter
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_library:DataType,DataTypeTag,EpilogueScheduleTag,OpcodeClassTag, cutlass_cppgen.backend.library:to_blackwell_threadblock_shape, cutlass_cppgen.backend:GemmOperationUniversal, cutlass_cppgen.backend.evt.backend.emitter_base:FusionCallbacks, cutlass_cppgen.backend.evt.ir.node:TupleEmitter CN: 内部依赖：cutlass_library:DataType,DataTypeTag,EpilogueScheduleTag,OpcodeClassTag, cutlass_cppgen.backend.library:to_blackwell_threadblock_shape, cutlass_cppgen.backend:GemmOperationUniversal, cutlass_cppgen.backend.evt.backend.emitter_base:FusionCallbacks, cutlass_cppgen.backend.evt.ir.node:TupleEmitter

@@ -1,0 +1,402 @@
+# test_run.h — Code Analysis / 代码分析
+
+**Source / 源文件**: `examples/13_two_tensor_op_fusion/test_run.h`
+**Purpose / 用途**: This header provides a shared C++ test harness that checks environment support and dispatches registered example tests. / 该头文件提供共享的 C++ 测试框架，用于检查环境支持情况并分发已注册的示例测试。
+
+---
+
+## Line-by-Line Analysis / 逐行分析
+
+- **Line 1 / 第1行**
+  - Code / 代码: `/***************************************************************************************************`
+  - EN: Starts a block comment or Doxygen documentation section.
+  - CN: 开始一个块注释或 Doxygen 文档片段。
+- **Line 2 / 第2行**
+  - Code / 代码: ` * Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: Records copyright ownership for the file.
+  - CN: 记录该文件的版权归属。
+- **Line 3 / 第3行**
+  - Code / 代码: ` * SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier.
+  - CN: 记录 SPDX 许可证标识符。
+- **Line 4 / 第4行**
+  - Code / 代码: ` *`
+  - EN: Continues the current block comment or Doxygen documentation.
+  - CN: 继续当前块注释或 Doxygen 文档。
+- **Line 5 / 第5行**
+  - Code / 代码: ` * Redistribution and use in source and binary forms, with or without`
+  - EN: Continues the current block comment or Doxygen documentation.
+  - CN: 继续当前块注释或 Doxygen 文档。
+- **Line 6 / 第6行**
+  - Code / 代码: ` * modification, are permitted provided that the following conditions are met:`
+  - EN: Continues the current block comment or Doxygen documentation.
+  - CN: 继续当前块注释或 Doxygen 文档。
+- **Line 7 / 第7行**
+  - Code / 代码: ` *`
+  - EN: Continues the current block comment or Doxygen documentation.
+  - CN: 继续当前块注释或 Doxygen 文档。
+- **Line 8 / 第8行**
+  - Code / 代码: ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Continues the current block comment or Doxygen documentation.
+  - CN: 继续当前块注释或 Doxygen 文档。
+- **Line 9 / 第9行**
+  - Code / 代码: ` * list of conditions and the following disclaimer.`
+  - EN: Continues the current block comment or Doxygen documentation.
+  - CN: 继续当前块注释或 Doxygen 文档。
+- **Line 10 / 第10行**
+  - Code / 代码: ` *`
+  - EN: Continues the current block comment or Doxygen documentation.
+  - CN: 继续当前块注释或 Doxygen 文档。
+- **Line 11 / 第11行**
+  - Code / 代码: ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Continues the current block comment or Doxygen documentation.
+  - CN: 继续当前块注释或 Doxygen 文档。
+- **Line 12 / 第12行**
+  - Code / 代码: ` * this list of conditions and the following disclaimer in the documentation`
+  - EN: Continues the current block comment or Doxygen documentation.
+  - CN: 继续当前块注释或 Doxygen 文档。
+- **Line 13 / 第13行**
+  - Code / 代码: ` * and/or other materials provided with the distribution.`
+  - EN: Continues the current block comment or Doxygen documentation.
+  - CN: 继续当前块注释或 Doxygen 文档。
+- **Line 14 / 第14行**
+  - Code / 代码: ` *`
+  - EN: Continues the current block comment or Doxygen documentation.
+  - CN: 继续当前块注释或 Doxygen 文档。
+- **Line 15 / 第15行**
+  - Code / 代码: ` * 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Continues the current block comment or Doxygen documentation.
+  - CN: 继续当前块注释或 Doxygen 文档。
+- **Line 16 / 第16行**
+  - Code / 代码: ` * contributors may be used to endorse or promote products derived from`
+  - EN: Continues the current block comment or Doxygen documentation.
+  - CN: 继续当前块注释或 Doxygen 文档。
+- **Line 17 / 第17行**
+  - Code / 代码: ` * this software without specific prior written permission.`
+  - EN: Continues the current block comment or Doxygen documentation.
+  - CN: 继续当前块注释或 Doxygen 文档。
+- **Line 18 / 第18行**
+  - Code / 代码: ` *`
+  - EN: Continues the current block comment or Doxygen documentation.
+  - CN: 继续当前块注释或 Doxygen 文档。
+- **Line 19 / 第19行**
+  - Code / 代码: ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Continues the current block comment or Doxygen documentation.
+  - CN: 继续当前块注释或 Doxygen 文档。
+- **Line 20 / 第20行**
+  - Code / 代码: ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Continues the current block comment or Doxygen documentation.
+  - CN: 继续当前块注释或 Doxygen 文档。
+- **Line 21 / 第21行**
+  - Code / 代码: ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Continues the current block comment or Doxygen documentation.
+  - CN: 继续当前块注释或 Doxygen 文档。
+- **Line 22 / 第22行**
+  - Code / 代码: ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Continues the current block comment or Doxygen documentation.
+  - CN: 继续当前块注释或 Doxygen 文档。
+- **Line 23 / 第23行**
+  - Code / 代码: ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Continues the current block comment or Doxygen documentation.
+  - CN: 继续当前块注释或 Doxygen 文档。
+- **Line 24 / 第24行**
+  - Code / 代码: ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Continues the current block comment or Doxygen documentation.
+  - CN: 继续当前块注释或 Doxygen 文档。
+- **Line 25 / 第25行**
+  - Code / 代码: ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Continues the current block comment or Doxygen documentation.
+  - CN: 继续当前块注释或 Doxygen 文档。
+- **Line 26 / 第26行**
+  - Code / 代码: ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Continues the current block comment or Doxygen documentation.
+  - CN: 继续当前块注释或 Doxygen 文档。
+- **Line 27 / 第27行**
+  - Code / 代码: ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Continues the current block comment or Doxygen documentation.
+  - CN: 继续当前块注释或 Doxygen 文档。
+- **Line 28 / 第28行**
+  - Code / 代码: ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Continues the current block comment or Doxygen documentation.
+  - CN: 继续当前块注释或 Doxygen 文档。
+- **Line 29 / 第29行**
+  - Code / 代码: ` *`
+  - EN: Continues the current block comment or Doxygen documentation.
+  - CN: 继续当前块注释或 Doxygen 文档。
+- **Line 30 / 第30行**
+  - Code / 代码: ` **************************************************************************************************/`
+  - EN: Closes the active C/C++ block comment.
+  - CN: 结束当前的 C/C++ 块注释。
+- **Line 31 / 第31行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 32 / 第32行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 33 / 第33行**
+  - Code / 代码: `#include <iostream>`
+  - EN: Includes dependency `<iostream>` for later declarations or runtime support.
+  - CN: 包含依赖 `<iostream>`，供后续声明或运行时支持使用。
+- **Line 34 / 第34行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 35 / 第35行**
+  - Code / 代码: `// Run tests on GPUs `
+  - EN: Adds an inline C/C++ comment that explains nearby logic.
+  - CN: 添加一条 C/C++ 行注释，用于说明邻近逻辑。
+- **Line 36 / 第36行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 37 / 第37行**
+  - Code / 代码: `int testRun(int arch, std::vector<bool (*)()> & test_funcs, const std::string & test_name) {`
+  - EN: Starts a C++ function or callable scope.
+  - CN: 开始一个 C++ 函数或可调用对象的作用域。
+- **Line 38 / 第38行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 39 / 第39行**
+  - Code / 代码: `  bool supported = false;`
+  - EN: Continues the C++ implementation for this test-related source file.
+  - CN: 继续实现该测试相关源文件中的 C++ 逻辑。
+- **Line 40 / 第40行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 41 / 第41行**
+  - Code / 代码: `  int arch_major = arch / 10;`
+  - EN: Continues the C++ implementation for this test-related source file.
+  - CN: 继续实现该测试相关源文件中的 C++ 逻辑。
+- **Line 42 / 第42行**
+  - Code / 代码: `  int arch_minor = arch - arch / 10 * 10;  `
+  - EN: Continues the C++ implementation for this test-related source file.
+  - CN: 继续实现该测试相关源文件中的 C++ 逻辑。
+- **Line 43 / 第43行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 44 / 第44行**
+  - Code / 代码: `  if(arch_major >= 8) {`
+  - EN: Starts a conditional branch in the C++ control flow.
+  - CN: 开始 C++ 控制流中的条件分支。
+- **Line 45 / 第45行**
+  - Code / 代码: `    // Ampere Tensor Core operations exposed with mma.sync are first available in CUDA 11.0.`
+  - EN: Adds an inline C/C++ comment that explains nearby logic.
+  - CN: 添加一条 C/C++ 行注释，用于说明邻近逻辑。
+- **Line 46 / 第46行**
+  - Code / 代码: `    //`
+  - EN: Adds an inline C/C++ comment that explains nearby logic.
+  - CN: 添加一条 C/C++ 行注释，用于说明邻近逻辑。
+- **Line 47 / 第47行**
+  - Code / 代码: `    // CUTLASS must be compiled with CUDA 11 Toolkit to run Conv2dFprop examples.`
+  - EN: Adds an inline C/C++ comment that explains nearby logic.
+  - CN: 添加一条 C/C++ 行注释，用于说明邻近逻辑。
+- **Line 48 / 第48行**
+  - Code / 代码: `    if (__CUDACC_VER_MAJOR__ > 11 || (__CUDACC_VER_MAJOR__ == 11 && __CUDACC_VER_MINOR__ >= 0)) {`
+  - EN: Starts a conditional branch in the C++ control flow.
+  - CN: 开始 C++ 控制流中的条件分支。
+- **Line 49 / 第49行**
+  - Code / 代码: `      supported = true;`
+  - EN: Continues the C++ implementation for this test-related source file.
+  - CN: 继续实现该测试相关源文件中的 C++ 逻辑。
+- **Line 50 / 第50行**
+  - Code / 代码: `    }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 51 / 第51行**
+  - Code / 代码: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 52 / 第52行**
+  - Code / 代码: `  else if(arch_major >= 7) {`
+  - EN: Checks an alternate conditional branch.
+  - CN: 检查另一条条件分支。
+- **Line 53 / 第53行**
+  - Code / 代码: `    // Turing Tensor Core operations exposed with mma.sync are first available in CUDA 10.2.`
+  - EN: Adds an inline C/C++ comment that explains nearby logic.
+  - CN: 添加一条 C/C++ 行注释，用于说明邻近逻辑。
+- **Line 54 / 第54行**
+  - Code / 代码: `    //`
+  - EN: Adds an inline C/C++ comment that explains nearby logic.
+  - CN: 添加一条 C/C++ 行注释，用于说明邻近逻辑。
+- **Line 55 / 第55行**
+  - Code / 代码: `    // CUTLASS must be compiled with CUDA 10.2 Toolkit to run these examples.`
+  - EN: Adds an inline C/C++ comment that explains nearby logic.
+  - CN: 添加一条 C/C++ 行注释，用于说明邻近逻辑。
+- **Line 56 / 第56行**
+  - Code / 代码: `    if (__CUDACC_VER_MAJOR__ > 10 || (__CUDACC_VER_MAJOR__ == 10 && __CUDACC_VER_MINOR__ >= 2)) {`
+  - EN: Starts a conditional branch in the C++ control flow.
+  - CN: 开始 C++ 控制流中的条件分支。
+- **Line 57 / 第57行**
+  - Code / 代码: `      supported = true;`
+  - EN: Continues the C++ implementation for this test-related source file.
+  - CN: 继续实现该测试相关源文件中的 C++ 逻辑。
+- **Line 58 / 第58行**
+  - Code / 代码: `    }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 59 / 第59行**
+  - Code / 代码: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 60 / 第60行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 61 / 第61行**
+  - Code / 代码: `  cudaDeviceProp props;`
+  - EN: Continues the C++ implementation for this test-related source file.
+  - CN: 继续实现该测试相关源文件中的 C++ 逻辑。
+- **Line 62 / 第62行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 63 / 第63行**
+  - Code / 代码: `  cudaError_t error = cudaGetDeviceProperties(&props, 0);`
+  - EN: Invokes a helper or library API.
+  - CN: 调用一个辅助函数或库 API。
+- **Line 64 / 第64行**
+  - Code / 代码: `  if (error != cudaSuccess) {`
+  - EN: Starts a conditional branch in the C++ control flow.
+  - CN: 开始 C++ 控制流中的条件分支。
+- **Line 65 / 第65行**
+  - Code / 代码: `    std::cerr << "cudaGetDeviceProperties() returned an error: " << cudaGetErrorString(error) << std::endl;`
+  - EN: Prints diagnostics or test progress information.
+  - CN: 打印诊断信息或测试进度信息。
+- **Line 66 / 第66行**
+  - Code / 代码: `    return -1;`
+  - EN: Returns a value from the current C++ function.
+  - CN: 从当前 C++ 函数返回一个值。
+- **Line 67 / 第67行**
+  - Code / 代码: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 68 / 第68行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 69 / 第69行**
+  - Code / 代码: `  if (!(props.major == arch_major && props.minor == arch_minor)) {`
+  - EN: Starts a conditional branch in the C++ control flow.
+  - CN: 开始 C++ 控制流中的条件分支。
+- **Line 70 / 第70行**
+  - Code / 代码: `    supported = false;`
+  - EN: Continues the C++ implementation for this test-related source file.
+  - CN: 继续实现该测试相关源文件中的 C++ 逻辑。
+- **Line 71 / 第71行**
+  - Code / 代码: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 72 / 第72行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 73 / 第73行**
+  - Code / 代码: `  if (!supported) {`
+  - EN: Starts a conditional branch in the C++ control flow.
+  - CN: 开始 C++ 控制流中的条件分支。
+- **Line 74 / 第74行**
+  - Code / 代码: `    // Returning zero so this test passes on older Toolkits. Its actions are no-op.`
+  - EN: Adds an inline C/C++ comment that explains nearby logic.
+  - CN: 添加一条 C/C++ 行注释，用于说明邻近逻辑。
+- **Line 75 / 第75行**
+  - Code / 代码: `    std::cout << "This example isn't supported on current architecture" << std::endl;`
+  - EN: Prints diagnostics or test progress information.
+  - CN: 打印诊断信息或测试进度信息。
+- **Line 76 / 第76行**
+  - Code / 代码: `    return 0;`
+  - EN: Returns a value from the current C++ function.
+  - CN: 从当前 C++ 函数返回一个值。
+- **Line 77 / 第77行**
+  - Code / 代码: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 78 / 第78行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 79 / 第79行**
+  - Code / 代码: `  bool pass = true;`
+  - EN: Continues the C++ implementation for this test-related source file.
+  - CN: 继续实现该测试相关源文件中的 C++ 逻辑。
+- **Line 80 / 第80行**
+  - Code / 代码: ` `
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 81 / 第81行**
+  - Code / 代码: `  std::cout << "Device: " << props.name << std::endl;`
+  - EN: Prints diagnostics or test progress information.
+  - CN: 打印诊断信息或测试进度信息。
+- **Line 82 / 第82行**
+  - Code / 代码: `  std::cout << "Arch: SM" << arch << std::endl;`
+  - EN: Prints diagnostics or test progress information.
+  - CN: 打印诊断信息或测试进度信息。
+- **Line 83 / 第83行**
+  - Code / 代码: `  std::cout << "Test: " << test_name << std::endl;`
+  - EN: Prints diagnostics or test progress information.
+  - CN: 打印诊断信息或测试进度信息。
+- **Line 84 / 第84行**
+  - Code / 代码: `  for(auto func : test_funcs) {`
+  - EN: Starts a loop that iterates across cases or values.
+  - CN: 开始一个循环，用于遍历用例或数值。
+- **Line 85 / 第85行**
+  - Code / 代码: `    pass &= func();`
+  - EN: Invokes a helper or library API.
+  - CN: 调用一个辅助函数或库 API。
+- **Line 86 / 第86行**
+  - Code / 代码: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 87 / 第87行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 88 / 第88行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 89 / 第89行**
+  - Code / 代码: `  if(pass)`
+  - EN: Starts a conditional branch in the C++ control flow.
+  - CN: 开始 C++ 控制流中的条件分支。
+- **Line 90 / 第90行**
+  - Code / 代码: `    return 0;`
+  - EN: Returns a value from the current C++ function.
+  - CN: 从当前 C++ 函数返回一个值。
+- **Line 91 / 第91行**
+  - Code / 代码: `  else`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 92 / 第92行**
+  - Code / 代码: `    return -1;`
+  - EN: Returns a value from the current C++ function.
+  - CN: 从当前 C++ 函数返回一个值。
+- **Line 93 / 第93行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 94 / 第94行**
+  - Code / 代码: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 95 / 第95行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+
+## Key Concepts / 关键概念
+
+- **EN**: Exercises CUTLASS APIs, types, or generated kernels.
+  **CN**: 测试 CUTLASS 的 API、类型或生成的内核。
+- **EN**: Focuses on Conv2d problem generation, execution, or validation.
+  **CN**: 聚焦 Conv2d 问题生成、执行或验证。
+
+## Dependencies / 依赖项
+
+- `<iostream>`
+  - EN: Provides console stream output for reporting test progress or failures.
+  - CN: 提供控制台流输出，用于报告测试进度或失败。

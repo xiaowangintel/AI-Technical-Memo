@@ -1,0 +1,443 @@
+# __init__.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/cute/__init__.py`
+
+## Purpose / 作用
+- EN: Package marker for `CuTeDSL.cutlass.cute` that exposes or initializes Callable, Any, AddressSpace, CacheEvictionPriority, Shape, Stride, ... (+173 more).
+- CN: 这是 `CuTeDSL.cutlass.cute` 的包标记文件，用于导出或初始化 Callable, Any, AddressSpace, CacheEvictionPriority, Shape, Stride, ... (+173 more)。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `from collections.abc import Callable` — **EN:** Imports Callable from `collections.abc`. **CN:** 从 `collections.abc` 导入 Callable。
+- **L13** `from typing import Any` — **EN:** Imports Any from `typing`. **CN:** 从 `typing` 导入 Any。
+- **L14** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L15** `# Use the auto-generated enum AddressSpace` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L16** `from cutlass._mlir.dialects.cute import AddressSpace, CacheEvictionPriority` — **EN:** Imports AddressSpace, CacheEvictionPriority from `cutlass._mlir.dialects.cute`. **CN:** 从 `cutlass._mlir.dialects.cute` 导入 AddressSpace, CacheEvictionPriority。
+- **L17** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L18** `# Explicitly import types that might be directly used by other modules.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L19** `# This is a fix for using Sphinx to generate documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L20** `# Because Sphinx processes each module in isolation, it won't be able to rely` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L21** `# on re-exported symbols via wildcard imports (from .typing import *) in the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# same way that Python does at runtime.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `from .typing import (` — **EN:** Imports Shape, Stride, IntTuple, Coord, Tile, XTuple, ... (+6 more) from `.typing`. **CN:** 从 `.typing` 导入 Shape, Stride, IntTuple, Coord, Tile, XTuple, ... (+6 more)。
+- **L24** `    Shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L25** `    Stride,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L26** `    IntTuple,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L27** `    Coord,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L28** `    Tile,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L29** `    XTuple,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L30** `    Tiler,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L31** `    Layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L32** `    ComposedLayout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L33** `    Pointer,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L34** `    Tensor,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L35** `    SymInt,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L36** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L37** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L38** `# Import everything else` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L39** `from .typing import *` — **EN:** Imports * from `.typing`. **CN:** 从 `.typing` 导入 *。
+- **L40** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L41** `from .core import (` — **EN:** Imports assume, is_static, size, static, get_leaves, has_underscore, ... (+79 more) from `.core`. **CN:** 从 `.core` 导入 assume, is_static, size, static, get_leaves, has_underscore, ... (+79 more)。
+- **L42** `    assume,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L43** `    is_static,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L44** `    size,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L45** `    static,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L46** `    get_leaves,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L47** `    has_underscore,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L48** `    slice_,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L49** `    make_ptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L50** `    make_layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L51** `    recast_layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L52** `    depth,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L53** `    rank,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L54** `    flatten,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L55** `    shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L56** `    size_in_bytes,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L57** `    make_identity_layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L58** `    make_ordered_layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L59** `    make_layout_like,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L60** `    make_composed_layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L61** `    make_layout_tv,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L62** `    make_swizzle,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L63** `    recast_ptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L64** `    get,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L65** `    select,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L66** `    front,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L67** `    is_major,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L68** `    leading_dim,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L69** `    coalesce,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L70** `    group_modes,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L71** `    cosize,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L72** `    dice,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L73** `    prepend,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L74** `    append,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L75** `    prepend_ones,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L76** `    append_ones,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L77** `    ceil_div,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L78** `    slice_and_offset,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L79** `    crd2idx,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L80** `    idx2crd,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L81** `    increment_coord,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L82** `    filter_zeros,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L83** `    filter,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L84** `    tile_to_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L85** `    shape_div,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L86** `    composition,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L87** `    complement,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L88** `    right_inverse,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L89** `    left_inverse,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L90** `    max_common_layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L91** `    max_common_vector,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L92** `    logical_product,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L93** `    zipped_product,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L94** `    tiled_product,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L95** `    flat_product,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L96** `    raked_product,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L97** `    blocked_product,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L98** `    flat_divide,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L99** `    logical_divide,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L100** `    zipped_divide,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L101** `    tiled_divide,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L102** `    local_partition,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L103** `    local_tile,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L104** `    printf,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L105** `    get_nonswizzle_portion,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L106** `    get_swizzle_portion,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L107** `    # Wrapper classes` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L108** `    Swizzle,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L109** `    E,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L110** `    # User defined struct` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L111** `    struct,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L112** `    union,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L113** `    pretty_str,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L114** `    make_layout_image_mask,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L115** `    repeat,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L116** `    repeat_as_tuple,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L117** `    repeat_like,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L118** `    round_up,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L119** `    is_congruent,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L120** `    is_weakly_congruent,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L121** `    ScaledBasis,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L122** `    get_divisibility,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L123** `    Ratio,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L124** `    # FastDivmod operations` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L125** `    FastDivmodDivisor,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L126** `    fast_divmod_create_divisor,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L127** `    basis_value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L128** `    basis_get,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L129** `    nullspace,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L130** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L131** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L132** `from .tuple import (` — **EN:** Imports transform_leaf, find_if, find, flatten_to_tuple, unflatten, product, ... (+8 more) from `.tuple`. **CN:** 从 `.tuple` 导入 transform_leaf, find_if, find, flatten_to_tuple, unflatten, product, ... (+8 more)。
+- **L133** `    transform_leaf,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L134** `    find_if,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L135** `    find,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L136** `    flatten_to_tuple,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L137** `    unflatten,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L138** `    product,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L139** `    product_like,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L140** `    product_each,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L141** `    elem_less,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L142** `    tuple_cat,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L143** `    transform_apply,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L144** `    filter_tuple,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L145** `    unwrap,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L146** `    wrap,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L147** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L148** `from .tensor import (` — **EN:** Imports TensorSSA, ReductionOp, make_tensor, make_identity_tensor, make_fragment, make_fragment_like, ... (+13 more) from `.tensor`. **CN:** 从 `.tensor` 导入 TensorSSA, ReductionOp, make_tensor, make_identity_tensor, make_fragment, make_fragment_like, ... (+13 more)。
+- **L149** `    TensorSSA,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L150** `    ReductionOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L151** `    make_tensor,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L152** `    make_identity_tensor,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L153** `    make_fragment,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L154** `    make_fragment_like,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L155** `    make_rmem_tensor_like,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L156** `    make_rmem_tensor,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L157** `    recast_tensor,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L158** `    domain_offset,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L159** `    print_tensor,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L160** `    full,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L161** `    full_like,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L162** `    empty_like,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L163** `    ones_like,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L164** `    zeros_like,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L165** `    where,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L166** `    any_,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L167** `    all_,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L168** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L169** `from .atom import (` — **EN:** Imports Atom, MmaAtom, CopyAtom, TiledCopy, TiledMma, ThrMma, ... (+16 more) from `.atom`. **CN:** 从 `.atom` 导入 Atom, MmaAtom, CopyAtom, TiledCopy, TiledMma, ThrMma, ... (+16 more)。
+- **L170** `    Atom,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L171** `    MmaAtom,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L172** `    CopyAtom,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L173** `    TiledCopy,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L174** `    TiledMma,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L175** `    ThrMma,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L176** `    ThrCopy,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L177** `    make_atom,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L178** `    # tiled mma/tiled copy` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L179** `    make_mma_atom,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L180** `    make_tiled_mma,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L181** `    make_copy_atom,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L182** `    make_tiled_copy_tv,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L183** `    make_tiled_copy,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L184** `    make_tiled_copy_S,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L185** `    make_tiled_copy_D,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L186** `    make_tiled_copy_A,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L187** `    make_tiled_copy_B,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L188** `    make_tiled_copy_C,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L189** `    make_tiled_copy_C_atom,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L190** `    make_cotiled_copy,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L191** `    copy_atom_call,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L192** `    mma_atom_call,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L193** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L194** `from .algorithm import gemm, copy, basic_copy, basic_copy_if, autovec_copy, prefetch` — **EN:** Imports gemm, copy, basic_copy, basic_copy_if, autovec_copy, prefetch from `.algorithm`. **CN:** 从 `.algorithm` 导入 gemm, copy, basic_copy, basic_copy_if, autovec_copy, prefetch。
+- **L195** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L196** `from . import typing as typing_module` — **EN:** Imports typing as typing_module from the current package. **CN:** 从当前包导入 typing as typing_module。
+- **L197** `from . import core` — **EN:** Imports core from the current package. **CN:** 从当前包导入 core。
+- **L198** `from . import arch` — **EN:** Imports arch from the current package. **CN:** 从当前包导入 arch。
+- **L199** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L200** `from . import export` — **EN:** Imports export from the current package. **CN:** 从当前包导入 export。
+- **L201** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L202** `from . import nvgpu` — **EN:** Imports nvgpu from the current package. **CN:** 从当前包导入 nvgpu。
+- **L203** `from . import testing` — **EN:** Imports testing from the current package. **CN:** 从当前包导入 testing。
+- **L204** `from . import runtime` — **EN:** Imports runtime from the current package. **CN:** 从当前包导入 runtime。
+- **L205** `from . import math` — **EN:** Imports math from the current package. **CN:** 从当前包导入 math。
+- **L206** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L207** `# Export all math ops without "math."` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L208** `from .math import *` — **EN:** Imports * from `.math`. **CN:** 从 `.math` 导入 *。
+- **L209** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L210** `# Used as internal symbol` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L211** `from .. import cutlass_dsl as _dsl` — **EN:** Imports cutlass_dsl as _dsl from the parent package. **CN:** 从父包导入 cutlass_dsl as _dsl。
+- **L212** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L213** `from .ffi import ffi, extern, BitCode, ConstValue, mangle` — **EN:** Imports ffi, extern, BitCode, ConstValue, mangle from `.ffi`. **CN:** 从 `.ffi` 导入 ffi, extern, BitCode, ConstValue, mangle。
+- **L214** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L215** `# Aliases` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L216** `jit: Callable[..., Any] = _dsl.CuTeDSL.jit` — **EN:** Assigns a typed value to jit. **CN:** 为 jit 赋予带类型标注的值。
+- **L217** `kernel: Callable[..., Any] = _dsl.CuTeDSL.kernel` — **EN:** Assigns a typed value to kernel. **CN:** 为 kernel 赋予带类型标注的值。
+- **L218** `register_jit_arg_adapter = _dsl.JitArgAdapterRegistry.register_jit_arg_adapter` — **EN:** Assigns a value to register_jit_arg_adapter. **CN:** 将一个值赋给 register_jit_arg_adapter。
+- **L219** `compile = _dsl.CompileCallable()` — **EN:** Assigns a value to compile. **CN:** 将一个值赋给 compile。
+- **L220** `OptLevel = _dsl.OptLevel` — **EN:** Assigns a value to OptLevel. **CN:** 将一个值赋给 OptLevel。
+- **L221** `PtxasOptions = _dsl.PtxasOptions` — **EN:** Assigns a value to PtxasOptions. **CN:** 将一个值赋给 PtxasOptions。
+- **L222** `EnableAssertions = _dsl.EnableAssertions` — **EN:** Assigns a value to EnableAssertions. **CN:** 将一个值赋给 EnableAssertions。
+- **L223** `GenerateLineInfo = _dsl.GenerateLineInfo` — **EN:** Assigns a value to GenerateLineInfo. **CN:** 将一个值赋给 GenerateLineInfo。
+- **L224** `KeepCUBIN = _dsl.KeepCUBIN` — **EN:** Assigns a value to KeepCUBIN. **CN:** 将一个值赋给 KeepCUBIN。
+- **L225** `KeepPTX = _dsl.KeepPTX` — **EN:** Assigns a value to KeepPTX. **CN:** 将一个值赋给 KeepPTX。
+- **L226** `GPUArch = _dsl.GPUArch` — **EN:** Assigns a value to GPUArch. **CN:** 将一个值赋给 GPUArch。
+- **L227** `LinkLibraries = _dsl.LinkLibraries` — **EN:** Assigns a value to LinkLibraries. **CN:** 将一个值赋给 LinkLibraries。
+- **L228** `EnableTVMFFI = _dsl.EnableTVMFFI` — **EN:** Assigns a value to EnableTVMFFI. **CN:** 将一个值赋给 EnableTVMFFI。
+- **L229** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L230** `native_struct = _dsl.native_struct` — **EN:** Assigns a value to native_struct. **CN:** 将一个值赋给 native_struct。
+- **L231** `make_native_struct = _dsl.make_native_struct  # factory for dynamic struct types` — **EN:** Assigns a value to make_native_struct. **CN:** 将一个值赋给 make_native_struct。
+- **L232** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L233** `# attach the TVM FFI ABI interface postprocessor to the DSL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L234** `from . import _tvm_ffi_args_spec_converter` — **EN:** Imports _tvm_ffi_args_spec_converter from the current package. **CN:** 从当前包导入 _tvm_ffi_args_spec_converter。
+- **L235** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L236** `_tvm_ffi_args_spec_converter.attach_args_spec_converter(_dsl.CuTeDSL._get_dsl())` — **EN:** Invokes `_tvm_ffi_args_spec_converter.attach_args_spec_converter` as a standalone call. **CN:** 以独立语句方式调用 `_tvm_ffi_args_spec_converter.attach_args_spec_converter`。
+- **L237** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L238** `# Explicitly export all symbols for documentation generation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L239** `__all__ = [` — **EN:** Assigns a value to __all__. **CN:** 将一个值赋给 __all__。
+- **L240** `    # Core types` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L241** `    *core.__all__,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L242** `    "AddressSpace",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L243** `    "CacheEvictionPriority",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L244** `    "Tensor",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L245** `    "Layout",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L246** `    "ComposedLayout",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L247** `    "Swizzle",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L248** `    "E",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L249** `    "ScaledBasis",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L250** `    "Atom",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L251** `    "MmaAtom",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L252** `    "CopyAtom",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L253** `    "TiledCopy",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L254** `    "TiledMma",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L255** `    "ThrMma",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L256** `    "ThrCopy",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L257** `    "TensorSSA",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L258** `    "ReductionOp",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L259** `    "SymInt",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L260** `    # Basic utility functions` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L261** `    "assume",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L262** `    "is_integer",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L263** `    "is_int_tuple",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L264** `    "is_static",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L265** `    "size",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L266** `    "has_underscore",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L267** `    "slice_",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L268** `    "depth",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L269** `    "rank",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L270** `    "shape",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L271** `    "printf",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L272** `    "print_tensor",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L273** `    "pretty_str",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L274** `    # Layout functions` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L275** `    "make_layout",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L276** `    "recast_layout",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L277** `    "make_identity_layout",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L278** `    "make_ordered_layout",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L279** `    "make_layout_like",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L280** `    "make_composed_layout",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L281** `    "make_layout_tv",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L282** `    "make_layout_image_mask",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L283** `    "get_nonswizzle_portion",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L284** `    "get_swizzle_portion",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L285** `    "nullspace",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L286** `    # Tensor functions` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L287** `    "make_ptr",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L288** `    "make_tensor",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L289** `    "make_identity_tensor",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L290** `    "make_fragment",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L291** `    "make_fragment_like",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L292** `    "make_rmem_tensor",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L293** `    "make_rmem_tensor_like",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L294** `    "recast_ptr",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L295** `    "recast_tensor",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L296** `    # Tensor manipulation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L297** `    "get",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L298** `    "select",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L299** `    "front",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L300** `    "is_major",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L301** `    "leading_dim",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L302** `    "find",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L303** `    "find_if",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L304** `    "transform_leaf",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L305** `    "basis_value",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L306** `    "basis_get",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L307** `    "coalesce",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L308** `    "group_modes",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L309** `    "cosize",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L310** `    "size_in_bytes",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L311** `    # Tuple operations` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L312** `    "flatten_to_tuple",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L313** `    "flatten",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L314** `    "unflatten",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L315** `    "product",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L316** `    "product_like",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L317** `    "product_each",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L318** `    "prepend",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L319** `    "append",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L320** `    "prepend_ones",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L321** `    "append_ones",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L322** `    "elem_less",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L323** `    "tuple_cat",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L324** `    "transform_apply",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L325** `    "filter_tuple",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L326** `    "unwrap",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L327** `    "wrap",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L328** `    # Math operations` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L329** `    "ceil_div",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L330** `    "round_up",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L331** `    # Layout operations` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L332** `    "slice_and_offset",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L333** `    "crd2idx",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L334** `    "increment_coord",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L335** `    "domain_offset",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L336** `    "filter_zeros",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L337** `    "filter",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L338** `    "tile_to_shape",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L339** `    "shape_div",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L340** `    "dice",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L341** `    # Layout algebra` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L342** `    "composition",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L343** `    "complement",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L344** `    "right_inverse",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L345** `    "left_inverse",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L346** `    "max_common_layout",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L347** `    "max_common_vector",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L348** `    "is_congruent",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L349** `    "is_weakly_congruent",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L350** `    # Product operations` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L351** `    "logical_product",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L352** `    "zipped_product",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L353** `    "tiled_product",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L354** `    "flat_product",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L355** `    "raked_product",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L356** `    "blocked_product",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L357** `    # Division operations` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L358** `    "flat_divide",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L359** `    "logical_divide",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L360** `    "zipped_divide",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L361** `    "tiled_divide",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L362** `    "local_partition",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L363** `    "local_tile",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L364** `    # MMA and Copy atom operations` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L365** `    "make_atom",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L366** `    "make_mma_atom",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L367** `    "make_tiled_mma",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L368** `    "make_copy_atom",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L369** `    "make_tiled_copy_tv",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L370** `    "make_tiled_copy",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L371** `    "make_tiled_copy_S",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L372** `    "make_tiled_copy_D",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L373** `    "make_tiled_copy_A",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L374** `    "make_tiled_copy_B",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L375** `    "make_tiled_copy_C",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L376** `    "make_tiled_copy_C_atom",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L377** `    "make_cotiled_copy",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L378** `    "copy_atom_call",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L379** `    "mma_atom_call",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L380** `    # Algorithm operations` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L381** `    "basic_copy",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L382** `    "basic_copy_if",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L383** `    "autovec_copy",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L384** `    "copy",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L385** `    "prefetch",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L386** `    "gemm",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L387** `    # Tensor SSA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L388** `    "full",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L389** `    "full_like",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L390** `    "empty_like",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L391** `    "ones_like",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L392** `    "zeros_like",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L393** `    "where",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L394** `    "any_",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L395** `    "all_",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L396** `    "repeat_as_tuple",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L397** `    "repeat",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L398** `    "repeat_like",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L399** `    # User defined struct` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L400** `    "struct",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L401** `    "union",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L402** `    # FastDivmod operations` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L403** `    "FastDivmodDivisor",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L404** `    "fast_divmod_create_divisor",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L405** `    # Modules` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L406** `    "arch",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L407** `    "export",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L408** `    "nvgpu",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L409** `    "testing",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L410** `    "runtime",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L411** `    # Math utils` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L412** `    *math.__all__,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L413** `    # Decorators and code generation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L414** `    "jit",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L415** `    "kernel",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L416** `    "register_jit_arg_adapter",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L417** `    "compile",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L418** `    # Foreign function interface` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L419** `    "ffi",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L420** `    "extern",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L421** `    "BitCode",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L422** `    "ConstValue",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L423** `    "mangle",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L424** `]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.cute.__init__`. CN: 模块名为 `CuTeDSL.cutlass.cute.__init__`。
+- EN: This `__init__.py` file acts as a package marker and central import surface. CN: 这个 `__init__.py` 文件既是包标记，也是集中导出入口。
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass._mlir.dialects.cute:AddressSpace,CacheEvictionPriority, .typing:Shape,Stride,IntTuple,Coord,Tile,XTuple,Tiler,Layout,ComposedLayout,Pointer,Tensor,SymInt, .typing:*, .core:assume,is_static,size,static,get_leaves,has_underscore,slice_,make_ptr,make_layout,recast_layout,depth,rank,flatten,shape,size_in_bytes,make_identity_layout,make_ordered_layout,make_layout_like,make_composed_layout,make_layout_tv,make_swizzle,recast_ptr,get,select,front,is_major,leading_dim,coalesce,group_modes,cosize,dice,prepend,append,prepend_ones,append_ones,ceil_div,slice_and_offset,crd2idx,idx2crd,increment_coord,filter_zeros,filter,tile_to_shape,shape_div,composition,complement,right_inverse,left_inverse,max_common_layout,max_common_vector,logical_product,zipped_product,tiled_product,flat_product,raked_product,blocked_product,flat_divide,logical_divide,zipped_divide,tiled_divide,local_partition,local_tile,printf,get_nonswizzle_portion,get_swizzle_portion,Swizzle,E,struct,union,pretty_str,make_layout_image_mask,repeat,repeat_as_tuple,repeat_like,round_up,is_congruent,is_weakly_congruent,ScaledBasis,get_divisibility,Ratio,FastDivmodDivisor,fast_divmod_create_divisor,basis_value,basis_get,nullspace, .tuple:transform_leaf,find_if,find,flatten_to_tuple,unflatten,product,product_like,product_each,elem_less,tuple_cat,transform_apply,filter_tuple,unwrap,wrap, .tensor:TensorSSA,ReductionOp,make_tensor,make_identity_tensor,make_fragment,make_fragment_like,make_rmem_tensor_like,make_rmem_tensor,recast_tensor,domain_offset,print_tensor,full,full_like,empty_like,ones_like,zeros_like,where,any_,all_, .atom:Atom,MmaAtom,CopyAtom,TiledCopy,TiledMma,ThrMma,ThrCopy,make_atom,make_mma_atom,make_tiled_mma,make_copy_atom,make_tiled_copy_tv,make_tiled_copy,make_tiled_copy_S,make_tiled_copy_D,make_tiled_copy_A,make_tiled_copy_B,make_tiled_copy_C,make_tiled_copy_C_atom,make_cotiled_copy,copy_atom_call,mma_atom_call, .algorithm:gemm,copy,basic_copy,basic_copy_if,autovec_copy,prefetch, .:typing, .:core, .:arch, .:export, .:nvgpu, .:testing, .:runtime, .:math, .math:*, ..:cutlass_dsl, .ffi:ffi,extern,BitCode,ConstValue,mangle, .:_tvm_ffi_args_spec_converter CN: 内部依赖：cutlass._mlir.dialects.cute:AddressSpace,CacheEvictionPriority, .typing:Shape,Stride,IntTuple,Coord,Tile,XTuple,Tiler,Layout,ComposedLayout,Pointer,Tensor,SymInt, .typing:*, .core:assume,is_static,size,static,get_leaves,has_underscore,slice_,make_ptr,make_layout,recast_layout,depth,rank,flatten,shape,size_in_bytes,make_identity_layout,make_ordered_layout,make_layout_like,make_composed_layout,make_layout_tv,make_swizzle,recast_ptr,get,select,front,is_major,leading_dim,coalesce,group_modes,cosize,dice,prepend,append,prepend_ones,append_ones,ceil_div,slice_and_offset,crd2idx,idx2crd,increment_coord,filter_zeros,filter,tile_to_shape,shape_div,composition,complement,right_inverse,left_inverse,max_common_layout,max_common_vector,logical_product,zipped_product,tiled_product,flat_product,raked_product,blocked_product,flat_divide,logical_divide,zipped_divide,tiled_divide,local_partition,local_tile,printf,get_nonswizzle_portion,get_swizzle_portion,Swizzle,E,struct,union,pretty_str,make_layout_image_mask,repeat,repeat_as_tuple,repeat_like,round_up,is_congruent,is_weakly_congruent,ScaledBasis,get_divisibility,Ratio,FastDivmodDivisor,fast_divmod_create_divisor,basis_value,basis_get,nullspace, .tuple:transform_leaf,find_if,find,flatten_to_tuple,unflatten,product,product_like,product_each,elem_less,tuple_cat,transform_apply,filter_tuple,unwrap,wrap, .tensor:TensorSSA,ReductionOp,make_tensor,make_identity_tensor,make_fragment,make_fragment_like,make_rmem_tensor_like,make_rmem_tensor,recast_tensor,domain_offset,print_tensor,full,full_like,empty_like,ones_like,zeros_like,where,any_,all_, .atom:Atom,MmaAtom,CopyAtom,TiledCopy,TiledMma,ThrMma,ThrCopy,make_atom,make_mma_atom,make_tiled_mma,make_copy_atom,make_tiled_copy_tv,make_tiled_copy,make_tiled_copy_S,make_tiled_copy_D,make_tiled_copy_A,make_tiled_copy_B,make_tiled_copy_C,make_tiled_copy_C_atom,make_cotiled_copy,copy_atom_call,mma_atom_call, .algorithm:gemm,copy,basic_copy,basic_copy_if,autovec_copy,prefetch, .:typing, .:core, .:arch, .:export, .:nvgpu, .:testing, .:runtime, .:math, .math:*, ..:cutlass_dsl, .ffi:ffi,extern,BitCode,ConstValue,mangle, .:_tvm_ffi_args_spec_converter
+- EN: External or standard-library dependencies: collections.abc:Callable, typing:Any CN: 外部或标准库依赖：collections.abc:Callable, typing:Any
